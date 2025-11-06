@@ -1,1 +1,95 @@
-.Rproj.user
+# R package build artifacts
+*.Rcheck/
+*.tar.gz
+*.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# RStudio project files
+*.Rproj
+
+# Temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Archived/deprecated code
+archived_*/
+old_*/
+deprecated_*/
+
+# Build outputs in parent directory
+../*.tar.gz
+
+# ===== CRITICAL: PRIVATE DATA PROTECTION =====
+# NEVER commit actual research data with participant information
+
+# Data files - all formats
+*.csv
+*.xlsx
+*.xls
+*.pdf
+*.PDF
+
+# Except: example/dummy data in inst/extdata (if you add it later)
+!inst/extdata/*.pdf
+!inst/extdata/*.csv
+
+# CRITICAL: Test data folders with real participant data
+tests/testdata_*/
+tests/testdata*/
+
+# Any folder named "data" or "test_data" or similar
+data/
+test_data/
+test-data/
+Data/
+TEST_DATA/
+private/
+Private/
+
+# Nextcloud sync files (if any)
+.sync-conflict-*
+*.sync-conflict-*
+
+# Results/output folders
+results/
+Results/
+output/
+Output/
+
+# Documentation builds
+docs/*.html
+man/*.html
+
+# VS Code / other editors
+.vscode/
+.idea/
+
+# Mac files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python (if you use any python tools)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ===== SAFE TO COMMIT =====
+# The following are explicitly allowed and safe:
+# - All R code (R/*.R)
+# - All Shiny code (inst/shiny/**/*.R)
+# - All tests (tests/testthat/*.R)
+# - Documentation (docs/*.md, man/*.Rd)
+# - Package metadata (DESCRIPTION, NAMESPACE, LICENSE)
+# - README and other .md files
+# - Scripts (.sh, but no data in them)
