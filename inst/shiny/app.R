@@ -14,6 +14,7 @@ mod_path <- file.path(system.file("shiny/modules", package = "musicAnalysis"))
 source(file.path(mod_path, "mod_home.R"), local = TRUE)
 source(file.path(mod_path, "mod_klawa.R"), local = TRUE)
 source(file.path(mod_path, "mod_mexp.R"), local = TRUE)
+source(file.path(mod_path, "mod_aat.R"), local = TRUE)
 source(file.path(mod_path, "mod_merge.R"), local = TRUE)
 
 ui <- navbarPage(
@@ -23,6 +24,7 @@ ui <- navbarPage(
   tabPanel("Home", value = "home", mod_home_ui("home")),
   tabPanel("KLAWA", value = "klawa", mod_klawa_ui("klawa")),
   tabPanel("Musical Experience", value = "mexp", mod_mexp_ui("mexp")),
+  tabPanel("AAT", value = "aat", mod_aat_ui("aat")),
   tabPanel("Merge", value = "merge", mod_merge_ui("merge"))
 )
 
@@ -30,6 +32,7 @@ server <- function(input, output, session) {
   mod_home_server("home", parent_session = session)
   mod_klawa_server("klawa")
   mod_mexp_server("mexp")
+  mod_aat_server("aat")
   mod_merge_server("merge")
 }
 

@@ -1,0 +1,44 @@
+# AAT — Analysis Guide (Auditory Ambiguity Test)
+
+## Zweck
+Der AAT quantifiziert (a) die Tendenz zu grundtonbezogenen Antworten in **ambigen** Reizen und (b) die **Kontrollgenauigkeit** bei eindeutigem Material. :contentReference[oaicite:10]{index=10}
+
+---
+
+## Primäre Outcomes
+1. **Ambiguous (%)** = **Prozentanteil grundtonbezogener Antworten** (*f0*) bei den ambigen Items; **auf eine Nachkommastelle runden**. :contentReference[oaicite:11]{index=11}  
+2. **Control (%)** = **Prozent korrekt gehörter Kontrolltöne**. :contentReference[oaicite:12]{index=12}
+
+---
+
+## Datenbasis & relevante Variablen
+- **Export** je Proband: *Save Item List containing response data* → CSV/ITL.  
+  Spalte **„Pitch Classification“** mit Kodierung:  
+  **0 = spektral/obertönig**, **1 = grundtönig**, **(2 = ambivalent)**, **(–1 = weiß nicht)**.  
+  **Dateibenennung (Beispiel)**: `AAT_response_<Code>_<Datum>.itl.csv`. 
+
+---
+
+## Auswertelogik (Items & Zählregeln)
+- **Ambiguous (%)**: Anteil der **f0-Antworten (Code 1)** bei den **ambigen** Items.  
+  *Praxisempfehlung*: Nur **auswertbare** Antworten (Codes **0/1**) in den Nenner aufnehmen; **ambivalent (2)** und **weiß nicht (–1)** **nicht** mitzählen und stattdessen **separat berichten** (die Anleitung nennt die Codes, definiert jedoch keine explizite Nennerregel). :contentReference[oaicite:14]{index=14}
+- **Control (%)**: **Prozent korrekt** bei **Kontrolltönen** (gemäß Stimulus-Kennzeichnung des Paradigmas). Falls die Kontroll-Flag in der Exportdatei nicht vorliegt, verwenden Sie den vom Programm ausgewiesenen **Control-Wert** bzw. die bekannte Stimulusliste der Kontrollitems. :contentReference[oaicite:15]{index=15}
+
+---
+
+## Probanden-Outputs
+1. **Ambiguous (%)** — gerundet auf **eine Nachkommastelle**. :contentReference[oaicite:16]{index=16}  
+2. **Control (%)**. :contentReference[oaicite:17]{index=17}  
+3. **Qualitätskennzahlen**: Anzahl **ambivalent (2)** und **weiß nicht (–1)**; Gesamtzahl ausgewerteter Trials.
+
+---
+
+## Gruppen-Outputs
+- **Mittelwerte** (und Konfidenzintervalle) für **Ambiguous (%)** und **Control (%)**.  
+- (Optional) **Verteilungsübersichten** (Histogramm/Perzentile) zur Streuungskontrolle.
+
+---
+
+## Reporting-Vorlage
+- **AAT Ambiguous (M ± CI)**: *XX.X% (LL–UL)*; **Control**: *YY.Y% (LL–UL)*.  
+- **Umgang mit Sondercodes**: *Ambivalent (2)* und *weiß nicht (–1)* wurden nicht in die Prozentberechnung einbezogen und **separat berichtet** (Empfehlung; Anleitung listet die Codes und nennt Ambiguous/Control als Hauptwerte). :contentReference[oaicite:18]{index=18}

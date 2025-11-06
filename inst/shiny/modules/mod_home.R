@@ -65,20 +65,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9023 (2025-11-06)"),
+        h4("✨ What's New in v0.0.0.9024 (2025-11-06)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "Category_sum plot labels now show proper format: 'CODE - total Category' (e.g., '0102SICH - total Instruments')"
+            tags$strong("NEW: "),
+            "AAT (Auditory Ambiguity Test) module implemented! Extracts ambiguous % and control % from CSV response files"
           ),
           tags$li(
-            tags$strong("FIXED: "),
-            "Category_sum plots: each participant now gets a unique color (was all same color per category)"
+            tags$strong("ADDED: "),
+            "Complete AAT analysis workflow: folder scanning, participant code extraction, quality metrics (31 tests passing)"
+          ),
+          tags$li(
+            tags$strong("ADDED: "),
+            "AAT Shiny interface with folder structure analysis, editable tables, quality issue detection, and CSV export"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Category_sum plotting behavior restored to v0.0.0.9018/9019 quality with better labels"
+            "GitHub repository secured - private test data removed, comprehensive .gitignore protection in place"
           )
         )
       ),
@@ -93,6 +97,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9023
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9023 (2025-11-06)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Category_sum plot labels now show proper format (CODE - total Category)"),
+                tags$li(tags$strong("FIXED:"), " Each participant gets unique color in category_sum plots"),
+                tags$li(tags$strong("IMPROVED:"), " Plotting quality restored to v0.0.0.9018/9019 standards")
+              )
+            ),
 
             # v0.0.0.9022
             tags$div(

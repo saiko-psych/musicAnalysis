@@ -7,9 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **musicAnalysis** is an R package for music psychology research data preparation at the University of Graz. It focuses on automated data extraction and preparation from four primary sources:
 
 1. **KLAWA PDFs** - Voice/singing performance metrics
-2. **PPPT data** - (To be implemented)
-3. **AAT data** - (To be implemented)
-4. **Musical Experience** - Practice history and instrument proficiency questionnaires
+2. **Musical Experience** - Practice history and instrument proficiency questionnaires
+3. **AAT CSV** - Auditory Ambiguity Test (ambiguous % and control % metrics)
+4. **PPPT data** - (To be implemented)
 
 **Note**: LimeSurvey processing and scale analysis (MDBF, etc.) should NOT be part of this package. Those will be moved to a separate limesurvey-focused package.
 
@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Standard R package layout:
 - **R/** - Core package functions (focus on KLAWA, musical experience, PPPT, AAT)
 - **inst/shiny/** - Shiny web application for GUI-based data processing
-- **tests/testthat/** - Unit tests (108 tests covering core functions)
+- **tests/testthat/** - Unit tests (139 tests covering core functions: 60 KLAWA, 31 AAT, 20 merge, 28 utils)
 - **docs/** - Development documentation and guidelines
   - **CLAUDE.md** - This file: AI assistant guidelines, development priorities, version history
   - **GITHUB_WORKFLOW.md** - Complete guide to GitHub CLI project management
@@ -337,17 +337,76 @@ plot_practice_curves(
 # Or use Shiny app: launch_app() -> Musical Experience tab
 ```
 
-### 3. PPPT Data
+### 3. AAT (Auditory Ambiguity Test) (R/aat.R)
+
+**Purpose**: Extract AAT metrics from CSV response files (*.itl.csv or *.csv).
+
+**Expected file format**:
+```
+AAT_response_<CODE>_<DATE>.itl.csv
+```
+
+**Key functions**:
+- `aat_scan(root)` - Main entry point, recursively scans folder for CSV files
+- `aat_parse_one(file_path, ...)` - Parses single AAT CSV file
+- `aat_analyze_structure(root)` - Analyzes folder organization
+
+**Participant code format**: Uses same `extract_and_check_code()` as KLAWA - 4 digits + 4 letters
+
+**Required CSV column**: `Pitch Classification` with codes:
+- 0 = spectral/overtone response
+- 1 = fundamental (f0) response
+- 2 = ambivalent
+- 3 = don't know (-1)
+
+**Optional columns**:
+- `Item Type` or `Trial Type`: Marks items as "ambiguous" or "control"
+- `Correct Answer`: Required for calculating control percentage
+
+**Calculated metrics**:
+- **Ambiguous (%)**: Percentage of f0-responses (code 1) in ambiguous items (rounded to 1 decimal)
+- **Control (%)**: Percentage correct in control items (rounded to 1 decimal)
+- **Quality metrics**: Counts of ambivalent (2) and "don't know" (-1) responses
+
+**Calculation logic** (per AAT manual):
+- Only codes 0 and 1 are included in percentage calculations (evaluable responses)
+- Codes 2 and -1 are excluded from denominators but counted separately
+- Formula: `(count of 1's) / (count of 0's and 1's) * 100`
+
+**Output tibble columns**:
+- `code`: Participant code
+- `ambiguous_pct`: Ambiguous percentage
+- `control_pct`: Control percentage
+- `n_ambivalent`: Count of ambivalent responses (2)
+- `n_dont_know`: Count of "don't know" responses (-1)
+- `n_evaluable`: Number of evaluable trials (0 or 1)
+- `n_total`: Total trials
+- `file`: Relative path to source CSV
+
+**Configuration**: Uses same code pattern as KLAWA, configurable via parameters
+
+**Usage example**:
+```r
+# Scan all AAT files in folder
+aat_data <- aat_scan("data/AAT")
+
+# Filter for high quality
+aat_clean <- aat_data %>%
+  filter(n_ambivalent < 5, n_dont_know < 3)
+
+# Summary statistics
+aat_data %>%
+  summarise(
+    mean_ambiguous = mean(ambiguous_pct, na.rm = TRUE),
+    mean_control = mean(control_pct, na.rm = TRUE)
+  )
+```
+
+### 4. PPPT Data
 
 **Status**: To be implemented
 **Expected location**: R/pppt.R (or similar)
 **Function naming**: Follow pattern `pppt_scan()`, `pppt_parse_*()`
-
-### 4. AAT Data
-
-**Status**: To be implemented
-**Expected location**: R/aat.R (or similar)
-**Function naming**: Follow pattern `aat_scan()`, `aat_parse_*()`
 
 ## Configuration System (R/options.R)
 
@@ -658,8 +717,36 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Motivation for playing (intrinsic vs extrinsic)
 
 11. ⬜ PPPT data parser
-12. ⬜ AAT data parser
-13. ⬜ Further validation improvements based on user feedback
+12. ⬜ Further validation improvements based on user feedback
+13. ⬜ Automatic folder structure maker/file sorting for different analyses
+
+### Recently Completed (v0.0.0.9024 - 2025-11-06)
+1. ✅ **NEW: AAT (Auditory Ambiguity Test) Module Implemented**
+   - Created R/aat.R with full CSV parsing functionality (R/aat.R)
+   - Extracts ambiguous % (f0-responses in ambiguous items) and control % (correct responses in control items)
+   - Quality metrics: counts ambivalent (2) and "don't know" (-1) responses
+   - Reuses `extract_and_check_code()` for participant code extraction (same pattern as KLAWA)
+   - 31 comprehensive tests in tests/testthat/test-aat.R (all passing)
+
+2. ✅ **AAT Shiny Module Created**
+   - Full-featured UI in inst/shiny/modules/mod_aat.R
+   - Folder structure analysis before scanning
+   - Editable data tables (double-click to edit cells)
+   - Quality issue detection and reporting (high ambivalent/don't-know counts)
+   - CSV export with all modifications
+   - Summary statistics display (mean ambiguous %, mean control %)
+   - Integrated into main app with new "AAT" tab
+
+3. ✅ **GitHub Security Improvements**
+   - Removed private test data from git tracking (tests/testdata_musical_experience/)
+   - Comprehensive .gitignore update to block all CSV/PDF/Excel files
+   - Security commit successfully pushed to GitHub
+   - Repository verified: no participant data visible
+
+4. ✅ **GitHub Issue Management**
+   - Created 13 GitHub issues from CLAUDE.md future tasks using create_github_issues.sh
+   - All issues properly labeled (enhancement, bug, documentation, priority levels)
+   - Issue #13 created: Automatic folder structure maker/file sorting
 
 ### Recently Completed (GitHub Setup - 2025-11-06)
 1. ✅ **Set up GitHub CLI project management**

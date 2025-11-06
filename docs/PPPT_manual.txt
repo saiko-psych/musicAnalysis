@@ -1,0 +1,56 @@
+# PPPT — Analysis Guide (Pitch Perception Preference Test)
+
+## Zweck
+Der PPPT erfasst Präferenzen für **Oberton- (spektral)** vs. **Grundtonhören (f0)** anhand von Tonpaaren. Die Auswertung liefert einen dimensionslosen Index von –1 bis +1. :contentReference[oaicite:0]{index=0}
+
+---
+
+## Primäres Outcome: PPPT-Index
+**Formel:**  
+\[
+\text{PPPT}=\frac{\#\text{Spectral}-\#\text{f0}}{\#\text{Spectral}+\#\text{f0}}
+\]
+
+- **Spectral** = Obertonerkennung; **f0** = Grundtonerkennung.  
+- **Ausschließen**: *inkonsistent/ambivalent* und *octavated* (oktaviert gehörte Beispiele zählen in diesem Test **nicht** zur Grundtonerkennung). Der Index wird ausschließlich aus **#Spectral** und **#f0** berechnet.  
+- **Interpretation**: –1 = komplett grundtonhörend, +1 = komplett obertonhörend, 0 = balanciert. :contentReference[oaicite:1]{index=1}
+
+---
+
+## Datenbasis & relevante Variablen
+- **Export** je Proband: *Save Item List containing response data* → CSV/ITL mit Einzelantworten. In der Spalte **„Pitch Classification“**:  
+  **0 = spektral/obertönig**, **1 = grundtönig**. (Weitere Spalten/Infos siehe unter „Zusammenfassung“.) 
+- **Zusammenfassung im Programm** (Feedbackfenster):  
+  - **UCF** (upper cutoff frequency, Hz): **6 Frequenzbänder** von **294 Hz** bis **5274 Hz**  
+  - **N**: Anzahl gespielter Obertöne (**2** oder **3**)  
+  - **# Stimulus Pairs**: **5 pro Frequenzband**  
+  - **# Inconsistent**, **# Octavated**, **# Spectral**, **# f0**  
+  - **PPPT-Index** (Formel s. oben)  
+  Diese Angaben dienen der Band-Auswertung und Qualitätssicherung. :contentReference[oaicite:3]{index=3}
+- **Dateibenennung (Beispiel)**: `PPPT_response_<Code>_<Datum>.itl.csv`. :contentReference[oaicite:4]{index=4}
+
+---
+
+## Einschluss-/Ausschlussregeln (Trial-Ebene)
+- **Einschließen**: Trials mit **Pitch Classification = 0 (spectral)** oder **1 (f0)**.  
+- **Ausschließen**: **Inconsistent/Ambivalent** sowie **Octavated** (werden **nicht** in Zähler/Nenner aufgenommen). :contentReference[oaicite:5]{index=5}
+
+---
+
+## Probanden-Outputs
+1. **PPPT-Index (gesamt)** über alle eingeschlossenen Trials. :contentReference[oaicite:6]{index=6}  
+2. **(Optional) Band-Weise Indizes**: je **UCF-Band** (294–5274 Hz) den PPPT-Index berechnen.  
+3. **Qualitätskennzahlen**: **# Inconsistent**, **# Octavated**, **# Trials pro Band** (Stichprobenumfang). :contentReference[oaicite:7]{index=7}
+
+---
+
+## Gruppen-Outputs
+- **Mittelwert** (und Konfidenzintervall) des **PPPT-Index** über Proband:innen.  
+- **(Optional) Frequenzprofil**: mittlere PPPT-Werte pro **UCF-Band** (Verlauf spektral↔f0 über die Frequenz). :contentReference[oaicite:8]{index=8}
+
+---
+
+## Reporting-Vorlage
+- **PPPT (M ± CI)**: *X.XX (LL–UL), n = …*  
+- **Band-weise PPPT (UCF in Hz)**: *294: x.xx; …; 5274: x.xx*.  
+- **Ausschluss**: *Inconsistent* und *Octavated* wurden **nicht** in den Index einbezogen; zur **Qualitätssicherung** werden ihre Häufigkeiten berichtet. :contentReference[oaicite:9]{index=9}
