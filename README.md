@@ -12,8 +12,8 @@ An R package for automated data extraction and preparation from music psychology
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
+- [Overview](##Overview)
+- [Features](##Features)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Data Sources](#data-sources)
