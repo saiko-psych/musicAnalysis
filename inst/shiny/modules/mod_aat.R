@@ -102,7 +102,7 @@ mod_aat_ui <- function(id) {
         br(),
         fluidRow(
           column(
-            width = 6,
+            width = 4,
             textInput(
               ns("code_pattern"),
               "Participant Code Pattern (regex):",
@@ -112,7 +112,24 @@ mod_aat_ui <- function(id) {
             tags$small(class = "text-muted", "Default: 4 digits + 4 letters (includes Ä,Ö,Ü,ß)")
           ),
           column(
-            width = 6,
+            width = 4,
+            selectInput(
+              ns("date_format"),
+              "Date Format in Filenames:",
+              choices = c(
+                "DD/MM/YY (e.g., 13/03/25)" = "DDMMYY",
+                "DD/MM/YYYY (e.g., 13/03/2025)" = "DDMMYYYY",
+                "YY/MM/DD (e.g., 25/03/13)" = "YYMMDD",
+                "YYYY/MM/DD (e.g., 2025/03/13)" = "YYYYMMDD",
+                "MM/DD/YY (e.g., 03/13/25)" = "MMDDYY",
+                "MM/DD/YYYY (e.g., 03/13/2025)" = "MMDDYYYY"
+              ),
+              selected = "DDMMYY"
+            ),
+            tags$small(class = "text-muted", "Date format used in AAT filenames")
+          ),
+          column(
+            width = 4,
             checkboxInput(
               ns("show_quality_only"),
               "Show only participants with quality issues",
@@ -284,10 +301,16 @@ mod_aat_server <- function(id) {
             code_pattern <- "(\\d{4}[A-Za-z]{4})"
           }
 
+          date_format <- input$date_format
+          if (is.null(date_format) || date_format == "") {
+            date_format <- "DDMMYY"
+          }
+
           # Scan files
           rv$aat_data <- aat_scan(
             root = rv$root_path,
-            code_pattern = code_pattern
+            code_pattern = code_pattern,
+            date_format = date_format
           )
 
           # Initialize edited data

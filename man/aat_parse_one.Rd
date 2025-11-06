@@ -8,6 +8,7 @@ aat_parse_one(
   file_path,
   rel_path,
   code_pattern,
+  date_format,
   ambiguous_items,
   control_items
 )
@@ -19,14 +20,17 @@ aat_parse_one(
 
 \item{code_pattern}{Regex for participant code}
 
-\item{ambiguous_items}{Numeric vector of ambiguous item indices}
+\item{date_format}{Date format in filename}
 
-\item{control_items}{Numeric vector of control item indices}
+\item{ambiguous_items}{Numeric vector of ambiguous item indices (for .itl files)}
+
+\item{control_items}{Numeric vector of control item indices (for .itl files)}
 }
 \value{
 Single-row tibble with AAT metrics
 }
 \description{
 Internal function to extract AAT metrics from one CSV file.
+Handles both .itl.csv (raw responses) and .rsl.csv (computed results) files.
 }
 \keyword{internal}

@@ -1,27 +1,35 @@
 #' Scan AAT (Auditory Ambiguity Test) CSV files
 #'
-#' Recursively scans a directory for AAT response CSV files (*.itl.csv or *.csv),
-#' extracts participant codes, and calculates AAT metrics:
+#' Recursively scans a directory for AAT files (filenames must contain "AAT").
+#' Supports two file types:
+#' - .itl.csv files: Raw responses (Pitch Classification column)
+#' - .rsl.csv files: Computed results (already has ambiguous %, control %)
+#'
+#' Extracts participant codes and dates from filenames, then calculates or reads AAT metrics:
 #' - Ambiguous (%): Percentage of f0-responses (code 1) in ambiguous items
 #' - Control (%): Percentage correct in control items
-#' - Quality metrics: counts of ambivalent (2) and "don't know" (-1) responses
+#' - Quality metrics: counts of ambivalent (2) and "don't know" (-1) responses (for .itl only)
 #'
-#' @param root Directory containing AAT CSV files (will scan recursively).
+#' @param root Directory containing AAT files (will scan recursively).
 #' @param code_pattern Regex pattern for extracting participant codes from filenames.
 #'   Default: `"(\\d{4}[A-Za-z]{4})"` (4 digits + 4 letters).
-#' @param ambiguous_items Optional numeric vector of item indices that are ambiguous.
+#' @param date_format Date format in filenames. One of: "DDMMYY", "DDMMYYYY", "YYMMDD",
+#'   "YYYYMMDD", "MMDDYY", "MMDDYYYY". Default: "DDMMYY".
+#' @param ambiguous_items Optional numeric vector of item indices that are ambiguous (for .itl files).
 #'   If NULL, will attempt to detect from data or assume all non-control items.
-#' @param control_items Optional numeric vector of item indices that are control items.
+#' @param control_items Optional numeric vector of item indices that are control items (for .itl files).
 #'   If NULL, will attempt to detect from data.
 #'
 #' @return A tibble with columns:
 #'   - `code`: Participant code (from filename)
+#'   - `date`: Date from filename (formatted as DD/MM/YYYY)
+#'   - `file_type`: "itl" or "rsl"
 #'   - `ambiguous_pct`: Percentage of f0-responses (1) in ambiguous items (rounded to 1 decimal)
 #'   - `control_pct`: Percentage correct in control items (rounded to 1 decimal)
-#'   - `n_ambivalent`: Count of ambivalent responses (code 2)
-#'   - `n_dont_know`: Count of "don't know" responses (code -1)
-#'   - `n_evaluable`: Number of evaluable trials (codes 0 or 1)
-#'   - `n_total`: Total number of trials
+#'   - `n_ambivalent`: Count of ambivalent responses (code 2) - NA for .rsl files
+#'   - `n_dont_know`: Count of "don't know" responses (code -1) - NA for .rsl files
+#'   - `n_evaluable`: Number of evaluable trials (codes 0 or 1) - NA for .rsl files
+#'   - `n_total`: Total number of trials - NA for .rsl files
 #'   - `file`: Relative path to source CSV file
 #'
 #' @details
@@ -54,6 +62,7 @@
 #' @export
 aat_scan <- function(root,
                      code_pattern = "(\\d{4}[A-Za-z]{4})",
+                     date_format = "DDMMYY",
                      ambiguous_items = NULL,
                      control_items = NULL) {
 
@@ -62,13 +71,18 @@ aat_scan <- function(root,
     rlang::abort(paste0("Directory not found: ", root))
   }
 
-  # Find all CSV files recursively
-  csv_files <- fs::dir_ls(root, recurse = TRUE, regexp = "\\.(csv|itl\\.csv)$", type = "file")
+  # Find all CSV files recursively that contain "AAT" in filename
+  all_csv_files <- fs::dir_ls(root, recurse = TRUE, regexp = "\\.csv$", type = "file")
+
+  # Filter for files containing "AAT" in the filename
+  csv_files <- all_csv_files[stringr::str_detect(basename(all_csv_files), "AAT")]
 
   if (length(csv_files) == 0) {
-    cli::cli_warn("No CSV files found in {root}")
+    cli::cli_warn("No AAT CSV files found in {root} (filenames must contain 'AAT')")
     return(tibble::tibble(
       code = character(),
+      date = character(),
+      file_type = character(),
       ambiguous_pct = numeric(),
       control_pct = numeric(),
       n_ambivalent = integer(),
@@ -87,11 +101,13 @@ aat_scan <- function(root,
     rel_path <- fs::path_rel(f, root)
     tryCatch(cli::cli_progress_update(id = progress_id), error = function(e) NULL)
     tryCatch({
-      aat_parse_one(f, rel_path, code_pattern, ambiguous_items, control_items)
+      aat_parse_one(f, rel_path, code_pattern, date_format, ambiguous_items, control_items)
     }, error = function(e) {
       cli::cli_warn("Failed to parse {rel_path}: {e$message}")
       tibble::tibble(
         code = NA_character_,
+        date = NA_character_,
+        file_type = NA_character_,
         ambiguous_pct = NA_real_,
         control_pct = NA_real_,
         n_ambivalent = NA_integer_,
@@ -112,19 +128,108 @@ aat_scan <- function(root,
 #' Parse a single AAT CSV file
 #'
 #' Internal function to extract AAT metrics from one CSV file.
+#' Handles both .itl.csv (raw responses) and .rsl.csv (computed results) files.
 #'
 #' @param file_path Full path to CSV file
 #' @param rel_path Relative path for output
 #' @param code_pattern Regex for participant code
-#' @param ambiguous_items Numeric vector of ambiguous item indices
-#' @param control_items Numeric vector of control item indices
+#' @param date_format Date format in filename
+#' @param ambiguous_items Numeric vector of ambiguous item indices (for .itl files)
+#' @param control_items Numeric vector of control item indices (for .itl files)
 #'
 #' @return Single-row tibble with AAT metrics
 #' @keywords internal
-aat_parse_one <- function(file_path, rel_path, code_pattern, ambiguous_items, control_items) {
+aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambiguous_items, control_items) {
+
+  filename <- basename(file_path)
 
   # Extract participant code from filename
-  code <- extract_and_check_code(basename(file_path), code_pattern)
+  code <- extract_and_check_code(filename, code_pattern)
+
+  # Extract date from filename (reuse KLAWA's date extraction logic)
+  date <- .extract_date_from_filename(filename, date_format)
+
+  # Determine file type: .itl.csv or .rsl.csv
+  if (stringr::str_detect(filename, "\\.itl\\.csv$")) {
+    file_type <- "itl"
+  } else if (stringr::str_detect(filename, "\\.rsl\\.csv$")) {
+    file_type <- "rsl"
+  } else {
+    # Default: treat as itl if not specified
+    file_type <- "unknown"
+  }
+
+  # Parse based on file type
+  if (file_type == "rsl") {
+    return(.aat_parse_rsl(file_path, rel_path, code, date))
+  } else {
+    return(.aat_parse_itl(file_path, rel_path, code, date, ambiguous_items, control_items))
+  }
+}
+
+
+#' Parse .rsl.csv file (computed results)
+#'
+#' @keywords internal
+.aat_parse_rsl <- function(file_path, rel_path, code, date) {
+  # Read CSV file
+  data <- readr::read_csv(file_path, show_col_types = FALSE)
+
+  # Look for columns with ambiguous and control percentages
+  # Common column names in .rsl files
+  ambiguous_col <- NULL
+  control_col <- NULL
+
+  # Try different possible column names
+  possible_ambiguous <- c("Ambiguous", "ambiguous", "Ambiguous %", "ambiguous_pct", "F0_percent")
+  possible_control <- c("Control", "control", "Control %", "control_pct", "Accuracy")
+
+  for (col in possible_ambiguous) {
+    if (col %in% names(data)) {
+      ambiguous_col <- col
+      break
+    }
+  }
+
+  for (col in possible_control) {
+    if (col %in% names(data)) {
+      control_col <- col
+      break
+    }
+  }
+
+  # Extract values
+  if (!is.null(ambiguous_col) && nrow(data) > 0) {
+    ambiguous_pct <- as.numeric(data[[ambiguous_col]][1])
+  } else {
+    ambiguous_pct <- NA_real_
+  }
+
+  if (!is.null(control_col) && nrow(data) > 0) {
+    control_pct <- as.numeric(data[[control_col]][1])
+  } else {
+    control_pct <- NA_real_
+  }
+
+  tibble::tibble(
+    code = code,
+    date = date,
+    file_type = "rsl",
+    ambiguous_pct = ambiguous_pct,
+    control_pct = control_pct,
+    n_ambivalent = NA_integer_,
+    n_dont_know = NA_integer_,
+    n_evaluable = NA_integer_,
+    n_total = NA_integer_,
+    file = rel_path
+  )
+}
+
+
+#' Parse .itl.csv file (raw responses)
+#'
+#' @keywords internal
+.aat_parse_itl <- function(file_path, rel_path, code, date, ambiguous_items, control_items) {
 
   # Read CSV file
   data <- readr::read_csv(file_path, show_col_types = FALSE)
@@ -215,6 +320,8 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, ambiguous_items, co
 
   tibble::tibble(
     code = code,
+    date = date,
+    file_type = "itl",
     ambiguous_pct = ambiguous_pct,
     control_pct = control_pct,
     n_ambivalent = n_ambivalent,

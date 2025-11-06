@@ -7,45 +7,57 @@
 aat_scan(
   root,
   code_pattern = "(\\\\d{4}[A-Za-z]{4})",
+  date_format = "DDMMYY",
   ambiguous_items = NULL,
   control_items = NULL
 )
 }
 \arguments{
-\item{root}{Directory containing AAT CSV files (will scan recursively).}
+\item{root}{Directory containing AAT files (will scan recursively).}
 
 \item{code_pattern}{Regex pattern for extracting participant codes from filenames.
 Default: \code{"(\\\\d{4}[A-Za-z]{4})"} (4 digits + 4 letters).}
 
-\item{ambiguous_items}{Optional numeric vector of item indices that are ambiguous.
+\item{date_format}{Date format in filenames. One of: "DDMMYY", "DDMMYYYY", "YYMMDD",
+"YYYYMMDD", "MMDDYY", "MMDDYYYY". Default: "DDMMYY".}
+
+\item{ambiguous_items}{Optional numeric vector of item indices that are ambiguous (for .itl files).
 If NULL, will attempt to detect from data or assume all non-control items.}
 
-\item{control_items}{Optional numeric vector of item indices that are control items.
+\item{control_items}{Optional numeric vector of item indices that are control items (for .itl files).
 If NULL, will attempt to detect from data.}
 }
 \value{
 A tibble with columns:
 \itemize{
 \item \code{code}: Participant code (from filename)
+\item \code{date}: Date from filename (formatted as DD/MM/YYYY)
+\item \code{file_type}: "itl" or "rsl"
 \item \code{ambiguous_pct}: Percentage of f0-responses (1) in ambiguous items (rounded to 1 decimal)
 \item \code{control_pct}: Percentage correct in control items (rounded to 1 decimal)
-\item \code{n_ambivalent}: Count of ambivalent responses (code 2)
-\item \code{n_dont_know}: Count of "don't know" responses (code -1)
-\item \code{n_evaluable}: Number of evaluable trials (codes 0 or 1)
-\item \code{n_total}: Total number of trials
+\item \code{n_ambivalent}: Count of ambivalent responses (code 2) - NA for .rsl files
+\item \code{n_dont_know}: Count of "don't know" responses (code -1) - NA for .rsl files
+\item \code{n_evaluable}: Number of evaluable trials (codes 0 or 1) - NA for .rsl files
+\item \code{n_total}: Total number of trials - NA for .rsl files
 \item \code{file}: Relative path to source CSV file
 }
 }
 \description{
-Recursively scans a directory for AAT response CSV files (*.itl.csv or *.csv),
-extracts participant codes, and calculates AAT metrics:
+Recursively scans a directory for AAT files (filenames must contain "AAT").
+Supports two file types:
 \itemize{
-\item Ambiguous (\%): Percentage of f0-responses (code 1) in ambiguous items
-\item Control (\%): Percentage correct in control items
-\item Quality metrics: counts of ambivalent (2) and "don't know" (-1) responses
+\item .itl.csv files: Raw responses (Pitch Classification column)
+\item .rsl.csv files: Computed results (already has ambiguous \%, control \%)
 }
 }
 \details{
+Extracts participant codes and dates from filenames, then calculates or reads AAT metrics:
+\itemize{
+\item Ambiguous (\%): Percentage of f0-responses (code 1) in ambiguous items
+\item Control (\%): Percentage correct in control items
+\item Quality metrics: counts of ambivalent (2) and "don't know" (-1) responses (for .itl only)
+}
+
 \strong{File format expected}:
 \itemize{
 \item CSV files with column "Pitch Classification" containing:
