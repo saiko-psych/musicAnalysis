@@ -175,39 +175,46 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   # Read CSV file
   data <- readr::read_csv(file_path, show_col_types = FALSE)
 
-  # Look for columns with ambiguous and control percentages
-  # Common column names in .rsl files
-  ambiguous_col <- NULL
-  control_col <- NULL
+  # .rsl files come in two formats:
+  #
+  # Format 1 (Summary format):
+  #   Type of Pair, # Tone Pairs, Avg. # Items/Pair, AAT Score [%]
+  #   Ambiguous,    50,           2,                 79
+  #   Control,      5,            2,                 100
+  #
+  # Format 2 (Item-level format):
+  #   Index, Reference F0 [Hz], F0 Difference [%], ..., # F0, % F0, # Ambi., % Ambi., ...
+  #   Each row is one tone pair with statistics
+  #
+  # We need to detect which format and parse accordingly
 
-  # Try different possible column names
-  possible_ambiguous <- c("Ambiguous", "ambiguous", "Ambiguous %", "ambiguous_pct", "F0_percent")
-  possible_control <- c("Control", "control", "Control %", "control_pct", "Accuracy")
+  ambiguous_pct <- NA_real_
+  control_pct <- NA_real_
 
-  for (col in possible_ambiguous) {
-    if (col %in% names(data)) {
-      ambiguous_col <- col
-      break
+  # Check for Format 1 (summary format)
+  if ("Type of Pair" %in% names(data) && "AAT Score [%]" %in% names(data)) {
+    # Find row where Type of Pair is "Ambiguous"
+    ambig_row <- which(stringr::str_detect(data$`Type of Pair`, "(?i)ambiguous"))
+    if (length(ambig_row) > 0) {
+      ambiguous_pct <- as.numeric(data$`AAT Score [%]`[ambig_row[1]])
+    }
+
+    # Find row where Type of Pair is "Control"
+    control_row <- which(stringr::str_detect(data$`Type of Pair`, "(?i)control"))
+    if (length(control_row) > 0) {
+      control_pct <- as.numeric(data$`AAT Score [%]`[control_row[1]])
     }
   }
-
-  for (col in possible_control) {
-    if (col %in% names(data)) {
-      control_col <- col
-      break
-    }
-  }
-
-  # Extract values
-  if (!is.null(ambiguous_col) && nrow(data) > 0) {
-    ambiguous_pct <- as.numeric(data[[ambiguous_col]][1])
-  } else {
+  # Check for Format 2 (item-level format)
+  else if ("% F0" %in% names(data)) {
+    # This format has per-item statistics
+    # We need to aggregate across all items
+    # NOTE: Without item type markers, we can't separate ambiguous from control
+    # So we'll compute an overall % F0 tendency
+    #
+    # For now, return NA for both since we can't distinguish item types
+    # Users should use Format 1 (.rsl summary files) for accurate ambiguous/control %
     ambiguous_pct <- NA_real_
-  }
-
-  if (!is.null(control_col) && nrow(data) > 0) {
-    control_pct <- as.numeric(data[[control_col]][1])
-  } else {
     control_pct <- NA_real_
   }
 
@@ -234,89 +241,67 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   # Read CSV file
   data <- readr::read_csv(file_path, show_col_types = FALSE)
 
-  # Check for required column
-  if (!"Pitch Classification" %in% names(data)) {
+  # Find the Pitch Classification column (may have suffix like "[-1;0;1;2]")
+  pitch_col <- names(data)[stringr::str_detect(names(data), "^Pitch Classification")]
+
+  if (length(pitch_col) == 0) {
     rlang::abort("Column 'Pitch Classification' not found in CSV")
   }
 
-  # Extract pitch classifications
-  classifications <- data$`Pitch Classification`
+  # Use the first matching column
+  pitch_col <- pitch_col[1]
 
-  # Auto-detect item types if not provided
-  # (For now, we'll need column markers or assume all items are ambiguous unless specified)
-  if (is.null(ambiguous_items)) {
-    # Try to detect from data - look for "Item Type" or "Trial Type" column
-    if ("Item Type" %in% names(data)) {
-      ambiguous_items <- which(data$`Item Type` %in% c("ambiguous", "Ambiguous", "AMBIGUOUS"))
-    } else if ("Trial Type" %in% names(data)) {
-      ambiguous_items <- which(data$`Trial Type` %in% c("ambiguous", "Ambiguous", "AMBIGUOUS"))
-    } else {
-      # If no markers, assume all non-control items are ambiguous
-      if (!is.null(control_items)) {
-        ambiguous_items <- setdiff(seq_along(classifications), control_items)
-      } else {
-        # Default: treat all items as ambiguous (conservative assumption)
-        ambiguous_items <- seq_along(classifications)
-      }
-    }
+  # Extract pitch classifications (only rows marked with * in Index column)
+  # The Index column format is "1 *", "2 *", etc.
+  if ("Index" %in% names(data)) {
+    # Filter for rows with "*" in Index
+    data <- data[stringr::str_detect(data$Index, "\\*"), ]
   }
 
-  if (is.null(control_items)) {
-    # Try to detect from data
-    if ("Item Type" %in% names(data)) {
-      control_items <- which(data$`Item Type` %in% c("control", "Control", "CONTROL"))
-    } else if ("Trial Type" %in% names(data)) {
-      control_items <- which(data$`Trial Type` %in% c("control", "Control", "CONTROL"))
-    } else {
-      # No control items identified
-      control_items <- integer(0)
-    }
-  }
+  classifications <- data[[pitch_col]]
 
   # Count response types
   n_total <- length(classifications)
   n_ambivalent <- sum(classifications == 2, na.rm = TRUE)
   n_dont_know <- sum(classifications == -1, na.rm = TRUE)
 
-  # Calculate ambiguous percentage
-  if (length(ambiguous_items) > 0) {
+  # Total evaluable responses (only 0 and 1, excluding 2 and -1)
+  n_evaluable <- sum(classifications %in% c(0, 1), na.rm = TRUE)
+
+  # NOTE: .itl files don't contain information about which items are ambiguous vs control
+  # The AAT software tracks this internally but doesn't export it to the .itl file
+  # Therefore, we can't calculate separate ambiguous % and control % from .itl files alone
+  # Users should use .rsl files (computed results) for accurate ambiguous/control percentages
+  #
+  # What we CAN provide from .itl files:
+  # - Overall f0 tendency across all items
+  # - Quality metrics (ambivalent, don't know counts)
+  #
+  # If users need ambiguous/control separation, they must:
+  # 1. Use .rsl files instead, OR
+  # 2. Manually specify ambiguous_items and control_items parameters
+
+  ambiguous_pct <- NA_real_
+  control_pct <- NA_real_
+
+  # If user explicitly provided item indices, calculate them
+  if (!is.null(ambiguous_items) && length(ambiguous_items) > 0) {
     amb_responses <- classifications[ambiguous_items]
-    # Only count evaluable responses (0 or 1)
     evaluable_amb <- amb_responses[amb_responses %in% c(0, 1)]
     n_evaluable_amb <- length(evaluable_amb)
     n_f0_amb <- sum(evaluable_amb == 1, na.rm = TRUE)
 
     if (n_evaluable_amb > 0) {
       ambiguous_pct <- round((n_f0_amb / n_evaluable_amb) * 100, 1)
-    } else {
-      ambiguous_pct <- NA_real_
     }
-  } else {
-    ambiguous_pct <- NA_real_
-    n_evaluable_amb <- 0
   }
 
-  # Calculate control percentage
-  if (length(control_items) > 0) {
-    ctrl_responses <- classifications[control_items]
-
-    # Try to determine correct answers
-    # If "Correct Answer" column exists, use it
-    if ("Correct Answer" %in% names(data)) {
-      correct_answers <- data$`Correct Answer`[control_items]
-      n_correct <- sum(ctrl_responses == correct_answers, na.rm = TRUE)
-      n_control_total <- length(control_items)
-      control_pct <- round((n_correct / n_control_total) * 100, 1)
-    } else {
-      # Without correct answer key, we can't calculate control accuracy
-      control_pct <- NA_real_
-    }
-  } else {
+  if (!is.null(control_items) && length(control_items) > 0) {
+    # For control items, we need to know correct answers
+    # Without this information, we cannot calculate control %
+    # This would require additional data not present in standard .itl files
     control_pct <- NA_real_
   }
-
-  # Total evaluable responses (across all items)
-  n_evaluable <- sum(classifications %in% c(0, 1), na.rm = TRUE)
 
   tibble::tibble(
     code = code,

@@ -720,7 +720,26 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 12. ⬜ Further validation improvements based on user feedback
 13. ⬜ Automatic folder structure maker/file sorting for different analyses
 
-### Recently Completed (v0.0.0.9025 - 2025-11-06)
+### Recently Completed (v0.0.0.9026 - 2025-11-06)
+1. ✅ **Fixed AAT Parsing for Real Data Structure**
+   - Fixed .rsl file parsing to correctly extract from summary format: "Type of Pair" + "AAT Score [%]" columns
+   - Fixed .itl file parsing to handle column names with suffixes: "Pitch Classification [-1;0;1;2]"
+   - Added detection for two .rsl formats: Format 1 (summary with Type of Pair) and Format 2 (item-level with % F0)
+   - Tested with real data files from tests/testdata_AAT/: Works correctly for both .rsl and .itl files
+
+2. ✅ **AAT Home Page Integration**
+   - Added AAT module description panel on home page (purple theme, 🎧 icon)
+   - Clickable panel navigates to AAT tab
+   - Describes ambiguous % and control % metrics clearly
+   - Lists all key features: recursive scanning, file type detection, quality metrics, etc.
+
+3. ✅ **Updated All AAT Tests (26 tests passing)**
+   - Rewrote tests to match real data structure (replaced 31 old tests with 26 new accurate tests)
+   - Tests now validate: summary .rsl parsing, item-level .rsl parsing, .itl quality metrics
+   - Tests validate: code extraction, date extraction, AAT filename filtering, CODE_CONFLICT handling
+   - All tests passing with real data patterns
+
+### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
    - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
@@ -737,7 +756,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Added date format selector (matches KLAWA module)
    - 3-column layout: code pattern | date format | quality filter
 
-### Recently Completed (v0.0.0.9024 - 2025-11-06)
+### Previously Completed (v0.0.0.9024 - 2025-11-06)
 1. ✅ **NEW: AAT (Auditory Ambiguity Test) Module Implemented**
    - Created R/aat.R with full CSV parsing functionality (R/aat.R)
    - Extracts ambiguous % (f0-responses in ambiguous items) and control % (correct responses in control items)

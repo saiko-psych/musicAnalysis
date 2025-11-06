@@ -65,24 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9025 (2025-11-06)"),
+        h4("✨ What's New in v0.0.0.9026 (2025-11-06)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("REFINED: "),
-            "AAT module now filters for files containing 'AAT' in filename only"
+            tags$strong("FIXED: "),
+            "AAT .rsl file parsing now correctly extracts Ambiguous % and Control % from summary format files"
+          ),
+          tags$li(
+            tags$strong("FIXED: "),
+            "AAT .itl file parsing now handles column names with suffixes (e.g., 'Pitch Classification [-1;0;1;2]')"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "AAT .rsl parser now detects two formats: summary (Type of Pair) and item-level (% F0)"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Automatic file type detection: .itl.csv (raw responses) vs .rsl.csv (computed results)"
+            "AAT module description on home page with clickable panel"
           ),
           tags$li(
-            tags$strong("ADDED: "),
-            "Metadata extraction from filenames: participant code and date (same as KLAWA)"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "Date format selector in AAT Shiny interface (matches KLAWA module)"
+            tags$strong("UPDATED: "),
+            "All 26 AAT tests now passing with real data structure"
           )
         )
       ),
@@ -97,6 +101,19 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9025
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9025 (2025-11-06)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("REFINED:"), " AAT module now filters for files containing 'AAT' in filename only"),
+                tags$li(tags$strong("ADDED:"), " Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed)"),
+                tags$li(tags$strong("ADDED:"), " Metadata extraction from filenames: participant code and date"),
+                tags$li(tags$strong("ADDED:"), " Date format selector in AAT Shiny interface")
+              )
+            ),
 
             # v0.0.0.9024
             tags$div(
@@ -334,6 +351,46 @@ mod_home_ui <- function(id) {
               tags$li("Three plot types: individual instruments, category sums, total musical experience"),
               tags$li("Flags unrealistic values for manual review"),
               tags$li("Wide and long format outputs for analysis flexibility")
+            )
+          )
+        )
+      ),
+
+      wellPanel(
+        style = "background-color: #f3e5f5; cursor: pointer;",
+        onclick = "Shiny.setInputValue('home-navigate_to', 'aat', {priority: 'event'});",
+        tags$div(
+          style = "padding: 10px;",
+          tags$h5(
+            style = "margin-top: 0; color: #6a1b9a;",
+            "🎧 AAT - Auditory Ambiguity Test ",
+            tags$span(
+              style = "font-size: 12px; color: #666; font-weight: normal;",
+              "(Click to open)"
+            )
+          ),
+          tags$p(
+            style = "margin-bottom: 10px; font-weight: 500;",
+            "Extract pitch perception metrics from AAT CSV export files"
+          ),
+          tags$p(
+            style = "margin-bottom: 10px;",
+            "The Auditory Ambiguity Test (AAT) measures the tendency to perceive fundamental (f0) tones ",
+            "versus spectral/overtone components in ambiguous pitch stimuli, plus control item accuracy. ",
+            "This module processes both raw response files (.itl.csv) and computed result files (.rsl.csv)."
+          ),
+          tags$div(
+            style = "background-color: rgba(255,255,255,0.5); padding: 10px; border-radius: 4px; margin-top: 10px;",
+            tags$strong("Key Features:"),
+            tags$ul(
+              style = "margin-top: 5px; margin-bottom: 0;",
+              tags$li("Scans folders recursively for all AAT files"),
+              tags$li("Extracts participant code and date from filenames"),
+              tags$li("Handles two file types: .itl (raw responses) and .rsl (computed results)"),
+              tags$li("Calculates Ambiguous % (f0 tendency) and Control % (accuracy) from .rsl files"),
+              tags$li("Provides quality metrics: ambivalent responses, 'don't know' responses, total evaluable items"),
+              tags$li("Configurable date format recognition (DDMMYY, DDMMYYYY, etc.)"),
+              tags$li("CSV export of all extracted metrics")
             )
           )
         )
