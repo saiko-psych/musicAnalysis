@@ -1,0 +1,29 @@
+Package: musicAnalysis
+Title: MusicPsychology Analysis in R (for University of Graz)
+Version: 0.0.0.9023
+Authors@R: 
+    person("David", "Matischek", , "david.matischek@uni-graz.at", role = c("aut", "cre"))
+Description: Should be usefull for our Analysis in Musicpsychology at the KF-Graz (only for our Team).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    pdftools,
+    stringr,
+    tibble,
+    purrr,
+    fs,
+    dplyr,
+    tidyr,
+    cli,
+    readr,
+    magrittr,
+    rlang,
+    shiny,
+    bslib,
+    DT,
+    shinyFiles,
+    plotly
+Suggests:
+    testthat (>= 3.0.0)
