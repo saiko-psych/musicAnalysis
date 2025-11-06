@@ -95,6 +95,25 @@ pkgbuild::build(path = ".")  # Creates ../musicAnalysis_0.0.0.9002.tar.gz
 
 This creates: `C:/Users/David/Nextcloud2/Documents/R/musicpsychology/musicAnalysis_0.0.0.9002.tar.gz`
 
+**Push to GitHub** (after building):
+```bash
+git add .
+git commit -m "Bump version to 0.0.0.9024
+
+- Updated DESCRIPTION version
+- Updated What's New in mod_home.R
+- Added version to version history
+- Built and tested tarball"
+
+git push origin master
+
+# Optional: Create GitHub release
+gh release create v0.0.0.9024 \
+  --title "v0.0.0.9024" \
+  --notes "See README.md for changes" \
+  musicAnalysis_0.0.0.9024.tar.gz
+```
+
 ### Manual Testing in Fresh R Session
 
 **IMPORTANT**: After making changes, always test in a completely fresh R session to ensure the updated package works correctly.
@@ -476,6 +495,96 @@ extract_and_check_code("0102SICH_0103ANDE.pdf")     # Returns "CODE_CONFLICT"
 - **Unrealistic practice hours**: Need validation (e.g., >12h/day should be flagged)
 - **Multi-instrument profiles**: Rankings across multiple instruments
 
+## GitHub Project Management
+
+### Repository Setup
+**GitHub URL**: https://github.com/saiko-psych/musicAnalysis
+**Remote**: `origin` → https://github.com/saiko-psych/musicAnalysis.git
+
+### Creating GitHub Issues from CLAUDE.md Todos
+
+All future tasks from this file have been converted to GitHub issues for better tracking.
+
+**Run once to create all issues**:
+```bash
+bash create_github_issues.sh
+```
+
+This creates 13 issues with proper labels and priorities based on the "Next steps" section below.
+
+**Benefits of using GitHub issues**:
+- ✅ Trackable and can be assigned
+- ✅ Integrate with PRs and commits (`Closes #123`)
+- ✅ Provide clear project board view
+- ✅ Easier to manage than text file
+- ✅ Can add milestones and due dates
+- ✅ Enable GitHub Actions integration
+
+### Standard Development Workflow
+
+1. **Create or pick an issue**:
+   ```bash
+   gh issue list  # See all open issues
+   gh issue view 5  # View details of issue #5
+   ```
+
+2. **Create feature branch**:
+   ```bash
+   gh issue develop 5  # Auto-creates branch like "5-fix-participant-selection"
+   ```
+
+3. **Make changes and test**:
+   ```r
+   devtools::load_all()  # Fast iteration
+   devtools::test()      # All tests pass
+   ```
+
+4. **Commit and push**:
+   ```bash
+   git add .
+   git commit -m "Implement context-aware ranking
+
+   - Modified plot_practice_curves() ranking logic
+   - Added tests for all scenarios
+   - Updated UI to show ranking context
+
+   Closes #5"
+
+   git push
+   ```
+
+5. **Create Pull Request**:
+   ```bash
+   gh pr create --title "Fix participant selection" \
+     --body "Implements context-aware ranking. Closes #5"
+   ```
+
+6. **Merge when ready**:
+   ```bash
+   gh pr merge 1 --squash --delete-branch
+   ```
+
+7. **Update version and push**:
+   ```r
+   # Update DESCRIPTION, mod_home.R, CLAUDE.md
+   devtools::document()
+   devtools::test()
+   pkgbuild::build(path = ".")
+   ```
+
+   ```bash
+   git add .
+   git commit -m "Bump version to 0.0.0.9024"
+   git push origin master
+
+   # Create release
+   gh release create v0.0.0.9024 \
+     --notes "See README.md for changes" \
+     musicAnalysis_0.0.0.9024.tar.gz
+   ```
+
+**For detailed GitHub CLI guide**: See `docs/GITHUB_WORKFLOW.md`
+
 ## Development Priorities
 
 ### Current focus (implemented)
@@ -551,6 +660,20 @@ extract_and_check_code("0102SICH_0103ANDE.pdf")     # Returns "CODE_CONFLICT"
 11. ⬜ PPPT data parser
 12. ⬜ AAT data parser
 13. ⬜ Further validation improvements based on user feedback
+
+### Recently Completed (GitHub Setup - 2025-11-06)
+1. ✅ **Set up GitHub CLI project management**
+   - Repository: https://github.com/saiko-psych/musicAnalysis
+   - Created comprehensive README.md with installation, usage examples, documentation
+   - Created create_github_issues.sh script to convert CLAUDE.md todos to 13 GitHub issues
+   - Documented GitHub workflow in CLAUDE.md
+   - Set up push workflow for future version releases
+
+2. ✅ **Documentation improvements**
+   - Added GitHub Project Management section to CLAUDE.md
+   - Documented standard development workflow with GitHub CLI
+   - Added push-to-GitHub step in version release process
+   - Created issue creation script with proper labels and priorities
 
 ### Recently Completed (v0.0.0.9023 - 2025-11-06)
 1. ✅ **FINAL FIX for category_sum plot labels and colors**
