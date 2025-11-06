@@ -65,24 +65,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9024 (2025-11-06)"),
+        h4("✨ What's New in v0.0.0.9025 (2025-11-06)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("NEW: "),
-            "AAT (Auditory Ambiguity Test) module implemented! Extracts ambiguous % and control % from CSV response files"
+            tags$strong("REFINED: "),
+            "AAT module now filters for files containing 'AAT' in filename only"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Complete AAT analysis workflow: folder scanning, participant code extraction, quality metrics (31 tests passing)"
+            "Automatic file type detection: .itl.csv (raw responses) vs .rsl.csv (computed results)"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "AAT Shiny interface with folder structure analysis, editable tables, quality issue detection, and CSV export"
+            "Metadata extraction from filenames: participant code and date (same as KLAWA)"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "GitHub repository secured - private test data removed, comprehensive .gitignore protection in place"
+            tags$strong("ADDED: "),
+            "Date format selector in AAT Shiny interface (matches KLAWA module)"
           )
         )
       ),
@@ -97,6 +97,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9024
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9024 (2025-11-06)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " AAT (Auditory Ambiguity Test) module implemented"),
+                tags$li(tags$strong("ADDED:"), " Complete AAT analysis workflow with 31 passing tests"),
+                tags$li(tags$strong("ADDED:"), " AAT Shiny interface with quality issue detection")
+              )
+            ),
 
             # v0.0.0.9023
             tags$div(

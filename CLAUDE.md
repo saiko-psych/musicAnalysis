@@ -720,6 +720,23 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 12. ⬜ Further validation improvements based on user feedback
 13. ⬜ Automatic folder structure maker/file sorting for different analyses
 
+### Recently Completed (v0.0.0.9025 - 2025-11-06)
+1. ✅ **AAT Module Refinements for Real Data**
+   - Filename filtering: Only processes files containing "AAT" in filename
+   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
+   - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
+   - New output columns: `date`, `file_type`
+
+2. ✅ **AAT Parsing Logic Split**
+   - `.aat_parse_itl()`: Calculates from raw Pitch Classification data
+   - `.aat_parse_rsl()`: Reads pre-computed percentages directly
+   - Quality metrics (n_ambivalent, n_dont_know) only for .itl files
+
+3. ✅ **Shiny Interface Enhancements**
+   - Added date format selector (matches KLAWA module)
+   - 3-column layout: code pattern | date format | quality filter
+
 ### Recently Completed (v0.0.0.9024 - 2025-11-06)
 1. ✅ **NEW: AAT (Auditory Ambiguity Test) Module Implemented**
    - Created R/aat.R with full CSV parsing functionality (R/aat.R)
