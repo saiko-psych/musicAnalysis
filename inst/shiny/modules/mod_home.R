@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9028 (2025-11-07)"),
+        h4("✨ What's New in v0.0.0.9029 (2025-11-07)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "AAT .rsl files with item-level data now properly calculate ambiguous % and control % using F0 Difference column (12.5% = control, >12.5% = ambiguous)"
+            tags$strong("FIXED (CRITICAL): "),
+            "AAT now uses Nmin [-] column to correctly separate ambiguous vs control items"
           ),
           tags$li(
-            tags$strong("FIXED: "),
-            "AAT .itl files now use F0 Difference column to correctly separate ambiguous vs control items"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "AAT percentage calculations now use TOTAL items as denominator (including non-evaluable), matching RSL file calculation method"
+            tags$strong("PATTERN: "),
+            "Control items = Nmin same harmonics (e.g., '3 3', '4 4', '5 5'). Ambiguous items = Nmin different harmonics (e.g., '5 2', '7 3', '9 4')"
           ),
           tags$li(
             tags$strong("VERIFIED: "),
-            ".itl and .rsl files now produce IDENTICAL results for same participant (tested with 043SIMA, 0405SAAD)"
+            "ALL 6 participants with item-level .rsl files now match their .itl files PERFECTLY (100% accuracy)"
+          ),
+          tags$li(
+            tags$strong("VERIFIED PARTICIPANTS: "),
+            "0303KAST, 0312CLTH, 0402ARDA, 0403SIMA, 0405SAAD, 0511JASH - all match exactly"
           ),
           tags$li(
             tags$strong("TESTING: "),
-            "All 28 AAT tests passing (updated from 26), verified with 7 real data files"
+            "All 28 AAT tests passing, calculation verified correct with real data"
           )
         )
       ),

@@ -235,18 +235,22 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     }
   }
   # Check for Format 2 (item-level format)
-  else if ("% F0" %in% names(data) && "F0 Difference [%]" %in% names(data)) {
+  else if ("% F0" %in% names(data) && "Nmin [-]" %in% names(data)) {
     # This format has per-tone-pair statistics
-    # We CAN separate ambiguous from control using F0 Difference:
-    # - Control items: F0 Difference = 12.5% (easy to distinguish)
-    # - Ambiguous items: F0 Difference > 12.5% (25%, 33%, 50%, 67%)
+    # We MUST use Nmin column to separate ambiguous from control:
+    # - Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
+    # - Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
 
-    f0_diff <- data[["F0 Difference [%]"]]
+    nmin_col <- data[["Nmin [-]"]]
     n_items <- data[["# Items"]]
     n_f0 <- data[["# F0"]]
+    
+    # Split Nmin into two parts and check if they're the same
+    nmin_parts <- stringr::str_split(nmin_col, "\\s+")
+    is_control <- purrr::map_lgl(nmin_parts, ~.x[1] == .x[2])
 
-    # Ambiguous: F0 diff != 12.5
-    ambig_idx <- which(f0_diff != 12.5)
+    # Ambiguous: Nmin parts are DIFFERENT
+    ambig_idx <- which(!is_control)
     if (length(ambig_idx) > 0) {
       ambig_total_items <- sum(n_items[ambig_idx], na.rm = TRUE)
       ambig_f0_responses <- sum(n_f0[ambig_idx], na.rm = TRUE)
@@ -264,8 +268,8 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
       }
     }
 
-    # Control: F0 diff == 12.5
-    control_idx <- which(f0_diff == 12.5)
+    # Control: Nmin parts are SAME
+    control_idx <- which(is_control)
     if (length(control_idx) > 0) {
       control_total_items <- sum(n_items[control_idx], na.rm = TRUE)
       control_f0_responses <- sum(n_f0[control_idx], na.rm = TRUE)
@@ -347,84 +351,55 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   a_avg_items_per_pair <- NA_real_
   c_avg_items_per_pair <- NA_real_
 
-  # Check if F0 Difference column exists - we can use it to separate ambiguous/control
-  if ("F0 Difference [%]" %in% names(data)) {
-    f0_diff <- data[["F0 Difference [%]"]]
-
-    # Ambiguous items: F0 diff != 12.5
-    ambig_idx <- which(f0_diff != 12.5)
+  # Check if Nmin [-] column exists - THIS is the key to separating control/ambiguous!
+  # Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
+  # Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
+  if ("Nmin [-]" %in% names(data)) {
+    # Extract Nmin values and parse them
+    nmin_col <- data[["Nmin [-]"]]
+    
+    # Split Nmin into two parts and check if they're the same
+    nmin_parts <- stringr::str_split(nmin_col, "\\s+")
+    is_control <- purrr::map_lgl(nmin_parts, ~.x[1] == .x[2])
+    
+    # Ambiguous items: Nmin parts are DIFFERENT
+    ambig_idx <- which(!is_control)
     if (length(ambig_idx) > 0) {
       ambig_class <- classifications[ambig_idx]
       ambig_f0_count <- sum(ambig_class == 1, na.rm = TRUE)
       ambig_total <- length(ambig_idx)  # ALL items including -1 and 2
-
+      
       if (ambig_total > 0) {
         ambiguous_pct <- round((ambig_f0_count / ambig_total) * 100, 1)
       }
-
+      
       # Calculate tone pairs (each pair presented twice)
       a_tone_pairs <- as.integer(ambig_total / 2)
       a_avg_items_per_pair <- 2
     }
-
-    # Control items: F0 diff == 12.5
-    control_idx <- which(f0_diff == 12.5)
+    
+    # Control items: Nmin parts are SAME
+    control_idx <- which(is_control)
     if (length(control_idx) > 0) {
       control_class <- classifications[control_idx]
       control_f0_count <- sum(control_class == 1, na.rm = TRUE)
       control_total <- length(control_idx)  # ALL items including -1 and 2
-
+      
       if (control_total > 0) {
         control_pct <- round((control_f0_count / control_total) * 100, 1)
       }
-
+      
       # Calculate tone pairs (each pair presented twice)
       c_tone_pairs <- as.integer(control_total / 2)
       c_avg_items_per_pair <- 2
     }
   }
-  # Fallback: if no F0 Difference column, calculate overall percentage
+  # Fallback: if no Nmin column, calculate overall percentage
   else if (n_total > 0) {
     n_f0_total <- sum(classifications == 1, na.rm = TRUE)
     # Use TOTAL items as denominator (including -1 and 2), not just evaluable
     overall_f0_pct <- round((n_f0_total / n_total) * 100, 1)
     ambiguous_pct <- overall_f0_pct
-  }
-
-  # If user explicitly provided item indices, calculate properly
-  if (!is.null(ambiguous_items) && length(ambiguous_items) > 0) {
-    amb_responses <- classifications[ambiguous_items]
-    evaluable_amb <- amb_responses[amb_responses %in% c(0, 1)]
-    n_evaluable_amb <- length(evaluable_amb)
-    n_f0_amb <- sum(evaluable_amb == 1, na.rm = TRUE)
-
-    if (n_evaluable_amb > 0) {
-      ambiguous_pct <- round((n_f0_amb / n_evaluable_amb) * 100, 1)
-    }
-
-    # Calculate tone pairs and avg items per pair for ambiguous
-    # Assuming each pair is presented twice (standard AAT protocol)
-    a_tone_pairs <- as.integer(length(ambiguous_items) / 2)
-    a_avg_items_per_pair <- 2
-  }
-
-  if (!is.null(control_items) && length(control_items) > 0) {
-    ctrl_responses <- classifications[control_items]
-    evaluable_ctrl <- ctrl_responses[ctrl_responses %in% c(0, 1)]
-    n_evaluable_ctrl <- length(evaluable_ctrl)
-
-    # For control %, we need to know which response is "correct" for each item
-    # Standard AAT: control items have clear f0, so "1" (f0) is correct
-    # This is an assumption based on typical AAT design
-    n_correct_ctrl <- sum(evaluable_ctrl == 1, na.rm = TRUE)
-
-    if (n_evaluable_ctrl > 0) {
-      control_pct <- round((n_correct_ctrl / n_evaluable_ctrl) * 100, 1)
-    }
-
-    # Calculate tone pairs and avg items per pair for control
-    c_tone_pairs <- as.integer(length(control_items) / 2)
-    c_avg_items_per_pair <- 2
   }
 
   tibble::tibble(

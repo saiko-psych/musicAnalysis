@@ -52,11 +52,12 @@ test_that(".rsl file parsing calculates from item-level format", {
   test_file <- file.path(temp_dir, "test_itemlevel.rsl.csv")
 
   # Create test data in item-level format
-  # Row 1-2: Ambiguous (F0 diff != 12.5), Row 3: Control (F0 diff == 12.5)
+  # Row 1-2: Ambiguous (Nmin different), Row 3: Control (Nmin same)
   test_data <- data.frame(
     Index = c(1, 2, 3),
     `Reference F0 [Hz]` = c(100, 200, 300),
     `F0 Difference [%]` = c(50, 25, 12.5),
+    `Nmin [-]` = c("7 3", "9 4", "5 5"),  # Row 3 is control (5 5)
     `# Items` = c(2, 2, 2),  # Total items per pair
     `# F0` = c(2, 1, 0),    # F0 responses per pair
     `% F0` = c(100, 50, 0),
@@ -66,10 +67,10 @@ test_that(".rsl file parsing calculates from item-level format", {
 
   result <- .aat_parse_rsl(test_file, "test.csv", "0102SICH", "17/03/25")
 
-  # Item-level format now properly calculates using F0 Difference
-  # Ambiguous (rows 1-2): (2+1) f0 / (2+2) items = 3/4 = 75%
+  # Item-level format now properly calculates using Nmin pattern
+  # Ambiguous (rows 1-2, Nmin different): (2+1) f0 / (2+2) items = 3/4 = 75%
   expect_equal(result$ambiguous_pct, 75.0)
-  # Control (row 3): 0 f0 / 2 items = 0%
+  # Control (row 3, Nmin same "5 5"): 0 f0 / 2 items = 0%
   expect_equal(result$control_pct, 0.0)
   expect_equal(result$file_type, "rsl")
 
@@ -84,9 +85,10 @@ test_that(".itl file parsing extracts quality metrics", {
   temp_dir <- tempdir()
   test_file <- file.path(temp_dir, "test.itl.csv")
 
-  # Create test data with Pitch Classification column
+  # Create test data with Pitch Classification column and Nmin
   test_data <- data.frame(
     Index = c("1 *", "2 *", "3 *", "4 *", "5 *", "6 *", "7 *"),
+    `Nmin [-]` = c("7 3", "9 4", "5 2", "9 4", "7 3", "5 5", "3 3"),  # Last 2 are control (same)
     `Pitch Classification [-1;0;1;2]` = c(0, 1, 1, 0, 1, 2, -1),
     check.names = FALSE
   )
@@ -100,11 +102,12 @@ test_that(".itl file parsing extracts quality metrics", {
   expect_equal(result$n_evaluable, 5)    # Five codes "0" or "1"
   expect_equal(result$file_type, "itl")
 
-  # Without F0 Difference column, fallback calculates across ALL items (including non-evaluable)
-  # (3 f0 responses / 7 total items = 42.9%)
-  expect_equal(result$ambiguous_pct, 42.9)
-  # control_pct remains NA since we can't calculate it without F0 Difference column
-  expect_true(is.na(result$control_pct))
+  # With Nmin column: rows 1-5 are ambiguous (different harmonics), rows 6-7 are control (same harmonics)
+  # Ambiguous: 3 f0 responses in rows 1-5 / 5 total = 60%
+  expect_equal(result$ambiguous_pct, 60.0)
+  # Control: 0 evaluable responses in rows 6-7 (both are code 2 and -1) / 2 total = 0%
+  # But actually we need to count f0 (code 1), which is 0
+  expect_equal(result$control_pct, 0.0)
 
   unlink(test_file)
 })

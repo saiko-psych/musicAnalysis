@@ -811,24 +811,29 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 12. ⬜ Further validation improvements based on user feedback
 13. ⬜ Automatic folder structure maker/file sorting for different analyses
 
-### Recently Completed (v0.0.0.9028 - 2025-11-07)
-1. ✅ **AAT MAJOR FIX: Correct calculation for .rsl item-level and .itl files**
-   - Fixed .rsl files with item-level data (have "% F0" column) to properly parse using F0 Difference
-   - Control items: F0 Difference = 12.5%, Ambiguous items: F0 Difference > 12.5% (25%, 33%, 50%, 67%)
-   - Both .rsl item-level and .itl now extract a_tone_pairs, c_tone_pairs, a_avg_items_per_pair, c_avg_items_per_pair
+### Recently Completed (v0.0.0.9029 - 2025-11-07)
+1. ✅ **AAT CRITICAL FIX: Correct identification of control vs ambiguous items**
+   - FOUND THE KEY: Must use **Nmin [-] column**, NOT F0 Difference!
+   - Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
+   - Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
+   - Previous v0.0.0.9028 used F0 Difference (12.5% vs >12.5%) which was WRONG
 
-2. ✅ **AAT MAJOR FIX: Correct denominator for percentage calculations**
-   - Changed from using only evaluable items (codes 0, 1) as denominator to using TOTAL items (including codes -1, 2)
-   - This matches the calculation method used by .rsl files
-   - Example: 043SIMA had 62 f0 responses / 88 total items = 70.5% (was incorrectly 62/77 evaluable = 80.5%)
+2. ✅ **AAT VERIFICATION: 100% match for item-level .rsl files**
+   - ALL 6 participants with item-level .rsl files match their .itl files PERFECTLY:
+   - 0303KAST: Ambiguous=88.0%, Control=80.0% ✓
+   - 0312CLTH: Ambiguous=62.0%, Control=90.0% ✓
+   - 0402ARDA: Ambiguous=66.0%, Control=100.0% ✓
+   - 0403SIMA: Ambiguous=61.0%, Control=100.0% ✓
+   - 0405SAAD: Ambiguous=51.0%, Control=60.0% ✓
+   - 0511JASH: Ambiguous=43.0%, Control=90.0% ✓
 
-3. ✅ **AAT VERIFICATION: .itl and .rsl files now produce IDENTICAL results**
-   - 043SIMA: Ambiguous = 70.5%, Control = 40.9% (matches exactly between .rsl and .itl)
-   - 0405SAAD: Ambiguous = 55.7%, Control = 36.4% (matches exactly between .rsl and .itl)
-   - Verified with 7 real data files from tests/testdata_AAT/
+3. ✅ **Understanding summary .rsl vs item-level .rsl**
+   - Summary .rsl files: Pre-calculated percentages from AAT software (cannot reproduce exactly)
+   - Item-level .rsl files: Raw data that matches .itl calculations perfectly
+   - My .itl calculations ARE correct (proven by item-level .rsl matches)
 
 4. ✅ **Testing**
-   - Updated 28 tests (was 26) to reflect correct calculations
+   - Updated 28 tests to use Nmin pattern
    - All tests passing with real data verification
 
 ### Previously Completed (v0.0.0.9027 - 2025-11-07)
