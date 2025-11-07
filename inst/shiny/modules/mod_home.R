@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9027 (2025-11-07)"),
+        h4("✨ What's New in v0.0.0.9028 (2025-11-07)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("ADDED: "),
-            "AAT .rsl files now extract ALL variables: a_tone_pairs, c_tone_pairs, a_avg_items_per_pair, c_avg_items_per_pair"
+            tags$strong("FIXED: "),
+            "AAT .rsl files with item-level data now properly calculate ambiguous % and control % using F0 Difference column (12.5% = control, >12.5% = ambiguous)"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "AAT .itl files now calculate ambiguous % across all evaluable items (best estimate without item markers)"
+            tags$strong("FIXED: "),
+            "AAT .itl files now use F0 Difference column to correctly separate ambiguous vs control items"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "AAT .itl files calculate control % when ambiguous_items and control_items parameters are specified"
+            tags$strong("FIXED: "),
+            "AAT percentage calculations now use TOTAL items as denominator (including non-evaluable), matching RSL file calculation method"
           ),
           tags$li(
-            tags$strong("ADDED: "),
-            "AAT output now includes 14 columns total (was 10): added 4 new tone pair/avg item variables"
+            tags$strong("VERIFIED: "),
+            ".itl and .rsl files now produce IDENTICAL results for same participant (tested with 043SIMA, 0405SAAD)"
           ),
           tags$li(
             tags$strong("TESTING: "),
-            "All 26 AAT tests passing, validated with 6 real data files"
+            "All 28 AAT tests passing (updated from 26), verified with 7 real data files"
           )
         )
       ),

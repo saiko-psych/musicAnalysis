@@ -46,17 +46,19 @@ test_that(".rsl file parsing works with summary format (Type of Pair)", {
   unlink(test_file)
 })
 
-test_that(".rsl file parsing returns NA for item-level format", {
+test_that(".rsl file parsing calculates from item-level format", {
   # This tests the Format 2 .rsl files with "% F0" column
   temp_dir <- tempdir()
   test_file <- file.path(temp_dir, "test_itemlevel.rsl.csv")
 
   # Create test data in item-level format
+  # Row 1-2: Ambiguous (F0 diff != 12.5), Row 3: Control (F0 diff == 12.5)
   test_data <- data.frame(
     Index = c(1, 2, 3),
     `Reference F0 [Hz]` = c(100, 200, 300),
     `F0 Difference [%]` = c(50, 25, 12.5),
-    `# F0` = c(2, 1, 0),
+    `# Items` = c(2, 2, 2),  # Total items per pair
+    `# F0` = c(2, 1, 0),    # F0 responses per pair
     `% F0` = c(100, 50, 0),
     check.names = FALSE
   )
@@ -64,10 +66,16 @@ test_that(".rsl file parsing returns NA for item-level format", {
 
   result <- .aat_parse_rsl(test_file, "test.csv", "0102SICH", "17/03/25")
 
-  # Item-level format should return NA (we can't distinguish ambiguous from control)
-  expect_true(is.na(result$ambiguous_pct))
-  expect_true(is.na(result$control_pct))
+  # Item-level format now properly calculates using F0 Difference
+  # Ambiguous (rows 1-2): (2+1) f0 / (2+2) items = 3/4 = 75%
+  expect_equal(result$ambiguous_pct, 75.0)
+  # Control (row 3): 0 f0 / 2 items = 0%
+  expect_equal(result$control_pct, 0.0)
   expect_equal(result$file_type, "rsl")
+
+  # Check tone pair counts
+  expect_equal(result$a_tone_pairs, 2)  # 2 ambiguous pairs
+  expect_equal(result$c_tone_pairs, 1)  # 1 control pair
 
   unlink(test_file)
 })
@@ -92,10 +100,10 @@ test_that(".itl file parsing extracts quality metrics", {
   expect_equal(result$n_evaluable, 5)    # Five codes "0" or "1"
   expect_equal(result$file_type, "itl")
 
-  # Without ambiguous_items specified, ambiguous_pct is calculated across ALL items
-  # (3 out of 5 evaluable are "1", so 60%)
-  expect_equal(result$ambiguous_pct, 60.0)
-  # control_pct remains NA since we can't calculate it without item separation
+  # Without F0 Difference column, fallback calculates across ALL items (including non-evaluable)
+  # (3 f0 responses / 7 total items = 42.9%)
+  expect_equal(result$ambiguous_pct, 42.9)
+  # control_pct remains NA since we can't calculate it without F0 Difference column
   expect_true(is.na(result$control_pct))
 
   unlink(test_file)

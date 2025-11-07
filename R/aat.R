@@ -235,17 +235,55 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     }
   }
   # Check for Format 2 (item-level format)
-  else if ("% F0" %in% names(data)) {
-    # This format has per-item statistics
-    # We need to aggregate across all items
-    # NOTE: Without item type markers, we can't separate ambiguous from control
-    # So we'll compute an overall % F0 tendency
-    #
-    # For now, return NA for all since we can't distinguish item types
-    # Users should use Format 1 (.rsl summary files) for accurate ambiguous/control %
-    ambiguous_pct <- NA_real_
-    control_pct <- NA_real_
+  else if ("% F0" %in% names(data) && "F0 Difference [%]" %in% names(data)) {
+    # This format has per-tone-pair statistics
+    # We CAN separate ambiguous from control using F0 Difference:
+    # - Control items: F0 Difference = 12.5% (easy to distinguish)
+    # - Ambiguous items: F0 Difference > 12.5% (25%, 33%, 50%, 67%)
+
+    f0_diff <- data[["F0 Difference [%]"]]
+    n_items <- data[["# Items"]]
+    n_f0 <- data[["# F0"]]
+
+    # Ambiguous: F0 diff != 12.5
+    ambig_idx <- which(f0_diff != 12.5)
+    if (length(ambig_idx) > 0) {
+      ambig_total_items <- sum(n_items[ambig_idx], na.rm = TRUE)
+      ambig_f0_responses <- sum(n_f0[ambig_idx], na.rm = TRUE)
+
+      if (ambig_total_items > 0) {
+        ambiguous_pct <- round((ambig_f0_responses / ambig_total_items) * 100, 1)
+      }
+
+      # Calculate tone pairs and avg items per pair
+      a_tone_pairs <- length(ambig_idx)
+      a_avg_items_per_pair <- if (a_tone_pairs > 0) {
+        round(ambig_total_items / a_tone_pairs, 1)
+      } else {
+        NA_real_
+      }
+    }
+
+    # Control: F0 diff == 12.5
+    control_idx <- which(f0_diff == 12.5)
+    if (length(control_idx) > 0) {
+      control_total_items <- sum(n_items[control_idx], na.rm = TRUE)
+      control_f0_responses <- sum(n_f0[control_idx], na.rm = TRUE)
+
+      if (control_total_items > 0) {
+        control_pct <- round((control_f0_responses / control_total_items) * 100, 1)
+      }
+
+      # Calculate tone pairs and avg items per pair
+      c_tone_pairs <- length(control_idx)
+      c_avg_items_per_pair <- if (c_tone_pairs > 0) {
+        round(control_total_items / c_tone_pairs, 1)
+      } else {
+        NA_real_
+      }
+    }
   }
+
 
   tibble::tibble(
     code = code,
@@ -301,10 +339,6 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   # Total evaluable responses (only 0 and 1, excluding 2 and -1)
   n_evaluable <- sum(classifications %in% c(0, 1), na.rm = TRUE)
 
-  # NOTE: .itl files don't contain information about which items are ambiguous vs control
-  # The AAT software tracks this internally but doesn't export it to the .itl file
-  # Without this information, we calculate percentages across ALL items (not separated)
-
   # Initialize variables
   ambiguous_pct <- NA_real_
   control_pct <- NA_real_
@@ -313,16 +347,48 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   a_avg_items_per_pair <- NA_real_
   c_avg_items_per_pair <- NA_real_
 
-  # Calculate overall f0 percentage across all evaluable items
-  # This is NOT the same as ambiguous % (which should only include ambiguous items)
-  # But it's the best we can do without item type information
-  if (n_evaluable > 0) {
-    n_f0_total <- sum(classifications == 1, na.rm = TRUE)
-    overall_f0_pct <- round((n_f0_total / n_evaluable) * 100, 1)
+  # Check if F0 Difference column exists - we can use it to separate ambiguous/control
+  if ("F0 Difference [%]" %in% names(data)) {
+    f0_diff <- data[["F0 Difference [%]"]]
 
-    # Store as ambiguous_pct with a note that this is across ALL items
+    # Ambiguous items: F0 diff != 12.5
+    ambig_idx <- which(f0_diff != 12.5)
+    if (length(ambig_idx) > 0) {
+      ambig_class <- classifications[ambig_idx]
+      ambig_f0_count <- sum(ambig_class == 1, na.rm = TRUE)
+      ambig_total <- length(ambig_idx)  # ALL items including -1 and 2
+
+      if (ambig_total > 0) {
+        ambiguous_pct <- round((ambig_f0_count / ambig_total) * 100, 1)
+      }
+
+      # Calculate tone pairs (each pair presented twice)
+      a_tone_pairs <- as.integer(ambig_total / 2)
+      a_avg_items_per_pair <- 2
+    }
+
+    # Control items: F0 diff == 12.5
+    control_idx <- which(f0_diff == 12.5)
+    if (length(control_idx) > 0) {
+      control_class <- classifications[control_idx]
+      control_f0_count <- sum(control_class == 1, na.rm = TRUE)
+      control_total <- length(control_idx)  # ALL items including -1 and 2
+
+      if (control_total > 0) {
+        control_pct <- round((control_f0_count / control_total) * 100, 1)
+      }
+
+      # Calculate tone pairs (each pair presented twice)
+      c_tone_pairs <- as.integer(control_total / 2)
+      c_avg_items_per_pair <- 2
+    }
+  }
+  # Fallback: if no F0 Difference column, calculate overall percentage
+  else if (n_total > 0) {
+    n_f0_total <- sum(classifications == 1, na.rm = TRUE)
+    # Use TOTAL items as denominator (including -1 and 2), not just evaluable
+    overall_f0_pct <- round((n_f0_total / n_total) * 100, 1)
     ambiguous_pct <- overall_f0_pct
-    # control_pct remains NA since we can't calculate it
   }
 
   # If user explicitly provided item indices, calculate properly
