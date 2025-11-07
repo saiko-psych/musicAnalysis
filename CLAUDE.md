@@ -27,6 +27,87 @@ Standard R package layout:
 
 **📖 For detailed project structure and workflow**: See `docs/PROJECT_STRUCTURE.md` and `docs/GITHUB_WORKFLOW.md`
 
+## Git Workflow (IMPORTANT!)
+
+### Branch Strategy
+
+**NEVER work directly on `master` branch!** Always use feature branches for development.
+
+```bash
+# Current branch structure:
+# - master: Production-ready, stable code only
+# - dev: Integration branch for completed features
+# - feature/*: Individual feature development branches
+```
+
+### Standard Development Workflow
+
+1. **Create Feature Branch from `dev`**:
+   ```bash
+   git checkout dev
+   git pull origin dev
+   git checkout -b feature/aat-improvements  # or feature/fix-klawa-parsing, etc.
+   ```
+
+2. **Make Changes and Commit**:
+   ```bash
+   # Make your changes
+   devtools::test()  # Ensure tests pass
+   git add -A
+   git commit -m "FEAT: Description of changes"
+   ```
+
+3. **Push Feature Branch**:
+   ```bash
+   git push -u origin feature/aat-improvements
+   ```
+
+4. **Create Pull Request**:
+   ```bash
+   gh pr create --base dev --title "Feature: AAT improvements" --body "Description..."
+   ```
+
+5. **User Reviews PR Manually**:
+   - User reviews changes on GitHub
+   - User approves or requests changes
+   - **NEVER auto-merge without user approval**
+
+6. **After Approval, Merge to dev**:
+   ```bash
+   gh pr merge --squash  # Only after user approval!
+   ```
+
+7. **When Ready for Release, Merge dev → master**:
+   ```bash
+   git checkout master
+   git pull origin master
+   git merge dev
+   git push origin master
+   ```
+
+### Quick Reference
+
+```bash
+# Check current branch
+git branch
+
+# Switch to dev
+git checkout dev
+
+# Create feature branch
+git checkout -b feature/my-feature
+
+# Push and create PR
+git push -u origin feature/my-feature
+gh pr create --base dev
+
+# List open PRs
+gh pr list
+
+# View PR details
+gh pr view 123
+```
+
 ## Building and Testing
 
 ### Development workflow
@@ -58,13 +139,23 @@ launch_app()
 2. **ALWAYS UPDATE HOME PAGE** (`inst/shiny/modules/mod_home.R`):
    - Update "What's New" section header with new version number
    - List changes made in this version (Added/Fixed/Improved/Enhanced)
-   - Move previous "What's New" entry to "Previous Updates" section
+   - Move previous "What's New" entry to "Version History" section
+   - Update "Build Date" field with current date
    - **This is MANDATORY for every version release!**
 
-3. **Update timestamp if shown** in home page:
-   ```r
-   "2025-10-31 14:30"  # Update to current date and time
-   ```
+3. **ALWAYS UPDATE README.md**:
+   - Update version badge at top: `[![Version](https://img.shields.io/badge/version-X.X.X.XXXX-green.svg)]`
+   - Update version history section with new changes
+   - Update "Last Updated" and "Version" at bottom
+   - Update installation example tarball filename
+   - Add status notes for WIP features (like AAT)
+   - **This is MANDATORY for every version release!**
+
+4. **ALWAYS UPDATE CLAUDE.md**:
+   - Add new version to "Recently Completed" section
+   - Move previous version to "Previously Completed"
+   - Document all significant changes
+   - **This is MANDATORY for every version release!**
 
 **Version numbering scheme**:
 - `0.0.0.9xxx` = Development versions
