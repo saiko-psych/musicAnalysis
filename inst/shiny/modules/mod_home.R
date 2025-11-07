@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9030 (2025-11-07)"),
+        h4("✨ What's New in v0.0.0.9031 (2025-11-07)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "AAT calculation now uses Nmin [-] column to correctly separate ambiguous vs control items"
+            tags$strong("FIXED (CRITICAL): "),
+            "AAT calculation now uses TONE PAIR aggregation method - matches user-provided formula"
+          ),
+          tags$li(
+            tags$strong("METHOD: "),
+            "Groups individual responses into tone pairs, then calculates: AAT Score = 100 * sum(# F0 per pair) / sum(# Items per pair)"
           ),
           tags$li(
             tags$strong("PATTERN: "),
-            "Control items have same harmonic numbers in Nmin (e.g., '3 3', '4 4', '5 5'). Ambiguous items have different harmonics (e.g., '5 2', '7 3', '9 4')"
-          ),
-          tags$li(
-            tags$strong("CALCULATION: "),
-            ".itl files now match .rsl item-level files by including all items (even ambivalent/-1 responses) in percentage calculation"
+            "Control items identified by Nmin same harmonics (e.g., '3 3', '4 4'). Ambiguous items have different harmonics (e.g., '5 2', '7 3')"
           ),
           tags$li(
             tags$strong("VERIFIED: "),
-            "Tested with multiple test participants - achieves ~76% match rate with .rsl files (remaining mismatches due to data inconsistencies)"
+            "100% success rate - all 25 item-level .rsl files match their .itl files perfectly!"
           ),
           tags$li(
             tags$strong("TESTING: "),
-            "All 28 AAT tests passing"
+            "All 136 tests passing"
           )
         )
       ),

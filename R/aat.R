@@ -355,46 +355,60 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   # Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
   # Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
   if ("Nmin [-]" %in% names(data)) {
-    # Extract Nmin values and parse them
-    nmin_col <- data[["Nmin [-]"]]
+    # CRITICAL: Must aggregate at TONE PAIR level, not individual item level
+    # Formula: AAT Score = 100 * sum(# F0 per pair) / sum(# Items per pair)
 
-    # Split Nmin into two parts and check if they're the same
-    nmin_parts <- stringr::str_split(nmin_col, "\\s+")
-    is_control <- purrr::map_lgl(nmin_parts, ~.x[1] == .x[2])
+    # Create tone pair identifier from Reference F0, F0 Difference, and Nmin
+    data$tone_pair_id <- paste(
+      data[["Reference F0 [Hz]"]],
+      data[["F0 Difference [%]"]],
+      data[["Nmin [-]"]],
+      sep = "_"
+    )
 
-    # CRITICAL: .itl files should match .rsl item-level files, which include ALL items (even -1 and 2)
-    # .rsl SUMMARY files use different logic (exclude non-evaluable), but we match item-level format
+    # Classify each item as F0 response (code = 1)
+    data$is_f0 <- (classifications == 1)
 
-    # Ambiguous items: Nmin parts are DIFFERENT
-    ambig_idx <- which(!is_control)
-    if (length(ambig_idx) > 0) {
-      ambig_class <- classifications[ambig_idx]
-      ambig_f0_count <- sum(ambig_class == 1, na.rm = TRUE)
-      ambig_total <- length(ambig_idx)  # ALL items including -1 and 2
+    # Determine Type for each item using Nmin pattern
+    data$Type <- ifelse(
+      stringr::str_detect(data[["Nmin [-]"]], "^(\\d+)\\s+\\1$"),
+      "Control",
+      "Ambiguous"
+    )
 
-      if (ambig_total > 0) {
-        ambiguous_pct <- round((ambig_f0_count / ambig_total) * 100, 1)
-      }
+    # Aggregate by tone pair
+    pairs <- data %>%
+      dplyr::group_by(tone_pair_id, Type) %>%
+      dplyr::summarise(
+        n_f0 = sum(is_f0, na.rm = TRUE),
+        n_items = dplyr::n(),
+        .groups = "drop"
+      )
 
-      # Calculate tone pairs (each pair presented twice)
-      a_tone_pairs <- as.integer(ambig_total / 2)
-      a_avg_items_per_pair <- 2
+    # Aggregate by Type
+    type_summary <- pairs %>%
+      dplyr::group_by(Type) %>%
+      dplyr::summarise(
+        n_tone_pairs = dplyr::n(),
+        avg_items_per_pair = mean(n_items, na.rm = TRUE),
+        aat_score = 100 * sum(n_f0, na.rm = TRUE) / sum(n_items, na.rm = TRUE),
+        .groups = "drop"
+      )
+
+    # Extract results for Ambiguous
+    ambig_row <- type_summary[type_summary$Type == "Ambiguous", ]
+    if (nrow(ambig_row) > 0) {
+      ambiguous_pct <- round(ambig_row$aat_score, 1)
+      a_tone_pairs <- as.integer(ambig_row$n_tone_pairs)
+      a_avg_items_per_pair <- round(ambig_row$avg_items_per_pair, 2)
     }
 
-    # Control items: Nmin parts are SAME
-    control_idx <- which(is_control)
-    if (length(control_idx) > 0) {
-      control_class <- classifications[control_idx]
-      control_f0_count <- sum(control_class == 1, na.rm = TRUE)
-      control_total <- length(control_idx)  # ALL items including -1 and 2
-
-      if (control_total > 0) {
-        control_pct <- round((control_f0_count / control_total) * 100, 1)
-      }
-
-      # Calculate tone pairs (each pair presented twice)
-      c_tone_pairs <- as.integer(control_total / 2)
-      c_avg_items_per_pair <- 2
+    # Extract results for Control
+    control_row <- type_summary[type_summary$Type == "Control", ]
+    if (nrow(control_row) > 0) {
+      control_pct <- round(control_row$aat_score, 1)
+      c_tone_pairs <- as.integer(control_row$n_tone_pairs)
+      c_avg_items_per_pair <- round(control_row$avg_items_per_pair, 2)
     }
   }
   # Fallback: if no Nmin column, calculate overall percentage
