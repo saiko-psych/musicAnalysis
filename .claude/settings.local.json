@@ -5,7 +5,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh\" pr create --base master --title \"Release v0.0.0.9026 - AAT fixes and workflow improvements\" --body \"Summary: Fixed AAT parsing for real data, added workflow improvements, WIP warnings. All 26 tests passing. Ready for review.\")",
       "Bash(git merge:*)",
       "Bash(\"/c/Program Files/GitHub CLI/gh\" pr create --base dev --title \"FEAT: Complete AAT variable extraction\" --body \"Adds all missing variables from .rsl files and calculates percentages for .itl files. Ready for review.\")",
-      "Bash(md5sum:*)"
+      "Bash(md5sum:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

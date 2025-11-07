@@ -298,7 +298,7 @@ data/KLAWA/
 - `klawa_pdf_values(file)` - Extracts numeric values from PDF text
 - `extract_and_check_code(x, pattern)` - Validates participant codes, detects conflicts
 
-**Participant code format**: 4 digits + 4 letters (e.g., "0102SICH")
+**Participant code format**: 4 digits + 4 letters (e.g., "<PARTICIPANT>")
 - Regex: `\\d{4}[A-Za-z]{4}`
 - Returns `"CODE_CONFLICT"` if multiple different codes found in same filename
 - Returns `NA_character_` if no code found
@@ -621,14 +621,14 @@ if (!is.null(music_exp$merge_notes)) {
 ### Testing individual components
 ```r
 # Test KLAWA metadata extraction
-klawa_file_info("Computer/Jeki4/Gruppen/LEN/post/0102SICH_post.pdf")
+klawa_file_info("Computer/Jeki4/Gruppen/LEN/post/<PARTICIPANT>_post.pdf")
 
 # Test PDF value extraction on single file
-klawa_pdf_values("data/KLAWA/Computer/Jeki4/Gruppen/LEN/post/0102SICH_post.pdf")
+klawa_pdf_values("data/KLAWA/Computer/Jeki4/Gruppen/LEN/post/<PARTICIPANT>_post.pdf")
 
 # Test code extraction
-extract_and_check_code("0102SICH_post_080425.pdf")  # Returns "0102SICH"
-extract_and_check_code("0102SICH_0103ANDE.pdf")     # Returns "CODE_CONFLICT"
+extract_and_check_code("<PARTICIPANT>_post_080425.pdf")  # Returns "<PARTICIPANT>"
+extract_and_check_code("<PARTICIPANT>_<PARTICIPANT>.pdf")     # Returns "CODE_CONFLICT"
 ```
 
 ## Known Data Challenges
@@ -820,12 +820,12 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 
 2. ✅ **AAT VERIFICATION: 100% match for item-level .rsl files**
    - ALL 6 participants with item-level .rsl files match their .itl files PERFECTLY:
-   - 0303KAST: Ambiguous=88.0%, Control=80.0% ✓
-   - 0312CLTH: Ambiguous=62.0%, Control=90.0% ✓
-   - 0402ARDA: Ambiguous=66.0%, Control=100.0% ✓
-   - 0403SIMA: Ambiguous=61.0%, Control=100.0% ✓
-   - 0405SAAD: Ambiguous=51.0%, Control=60.0% ✓
-   - 0511JASH: Ambiguous=43.0%, Control=90.0% ✓
+   - <PARTICIPANT>: Ambiguous=88.0%, Control=80.0% ✓
+   - <PARTICIPANT>: Ambiguous=62.0%, Control=90.0% ✓
+   - <PARTICIPANT>: Ambiguous=66.0%, Control=100.0% ✓
+   - <PARTICIPANT>: Ambiguous=61.0%, Control=100.0% ✓
+   - <PARTICIPANT>: Ambiguous=51.0%, Control=60.0% ✓
+   - <PARTICIPANT>: Ambiguous=43.0%, Control=90.0% ✓
 
 3. ✅ **Understanding summary .rsl vs item-level .rsl**
    - Summary .rsl files: Pre-calculated percentages from AAT software (cannot reproduce exactly)
@@ -875,7 +875,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -937,7 +937,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -963,7 +963,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -985,8 +985,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -1006,8 +1006,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -1026,7 +1026,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -1230,7 +1230,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -1292,7 +1292,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -1318,7 +1318,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -1340,8 +1340,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -1361,8 +1361,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -1381,7 +1381,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -1530,7 +1530,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
  (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -1583,7 +1583,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -1645,7 +1645,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -1671,7 +1671,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -1693,8 +1693,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -1714,8 +1714,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -1734,7 +1734,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -1928,7 +1928,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -1954,7 +1954,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -2011,7 +2011,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -2073,7 +2073,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -2099,7 +2099,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -2121,8 +2121,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -2142,8 +2142,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -2162,7 +2162,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -2312,8 +2312,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -2363,7 +2363,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -2425,7 +2425,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -2451,7 +2451,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -2473,8 +2473,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -2494,8 +2494,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -2514,7 +2514,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -2669,8 +2669,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -2713,7 +2713,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -2775,7 +2775,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -2801,7 +2801,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -2823,8 +2823,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -2844,8 +2844,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -2864,7 +2864,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -3025,7 +3025,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -3068,7 +3068,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -3130,7 +3130,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -3156,7 +3156,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -3178,8 +3178,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -3199,8 +3199,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -3219,7 +3219,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -3431,7 +3431,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -3493,7 +3493,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -3519,7 +3519,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -3541,8 +3541,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -3562,8 +3562,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -3582,7 +3582,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -3771,7 +3771,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -3833,7 +3833,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -3859,7 +3859,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -3881,8 +3881,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -3902,8 +3902,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -3922,7 +3922,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -4120,7 +4120,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -4182,7 +4182,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -4208,7 +4208,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -4230,8 +4230,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -4251,8 +4251,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -4271,7 +4271,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -4472,7 +4472,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -4534,7 +4534,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -4560,7 +4560,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -4582,8 +4582,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -4603,8 +4603,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -4623,7 +4623,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -4831,7 +4831,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -4893,7 +4893,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -4919,7 +4919,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -4941,8 +4941,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -4962,8 +4962,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -4982,7 +4982,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -5183,7 +5183,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -5245,7 +5245,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -5271,7 +5271,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -5293,8 +5293,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -5314,8 +5314,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -5334,7 +5334,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 
@@ -5546,7 +5546,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 ### Previously Completed (v0.0.0.9025 - 2025-11-06)
 1. ✅ **AAT Module Refinements for Real Data**
    - Filename filtering: Only processes files containing "AAT" in filename
-   - Works with complex real filenames: `0104ANMA_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
+   - Works with complex real filenames: `<PARTICIPANT>_list_pre_130325_AAT_Default_70dBSPL_FM2_~Calib_response.itl.csv`
    - Automatic file type detection: .itl.csv (raw) vs .rsl.csv (computed results)
    - Metadata extraction: participant code and date from filenames (reuses KLAWA logic)
    - New output columns: `date`, `file_type`
@@ -5608,7 +5608,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - Problem 2: All participants in same category had same color (lines overlapped visually)
    - Solution: Changed label format to "CODE - total Category" (R/plot_practice_curves.R:260-262)
    - Result: Each participant gets unique color, proper label format
-   - Labels now: "0102SICH - total Instruments", "0103ANDE - total Singing"
+   - Labels now: "<PARTICIPANT> - total Instruments", "<PARTICIPANT> - total Singing"
    - Both `group_var` and `color_var` use same value to prevent duplicate legend entries
 
 2. ✅ **Restored category_sum plotting behavior to v0.0.0.9018/9019 quality**
@@ -5634,7 +5634,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **FULLY FIXED individual plot labels in Shiny app**
    - Added `wide_data` parameter to plot call in `inst/shiny/modules/mod_mexp.R:433`
    - Individual plots now correctly show instrument names from `whichinstrument#`, `singingtype#`, `whichothermusic#` columns
-   - Tested and confirmed working: "0102SICH - Klavier", "0103ANDE - Geige", etc.
+   - Tested and confirmed working: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige", etc.
 
 2. ✅ **Implemented clickable module navigation on home page**
    - Updated `inst/shiny/app.R`: Added `id = "main_nav"` and tab values
@@ -5656,8 +5656,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 1. ✅ **TRULY FIXED plot legend display issues** (after deep debugging)
    - Root cause identified: plotly shows both `color` AND `split` values when they differ (displays as "color<br/>split")
    - Solution: Aligned `group_var` (split parameter) with `category_label_display` (color parameter)
-   - Individual plots now correctly show: "0102SICH - Klavier", "0103ANDE - Geige" (actual instrument names)
-   - Category_sum plots now correctly show: "0102SICH - Instruments", "0102SICH - Singing" (readable categories)
+   - Individual plots now correctly show: "<PARTICIPANT> - Klavier", "<PARTICIPANT> - Geige" (actual instrument names)
+   - Category_sum plots now correctly show: "<PARTICIPANT> - Instruments", "<PARTICIPANT> - Singing" (readable categories)
    - Fixed in `R/plot_practice_curves.R:269-273` by replacing group_var after creating category_label_display
    - Comprehensive tests verify all plot types work correctly
 
@@ -5677,8 +5677,8 @@ This creates 13 issues with proper labels and priorities based on the "Next step
    - All variables automatically computed in `musical_experience_time()` wide output
 
 2. ✅ **Fixed plot legend display issues**
-   - Individual plots now correctly show instrument names in legend (e.g., "0102SICH - Klavier")
-   - Category_sum plots now show readable category names (e.g., "0102SICH - Instruments")
+   - Individual plots now correctly show instrument names in legend (e.g., "<PARTICIPANT> - Klavier")
+   - Category_sum plots now show readable category names (e.g., "<PARTICIPANT> - Instruments")
    - Enhanced `category_label_display` logic with `dplyr::case_when()` for proper name mapping
    - Fixed fallback behavior for cases without instrument name data
 
@@ -5697,7 +5697,7 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 3. ✅ **Enhanced plot legends with instrument names**
    - Added `wide_data` parameter to `plot_practice_curves()` function
    - Implemented logic to join instrument/singing/othermusic names from wide format
-   - Created `category_label_display` that combines code with instrument name (e.g., "0102SICH - Klavier")
+   - Created `category_label_display` that combines code with instrument name (e.g., "<PARTICIPANT> - Klavier")
    - Enhanced hover tooltips to show instrument names
    - Legends now display meaningful names instead of generic codes
 

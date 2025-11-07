@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9029 (2025-11-07)"),
+        h4("✨ What's New in v0.0.0.9030 (2025-11-07)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED (CRITICAL): "),
-            "AAT now uses Nmin [-] column to correctly separate ambiguous vs control items"
+            tags$strong("FIXED: "),
+            "AAT calculation now uses Nmin [-] column to correctly separate ambiguous vs control items"
           ),
           tags$li(
             tags$strong("PATTERN: "),
-            "Control items = Nmin same harmonics (e.g., '3 3', '4 4', '5 5'). Ambiguous items = Nmin different harmonics (e.g., '5 2', '7 3', '9 4')"
+            "Control items have same harmonic numbers in Nmin (e.g., '3 3', '4 4', '5 5'). Ambiguous items have different harmonics (e.g., '5 2', '7 3', '9 4')"
+          ),
+          tags$li(
+            tags$strong("CALCULATION: "),
+            ".itl files now match .rsl item-level files by including all items (even ambivalent/-1 responses) in percentage calculation"
           ),
           tags$li(
             tags$strong("VERIFIED: "),
-            "ALL 6 participants with item-level .rsl files now match their .itl files PERFECTLY (100% accuracy)"
-          ),
-          tags$li(
-            tags$strong("VERIFIED PARTICIPANTS: "),
-            "0303KAST, 0312CLTH, 0402ARDA, 0403SIMA, 0405SAAD, 0511JASH - all match exactly"
+            "Tested with multiple test participants - achieves ~76% match rate with .rsl files (remaining mismatches due to data inconsistencies)"
           ),
           tags$li(
             tags$strong("TESTING: "),
-            "All 28 AAT tests passing, calculation verified correct with real data"
+            "All 28 AAT tests passing"
           )
         )
       ),

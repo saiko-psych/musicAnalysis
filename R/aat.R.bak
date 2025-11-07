@@ -357,41 +357,38 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   if ("Nmin [-]" %in% names(data)) {
     # Extract Nmin values and parse them
     nmin_col <- data[["Nmin [-]"]]
-
+    
     # Split Nmin into two parts and check if they're the same
     nmin_parts <- stringr::str_split(nmin_col, "\\s+")
     is_control <- purrr::map_lgl(nmin_parts, ~.x[1] == .x[2])
-
-    # CRITICAL: .itl files should match .rsl item-level files, which include ALL items (even -1 and 2)
-    # .rsl SUMMARY files use different logic (exclude non-evaluable), but we match item-level format
-
+    
     # Ambiguous items: Nmin parts are DIFFERENT
     ambig_idx <- which(!is_control)
     if (length(ambig_idx) > 0) {
       ambig_class <- classifications[ambig_idx]
       ambig_f0_count <- sum(ambig_class == 1, na.rm = TRUE)
       ambig_total <- length(ambig_idx)  # ALL items including -1 and 2
-
+      
       if (ambig_total > 0) {
         ambiguous_pct <- round((ambig_f0_count / ambig_total) * 100, 1)
       }
-
+      
       # Calculate tone pairs (each pair presented twice)
       a_tone_pairs <- as.integer(ambig_total / 2)
       a_avg_items_per_pair <- 2
     }
-
+    
     # Control items: Nmin parts are SAME
     control_idx <- which(is_control)
     if (length(control_idx) > 0) {
       control_class <- classifications[control_idx]
       control_f0_count <- sum(control_class == 1, na.rm = TRUE)
       control_total <- length(control_idx)  # ALL items including -1 and 2
-
+      
       if (control_total > 0) {
         control_pct <- round((control_f0_count / control_total) * 100, 1)
       }
-
+      
       # Calculate tone pairs (each pair presented twice)
       c_tone_pairs <- as.integer(control_total / 2)
       c_avg_items_per_pair <- 2
