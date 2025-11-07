@@ -52,10 +52,10 @@ mod_home_ui <- function(id) {
             width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("🕐 Last Updated: "),
+              tags$strong("🕐 Build Date: "),
               tags$span(
                 style = "color: #27ae60; font-family: monospace;",
-                format(Sys.time(), "%Y-%m-%d %H:%M")
+                "2025-11-06"
               )
             )
           )

@@ -6,7 +6,7 @@ An R package for automated data extraction and preparation from music psychology
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.4.0-blue.svg)](https://www.r-project.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.0.0.9023-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
+[![Version](https://img.shields.io/badge/version-0.0.0.9026-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
 
 ---
 
@@ -91,7 +91,7 @@ devtools::install_github("saiko-psych/musicAnalysis")
 ```r
 # Download the latest release tarball
 # Then install locally:
-install.packages("path/to/musicAnalysis_0.0.0.9023.tar.gz",
+install.packages("path/to/musicAnalysis_0.0.0.9026.tar.gz",
                  repos = NULL, type = "source")
 ```
 
@@ -187,9 +187,25 @@ data/KLAWA/
 
 **Time format support**: `2d`, `1.5w`, `1/2w`, `3m`, `2y` (days, weeks, months, years)
 
-### 3. PPPT Data *(Coming Soon)*
+### 3. AAT Data *(Work in Progress - Not Production Ready)*
 
-### 4. AAT Data *(Coming Soon)*
+⚠️ **Status**: The AAT (Auditory Ambiguity Test) module is under active development. Basic functionality exists but is still being validated with real data. Use with caution and manually verify all extracted values.
+
+**Expected files**:
+- `.rsl.csv` files: Computed results with ambiguous % and control %
+- `.itl.csv` files: Raw response data with pitch classifications
+
+**Extracted metrics**:
+- Ambiguous %: Percentage of f0-responses in ambiguous items
+- Control %: Percentage correct in control items
+- Quality metrics: Ambivalent responses, "don't know" responses
+
+**Known limitations**:
+- Two different .rsl formats exist (summary vs item-level); only summary format fully supported
+- .itl files require manual specification of which items are ambiguous vs control
+- File format detection is still being refined
+
+### 4. PPPT Data *(Coming Soon)*
 
 ---
 
@@ -473,23 +489,30 @@ set_ma_options(thresholds = list(
 
 ## 📋 Version History
 
-### v0.0.0.9023 (2025-11-06) - Latest
+### v0.0.0.9026 (2025-11-06) - Latest
+- ✅ Fixed AAT .rsl parsing to extract from "Type of Pair" + "AAT Score [%]" columns
+- ✅ Fixed AAT .itl parsing to handle column names with suffixes
+- ✅ Added detection for two .rsl formats: summary vs item-level
+- ✅ Added AAT module description panel on home page
+- ✅ Added WIP warning to AAT module
+- ⚠️ **AAT module is not yet production-ready**
+
+### v0.0.0.9025 (2025-11-06)
+- ✅ AAT module refinements: filename filtering, file type detection
+- ✅ Metadata extraction from filenames (code and date)
+- ✅ Date format selector in AAT Shiny interface
+
+### v0.0.0.9024 (2025-11-06)
+- ✅ NEW: AAT (Auditory Ambiguity Test) module implemented (WIP)
+- ✅ Complete AAT analysis workflow with tests
+- ✅ AAT Shiny interface with quality detection
+
+### v0.0.0.9023 (2025-11-06)
 - ✅ Fixed category_sum plot labels and colors
 - ✅ Each participant gets unique color
 - ✅ Proper label format: "CODE - total Category"
-- ✅ Restored plotting behavior to v0.0.0.9018/9019 quality
 
-### v0.0.0.9022 (2025-11-06)
-- ✅ Consolidated all version history into collapsible section
-- ✅ Initial category_sum label improvements
-
-### v0.0.0.9021 (2025-11-06)
-- ✅ Fixed individual plot labels showing instrument names
-- ✅ Fixed critical syntax error preventing app launch
-- ✅ Added clickable module navigation on home page
-- ✅ Added collapsible version history
-
-### v0.0.0.9020 and Earlier
+### Earlier Versions
 See `inst/shiny/modules/mod_home.R` or `docs/CLAUDE.md` for complete version history.
 
 ---
@@ -587,5 +610,5 @@ For questions, issues, or feature requests:
 ---
 
 **Last Updated**: 2025-11-06
-**Version**: 0.0.0.9023
+**Version**: 0.0.0.9026
 **Status**: Active Development 🚧

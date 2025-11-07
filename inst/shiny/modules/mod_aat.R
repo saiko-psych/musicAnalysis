@@ -5,6 +5,22 @@ mod_aat_ui <- function(id) {
   fluidPage(
     h2("AAT Scanner (Auditory Ambiguity Test)"),
 
+    # WIP Warning
+    wellPanel(
+      style = "background-color: #fff3cd; border-left: 4px solid #ffc107;",
+      tags$h4(
+        style = "color: #856404; margin-top: 0;",
+        "⚠️ Work in Progress - Not Yet Ready for Production Use"
+      ),
+      tags$p(
+        style = "color: #856404; margin-bottom: 0;",
+        tags$strong("This module is currently under active development and testing."),
+        " While basic functionality works, the parsing logic for different AAT file formats ",
+        "is still being validated with real data. Please use with caution and report any issues. ",
+        "For production analysis, manually verify all extracted values against source files."
+      )
+    ),
+
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
