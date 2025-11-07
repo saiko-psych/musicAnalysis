@@ -55,7 +55,7 @@ mod_home_ui <- function(id) {
               tags$strong("🕐 Build Date: "),
               tags$span(
                 style = "color: #27ae60; font-family: monospace;",
-                "2025-11-06"
+                "2025-11-07"
               )
             )
           )
@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9026 (2025-11-06)"),
+        h4("✨ What's New in v0.0.0.9027 (2025-11-07)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "AAT .rsl file parsing now correctly extracts Ambiguous % and Control % from summary format files"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "AAT .itl file parsing now handles column names with suffixes (e.g., 'Pitch Classification [-1;0;1;2]')"
+            tags$strong("ADDED: "),
+            "AAT .rsl files now extract ALL variables: a_tone_pairs, c_tone_pairs, a_avg_items_per_pair, c_avg_items_per_pair"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "AAT .rsl parser now detects two formats: summary (Type of Pair) and item-level (% F0)"
+            "AAT .itl files now calculate ambiguous % across all evaluable items (best estimate without item markers)"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "AAT .itl files calculate control % when ambiguous_items and control_items parameters are specified"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "AAT module description on home page with clickable panel"
+            "AAT output now includes 14 columns total (was 10): added 4 new tone pair/avg item variables"
           ),
           tags$li(
-            tags$strong("UPDATED: "),
-            "All 26 AAT tests now passing with real data structure"
+            tags$strong("TESTING: "),
+            "All 26 AAT tests passing, validated with 6 real data files"
           )
         )
       ),
@@ -101,6 +101,19 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9026
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9026 (2025-11-06)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " AAT .rsl parsing extracts Ambiguous % and Control % correctly"),
+                tags$li(tags$strong("FIXED:"), " AAT .itl parsing handles column names with suffixes"),
+                tags$li(tags$strong("ADDED:"), " AAT module description on home page, WIP warning added"),
+                tags$li(tags$strong("WORKFLOW:"), " Implemented feature branch workflow (dev → feature/* → PR)")
+              )
+            ),
 
             # v0.0.0.9025
             tags$div(

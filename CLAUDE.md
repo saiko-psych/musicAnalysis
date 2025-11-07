@@ -811,7 +811,25 @@ This creates 13 issues with proper labels and priorities based on the "Next step
 12. ⬜ Further validation improvements based on user feedback
 13. ⬜ Automatic folder structure maker/file sorting for different analyses
 
-### Recently Completed (v0.0.0.9026 - 2025-11-06)
+### Recently Completed (v0.0.0.9027 - 2025-11-07)
+1. ✅ **AAT Complete Variable Extraction**
+   - Added ALL variables from .rsl summary format: `a_tone_pairs`, `c_tone_pairs`, `a_avg_items_per_pair`, `c_avg_items_per_pair`
+   - .rsl summary files now extract 6 metrics total (ambiguous %, control %, + 4 count/avg variables)
+   - Output expanded from 10 columns to 14 columns
+
+2. ✅ **AAT .itl File Percentage Calculation**
+   - .itl files now calculate `ambiguous_pct` across all evaluable items (best estimate without item type markers)
+   - When user specifies `ambiguous_items` and `control_items` parameters, calculates both percentages accurately
+   - Computes tone pair counts when item indices provided (assumes standard 2 presentations per pair)
+   - Control % calculation assumes f0 response (code 1) is correct for control items
+
+3. ✅ **Testing and Validation**
+   - All 26 AAT tests passing with updated column structure
+   - Tested with 6 real data files from tests/testdata_AAT/
+   - Verified .rsl summary extraction: all variables correct (50 pairs, 5 pairs, 2 items/pair, etc.)
+   - Verified .itl percentage calculation: 75.5%, 54.8% across all items
+
+### Previously Completed (v0.0.0.9026 - 2025-11-06)
 1. ✅ **Fixed AAT Parsing for Real Data Structure**
    - Fixed .rsl file parsing to correctly extract from summary format: "Type of Pair" + "AAT Score [%]" columns
    - Fixed .itl file parsing to handle column names with suffixes: "Pitch Classification [-1;0;1;2]"
