@@ -16,6 +16,7 @@ test_that("aat_scan returns empty tibble for directory with no AAT files", {
   expect_s3_class(result, "tbl_df")
   expect_equal(nrow(result), 0)
   expect_named(result, c("code", "date", "file_type", "ambiguous_pct", "control_pct",
+                         "a_tone_pairs", "c_tone_pairs", "a_avg_items_per_pair", "c_avg_items_per_pair",
                          "n_ambivalent", "n_dont_know", "n_evaluable", "n_total", "file"))
 
   unlink(empty_dir, recursive = TRUE)
@@ -91,8 +92,10 @@ test_that(".itl file parsing extracts quality metrics", {
   expect_equal(result$n_evaluable, 5)    # Five codes "0" or "1"
   expect_equal(result$file_type, "itl")
 
-  # Without ambiguous_items specified, percentages should be NA
-  expect_true(is.na(result$ambiguous_pct))
+  # Without ambiguous_items specified, ambiguous_pct is calculated across ALL items
+  # (3 out of 5 evaluable are "1", so 60%)
+  expect_equal(result$ambiguous_pct, 60.0)
+  # control_pct remains NA since we can't calculate it without item separation
   expect_true(is.na(result$control_pct))
 
   unlink(test_file)

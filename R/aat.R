@@ -85,6 +85,10 @@ aat_scan <- function(root,
       file_type = character(),
       ambiguous_pct = numeric(),
       control_pct = numeric(),
+      a_tone_pairs = integer(),
+      c_tone_pairs = integer(),
+      a_avg_items_per_pair = numeric(),
+      c_avg_items_per_pair = numeric(),
       n_ambivalent = integer(),
       n_dont_know = integer(),
       n_evaluable = integer(),
@@ -110,6 +114,10 @@ aat_scan <- function(root,
         file_type = NA_character_,
         ambiguous_pct = NA_real_,
         control_pct = NA_real_,
+        a_tone_pairs = NA_integer_,
+        c_tone_pairs = NA_integer_,
+        a_avg_items_per_pair = NA_real_,
+        c_avg_items_per_pair = NA_real_,
         n_ambivalent = NA_integer_,
         n_dont_know = NA_integer_,
         n_evaluable = NA_integer_,
@@ -188,8 +196,13 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   #
   # We need to detect which format and parse accordingly
 
+  # Initialize all variables
   ambiguous_pct <- NA_real_
   control_pct <- NA_real_
+  a_tone_pairs <- NA_integer_
+  c_tone_pairs <- NA_integer_
+  a_avg_items_per_pair <- NA_real_
+  c_avg_items_per_pair <- NA_real_
 
   # Check for Format 1 (summary format)
   if ("Type of Pair" %in% names(data) && "AAT Score [%]" %in% names(data)) {
@@ -197,12 +210,28 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     ambig_row <- which(stringr::str_detect(data$`Type of Pair`, "(?i)ambiguous"))
     if (length(ambig_row) > 0) {
       ambiguous_pct <- as.numeric(data$`AAT Score [%]`[ambig_row[1]])
+
+      # Extract tone pairs and avg items per pair for ambiguous
+      if ("# Tone Pairs" %in% names(data)) {
+        a_tone_pairs <- as.integer(data$`# Tone Pairs`[ambig_row[1]])
+      }
+      if ("Avg. # Items/Pair" %in% names(data)) {
+        a_avg_items_per_pair <- as.numeric(data$`Avg. # Items/Pair`[ambig_row[1]])
+      }
     }
 
     # Find row where Type of Pair is "Control"
     control_row <- which(stringr::str_detect(data$`Type of Pair`, "(?i)control"))
     if (length(control_row) > 0) {
       control_pct <- as.numeric(data$`AAT Score [%]`[control_row[1]])
+
+      # Extract tone pairs and avg items per pair for control
+      if ("# Tone Pairs" %in% names(data)) {
+        c_tone_pairs <- as.integer(data$`# Tone Pairs`[control_row[1]])
+      }
+      if ("Avg. # Items/Pair" %in% names(data)) {
+        c_avg_items_per_pair <- as.numeric(data$`Avg. # Items/Pair`[control_row[1]])
+      }
     }
   }
   # Check for Format 2 (item-level format)
@@ -212,7 +241,7 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # NOTE: Without item type markers, we can't separate ambiguous from control
     # So we'll compute an overall % F0 tendency
     #
-    # For now, return NA for both since we can't distinguish item types
+    # For now, return NA for all since we can't distinguish item types
     # Users should use Format 1 (.rsl summary files) for accurate ambiguous/control %
     ambiguous_pct <- NA_real_
     control_pct <- NA_real_
@@ -224,6 +253,10 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     file_type = "rsl",
     ambiguous_pct = ambiguous_pct,
     control_pct = control_pct,
+    a_tone_pairs = a_tone_pairs,
+    c_tone_pairs = c_tone_pairs,
+    a_avg_items_per_pair = a_avg_items_per_pair,
+    c_avg_items_per_pair = c_avg_items_per_pair,
     n_ambivalent = NA_integer_,
     n_dont_know = NA_integer_,
     n_evaluable = NA_integer_,
@@ -270,21 +303,29 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
 
   # NOTE: .itl files don't contain information about which items are ambiguous vs control
   # The AAT software tracks this internally but doesn't export it to the .itl file
-  # Therefore, we can't calculate separate ambiguous % and control % from .itl files alone
-  # Users should use .rsl files (computed results) for accurate ambiguous/control percentages
-  #
-  # What we CAN provide from .itl files:
-  # - Overall f0 tendency across all items
-  # - Quality metrics (ambivalent, don't know counts)
-  #
-  # If users need ambiguous/control separation, they must:
-  # 1. Use .rsl files instead, OR
-  # 2. Manually specify ambiguous_items and control_items parameters
+  # Without this information, we calculate percentages across ALL items (not separated)
 
+  # Initialize variables
   ambiguous_pct <- NA_real_
   control_pct <- NA_real_
+  a_tone_pairs <- NA_integer_
+  c_tone_pairs <- NA_integer_
+  a_avg_items_per_pair <- NA_real_
+  c_avg_items_per_pair <- NA_real_
 
-  # If user explicitly provided item indices, calculate them
+  # Calculate overall f0 percentage across all evaluable items
+  # This is NOT the same as ambiguous % (which should only include ambiguous items)
+  # But it's the best we can do without item type information
+  if (n_evaluable > 0) {
+    n_f0_total <- sum(classifications == 1, na.rm = TRUE)
+    overall_f0_pct <- round((n_f0_total / n_evaluable) * 100, 1)
+
+    # Store as ambiguous_pct with a note that this is across ALL items
+    ambiguous_pct <- overall_f0_pct
+    # control_pct remains NA since we can't calculate it
+  }
+
+  # If user explicitly provided item indices, calculate properly
   if (!is.null(ambiguous_items) && length(ambiguous_items) > 0) {
     amb_responses <- classifications[ambiguous_items]
     evaluable_amb <- amb_responses[amb_responses %in% c(0, 1)]
@@ -294,13 +335,30 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     if (n_evaluable_amb > 0) {
       ambiguous_pct <- round((n_f0_amb / n_evaluable_amb) * 100, 1)
     }
+
+    # Calculate tone pairs and avg items per pair for ambiguous
+    # Assuming each pair is presented twice (standard AAT protocol)
+    a_tone_pairs <- as.integer(length(ambiguous_items) / 2)
+    a_avg_items_per_pair <- 2
   }
 
   if (!is.null(control_items) && length(control_items) > 0) {
-    # For control items, we need to know correct answers
-    # Without this information, we cannot calculate control %
-    # This would require additional data not present in standard .itl files
-    control_pct <- NA_real_
+    ctrl_responses <- classifications[control_items]
+    evaluable_ctrl <- ctrl_responses[ctrl_responses %in% c(0, 1)]
+    n_evaluable_ctrl <- length(evaluable_ctrl)
+
+    # For control %, we need to know which response is "correct" for each item
+    # Standard AAT: control items have clear f0, so "1" (f0) is correct
+    # This is an assumption based on typical AAT design
+    n_correct_ctrl <- sum(evaluable_ctrl == 1, na.rm = TRUE)
+
+    if (n_evaluable_ctrl > 0) {
+      control_pct <- round((n_correct_ctrl / n_evaluable_ctrl) * 100, 1)
+    }
+
+    # Calculate tone pairs and avg items per pair for control
+    c_tone_pairs <- as.integer(length(control_items) / 2)
+    c_avg_items_per_pair <- 2
   }
 
   tibble::tibble(
@@ -309,6 +367,10 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     file_type = "itl",
     ambiguous_pct = ambiguous_pct,
     control_pct = control_pct,
+    a_tone_pairs = a_tone_pairs,
+    c_tone_pairs = c_tone_pairs,
+    a_avg_items_per_pair = a_avg_items_per_pair,
+    c_avg_items_per_pair = c_avg_items_per_pair,
     n_ambivalent = n_ambivalent,
     n_dont_know = n_dont_know,
     n_evaluable = n_evaluable,
