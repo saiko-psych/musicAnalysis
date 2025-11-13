@@ -34,18 +34,18 @@
 #'
 #' @details
 #' **File format expected**:
-#' - CSV files with column "Pitch Classification" containing:
-#'   - 0 = spectral/overtone response
-#'   - 1 = fundamental (f0) response
-#'   - 2 = ambivalent
-#'   - -1 = don't know
+#' - CSV files with columns:
+#'   - "Pitch Classification": 0 = spectral, 1 = f0, 2 = ambivalent, -1 = don't know
+#'   - "Response": -1 = skip trial (excluded), 0/1/2 = participant response
+#'   - "Nmin [-]": Identifies Control (same numbers, e.g. "3 3") vs Ambiguous (different, e.g. "5 2")
 #' - Filename format: `AAT_response_<CODE>_<DATE>.itl.csv` or similar
 #'
-#' **Calculation logic**:
-#' - Only codes 0 and 1 are included in percentage calculations (evaluable responses)
-#' - Codes 2 and -1 are excluded from denominators but counted separately
-#' - Ambiguous %: (count of 1's in ambiguous items) / (count of 0's and 1's in ambiguous items) * 100
-#' - Control %: (count correct in control items) / (total control items) * 100
+#' **Calculation logic (matching AAT manual and .rsl files)**:
+#' 1. Filter out skip trials (Response == -1)
+#' 2. Aggregate by TONE PAIR (Reference F0, F0 Difference, Nmin, Phase)
+#' 3. Count F0 responses: Pitch Classification in c(1, 2) - BOTH codes count!
+#' 4. Formula: AAT Score [%] = 100 * sum(# F0 per pair) / sum(# Items per pair)
+#' 5. Separate scores for Ambiguous (different Nmin) and Control (same Nmin)
 #'
 #' @examples
 #' \dontrun{
@@ -316,31 +316,41 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   # Read CSV file
   data <- readr::read_csv(file_path, show_col_types = FALSE)
 
-  # Find the Pitch Classification column (may have suffix like "[-1;0;1;2]")
+  # Find required columns
   pitch_col <- names(data)[stringr::str_detect(names(data), "^Pitch Classification")]
+  response_col <- names(data)[stringr::str_detect(names(data), "^Response")]
 
   if (length(pitch_col) == 0) {
     rlang::abort("Column 'Pitch Classification' not found in CSV")
   }
 
-  # Use the first matching column
   pitch_col <- pitch_col[1]
 
-  # Extract pitch classifications (only rows marked with * in Index column)
-  # The Index column format is "1 *", "2 *", etc.
-  if ("Index" %in% names(data)) {
-    # Filter for rows with "*" in Index
+  # CRITICAL FIX: Filter out skip trials (Response == -1)
+  # This is the ONLY filtering we do - do NOT filter by "*" in Index!
+  if (length(response_col) > 0) {
+    response_col <- response_col[1]
+    responses <- as.numeric(data[[response_col]])
+    skip_idx <- which(is.na(responses) | responses == -1)
+
+    # CRITICAL: Only filter if there ARE skip trials
+    # If skip_idx is empty, data[-integer(0), ] would return empty data frame!
+    if (length(skip_idx) > 0) {
+      data <- data[-skip_idx, ]
+    }
+  }
+  # Fallback for test data without Response column: filter by "*" in Index
+  else if ("Index" %in% names(data)) {
     data <- data[stringr::str_detect(data$Index, "\\*"), ]
   }
 
-  classifications <- data[[pitch_col]]
+  # Extract Pitch Classification after filtering
+  classifications <- as.numeric(data[[pitch_col]])
 
-  # Count response types
+  # Count response types for quality metrics (from Pitch Classification)
   n_total <- length(classifications)
   n_ambivalent <- sum(classifications == 2, na.rm = TRUE)
   n_dont_know <- sum(classifications == -1, na.rm = TRUE)
-
-  # Total evaluable responses (only 0 and 1, excluding 2 and -1)
   n_evaluable <- sum(classifications %in% c(0, 1), na.rm = TRUE)
 
   # Initialize variables
@@ -351,46 +361,45 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   a_avg_items_per_pair <- NA_real_
   c_avg_items_per_pair <- NA_real_
 
-  # Check if Nmin [-] column exists - THIS is the key to separating control/ambiguous!
-  # Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
-  # Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
-  if ("Nmin [-]" %in% names(data)) {
-    # CRITICAL: Must aggregate at TONE PAIR level, not individual item level
-    # Formula: AAT Score = 100 * sum(# F0 per pair) / sum(# Items per pair)
+  # Check if all required columns exist for tone-pair aggregation
+  required_cols <- c("Reference F0 [Hz]", "F0 Difference [%]", "Nmin [-]", "Phase [Cos;Alt;Rnd]")
 
-    # Create tone pair identifier from Reference F0, F0 Difference, and Nmin
-    data$tone_pair_id <- paste(
-      data[["Reference F0 [Hz]"]],
-      data[["F0 Difference [%]"]],
-      data[["Nmin [-]"]],
-      sep = "_"
-    )
+  if (all(required_cols %in% names(data))) {
 
-    # Classify each item as F0 response (code = 1)
-    data$is_f0 <- (classifications == 1)
-
-    # Determine Type for each item using Nmin pattern
+    # Determine Type (Control vs Ambiguous) using Nmin pattern
+    # Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
+    # Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
     data$Type <- ifelse(
       stringr::str_detect(data[["Nmin [-]"]], "^(\\d+)\\s+\\1$"),
       "Control",
       "Ambiguous"
     )
 
+    # Create unique tone pair identifiers (must include ALL defining columns!)
+    pair_keys <- c("Reference F0 [Hz]", "F0 Difference [%]", "Nmin [-]", "Phase [Cos;Alt;Rnd]", "Type")
+
+    # CRITICAL FIX: F0 codes are 1 AND 2 (not just 1!)
+    # This matches the AAT manual and makes Control scores work correctly
+    data$is_f0 <- (classifications %in% c(1, 2))
+
     # Aggregate by tone pair
     pairs <- data %>%
-      dplyr::group_by(tone_pair_id, Type) %>%
+      dplyr::group_by(
+        dplyr::across(dplyr::all_of(pair_keys))
+      ) %>%
       dplyr::summarise(
-        n_f0 = sum(is_f0, na.rm = TRUE),
         n_items = dplyr::n(),
+        n_f0 = sum(is_f0, na.rm = TRUE),
         .groups = "drop"
       )
 
-    # Aggregate by Type
+    # Aggregate by Type (Ambiguous / Control)
     type_summary <- pairs %>%
       dplyr::group_by(Type) %>%
       dplyr::summarise(
         n_tone_pairs = dplyr::n(),
         avg_items_per_pair = mean(n_items, na.rm = TRUE),
+        # FORMULA: AAT Score = 100 * sum(# F0) / sum(# Items)
         aat_score = 100 * sum(n_f0, na.rm = TRUE) / sum(n_items, na.rm = TRUE),
         .groups = "drop"
       )
@@ -410,13 +419,14 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
       c_tone_pairs <- as.integer(control_row$n_tone_pairs)
       c_avg_items_per_pair <- round(control_row$avg_items_per_pair, 2)
     }
-  }
-  # Fallback: if no Nmin column, calculate overall percentage
-  else if (n_total > 0) {
-    n_f0_total <- sum(classifications == 1, na.rm = TRUE)
-    # Use TOTAL items as denominator (including -1 and 2), not just evaluable
-    overall_f0_pct <- round((n_f0_total / n_total) * 100, 1)
-    ambiguous_pct <- overall_f0_pct
+
+  } else {
+    # Fallback: if required columns don't exist, calculate overall percentage
+    if (n_total > 0) {
+      n_f0_total <- sum(classifications %in% c(1, 2), na.rm = TRUE)
+      overall_f0_pct <- round((n_f0_total / n_total) * 100, 1)
+      ambiguous_pct <- overall_f0_pct
+    }
   }
 
   tibble::tibble(
