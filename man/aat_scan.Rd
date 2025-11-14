@@ -60,22 +60,22 @@ Extracts participant codes and dates from filenames, then calculates or reads AA
 
 \strong{File format expected}:
 \itemize{
-\item CSV files with column "Pitch Classification" containing:
+\item CSV files with columns:
 \itemize{
-\item 0 = spectral/overtone response
-\item 1 = fundamental (f0) response
-\item 2 = ambivalent
-\item -1 = don't know
+\item "Pitch Classification": 0 = spectral, 1 = f0, 2 = ambivalent, -1 = don't know
+\item "Response": -1 = skip trial (excluded), 0/1/2 = participant response
+\item "Nmin \link{-}": Identifies Control (same numbers, e.g. "3 3") vs Ambiguous (different, e.g. "5 2")
 }
 \item Filename format: \verb{AAT_response_<CODE>_<DATE>.itl.csv} or similar
 }
 
-\strong{Calculation logic}:
-\itemize{
-\item Only codes 0 and 1 are included in percentage calculations (evaluable responses)
-\item Codes 2 and -1 are excluded from denominators but counted separately
-\item Ambiguous \%: (count of 1's in ambiguous items) / (count of 0's and 1's in ambiguous items) * 100
-\item Control \%: (count correct in control items) / (total control items) * 100
+\strong{Calculation logic (matching AAT manual and .rsl files)}:
+\enumerate{
+\item Filter out skip trials (Response == -1)
+\item Aggregate by TONE PAIR (Reference F0, F0 Difference, Nmin, Phase)
+\item Count F0 responses: Pitch Classification in c(1, 2) - BOTH codes count!
+\item Formula: AAT Score \link{\%} = 100 * sum(# F0 per pair) / sum(# Items per pair)
+\item Separate scores for Ambiguous (different Nmin) and Control (same Nmin)
 }
 }
 \examples{

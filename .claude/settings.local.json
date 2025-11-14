@@ -16,7 +16,10 @@
       "Bash(gh issue view:*)",
       "Bash(git add:*)",
       "Bash(Rscript:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []
