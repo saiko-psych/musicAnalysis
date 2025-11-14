@@ -65,28 +65,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9034 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9043 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "PPPT Shiny module now properly displays data table after scanning"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "'Show R Code' button in PPPT module to display reproducible scan code"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "Download button for R code (.R file) in PPPT module"
+            tags$strong("FIXED: "),
+            "R code generation now properly escapes Windows paths!"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Enhanced PPPT data table with better editing and display capabilities"
+            "Generated R code is now directly executable"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Better UI layout with properly organized action buttons"
+            "Cross-platform path handling (Windows/Mac/Linux)"
+          ),
+          tags$li(
+            tags$strong("TECHNICAL: "),
+            "Regex patterns and file paths now use proper escaping"
           )
         )
       ),
@@ -101,6 +97,120 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9042
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9042 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " 95% CI vectorization bug"),
+                tags$li(tags$strong("IMPROVED:"), " All error bar types work correctly"),
+                tags$li(tags$strong("IMPROVED:"), " Overall markers match line colors")
+              )
+            ),
+
+            # v0.0.0.9041
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9041 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Error bars calculate correctly (no more ±0)"),
+                tags$li(tags$strong("NEW:"), " Error bar type selector (SE, SD, CI95, None)"),
+                tags$li(tags$strong("IMPROVED:"), " Hover tooltips show error type")
+              )
+            ),
+
+            # v0.0.0.9040
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9040 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Group summary plot rendering"),
+                tags$li(tags$strong("FIXED:"), " Error bars display on plots"),
+                tags$li(tags$strong("IMPROVED:"), " Overall index error bars")
+              )
+            ),
+
+            # v0.0.0.9039
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9039 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ENHANCED:"), " Flexible grouping variable selection"),
+                tags$li(tags$strong("NEW:"), " Group summary plot type with error bars"),
+                tags$li(tags$strong("IMPROVED:"), " Bigger overall symbol size")
+              )
+            ),
+
+            # v0.0.0.9038
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9038 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " PPPT Visualization UI - buttons now visible"),
+                tags$li(tags$strong("IMPROVED:"), " Better user guidance messages"),
+                tags$li(tags$strong("IMPROVED:"), " UI style consistency")
+              )
+            ),
+
+            # v0.0.0.9037
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9037 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " PPPT Visualization data recognition"),
+                tags$li(tags$strong("ADDED:"), " CSV upload option with validation"),
+                tags$li(tags$strong("ADDED:"), " Data source selector")
+              )
+            ),
+
+            # v0.0.0.9036
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9036 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " PPPT Frequency Profile Visualization"),
+                tags$li(tags$strong("ADDED:"), " Visualization tab with 4 plot types"),
+                tags$li(tags$strong("ADDED:"), " Interactive plots with frequency lines and overall marker"),
+                tags$li(tags$strong("ADDED:"), " Show R Code and download buttons for plots")
+              )
+            ),
+
+            # v0.0.0.9035
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9035 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " PPPT scanner with comprehensive enhancements"),
+                tags$li(tags$strong("ADDED:"), " Row display selector (10, 25, 50, 100, All)"),
+                tags$li(tags$strong("ADDED:"), " Enhanced folder structure analysis with 4 file type counts"),
+                tags$li(tags$strong("ADDED:"), " Duplicate detection and removal with reporting"),
+                tags$li(tags$strong("ADDED:"), " Improved code extraction with fallback strategies"),
+                tags$li(tags$strong("ADDED:"), " Optional group extraction from folder paths"),
+                tags$li(tags$strong("ADDED:"), " pppt_validate() function for data quality checks")
+              )
+            ),
+
+            # v0.0.0.9034
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9034 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " PPPT Shiny module UI enhancements"),
+                tags$li(tags$strong("FIXED:"), " Data table display now shows properly after scanning"),
+                tags$li(tags$strong("ADDED:"), " 'Show R Code' button for reproducible scan code"),
+                tags$li(tags$strong("ADDED:"), " Download button for R code (.R file)")
+              )
+            ),
 
             # v0.0.0.9033
             tags$div(

@@ -4,7 +4,14 @@
 \alias{pppt_parse_one}
 \title{Parse a single PPPT .rsl.csv file}
 \usage{
-pppt_parse_one(file_path, code_pattern, date_format)
+pppt_parse_one(
+  file_path,
+  code_pattern,
+  date_format,
+  root = NULL,
+  extract_groups = FALSE,
+  group_names = character()
+)
 }
 \arguments{
 \item{file_path}{Path to PPPT .rsl.csv file}
@@ -12,6 +19,12 @@ pppt_parse_one(file_path, code_pattern, date_format)
 \item{code_pattern}{Regex pattern for participant codes}
 
 \item{date_format}{Date format in filename}
+
+\item{root}{Root directory for relative paths}
+
+\item{extract_groups}{Whether to extract group information}
+
+\item{group_names}{Group names to look for}
 }
 \value{
 Tibble with one row containing extracted data

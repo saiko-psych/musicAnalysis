@@ -3,7 +3,102 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9034 (2025-11-14)
+## Current Version: v0.0.0.9043 (2025-11-14)
+
+### v0.0.0.9043 (2025-11-14)
+- **FIXED: R code generation now properly escapes Windows paths**
+- Added `escape_for_r()` helper function to handle path escaping
+- Windows paths now use double backslashes (e.g., `C:\\Users\\David\\...`)
+- Regex patterns now properly escaped (e.g., `\\d{4}` instead of `\d{4}`)
+- Generated R code is now directly executable without modification
+- Cross-platform compatible: works on Windows, Mac, and Linux
+- Updated both "Show R Code" and "Download R Code" sections
+
+### v0.0.0.9042 (2025-11-14)
+- **CRITICAL FIX: 95% Confidence Interval now works correctly**
+- Fixed `.calculate_error()` function to use `ifelse()` instead of `if` for vectorization
+- The `if (n > 30)` statement was causing "condition has length > 1" error
+- CI95 now calculates correctly using t-distribution: `t_val * SD / sqrt(n)`
+- All error bar types (SE, SD, CI95) now work properly in all plot types
+- Overall PPP index markers now automatically match line colors via `legendgroup` in overlaid plots
+- Fixed vectorization to handle multiple data points simultaneously
+
+### v0.0.0.9041 (2025-11-14)
+- **FIXED: Error bars now calculate correctly (were showing ±0)**
+- Fixed error bar calculation to properly compute SE, SD, and CI95
+- Changed from hardcoded `se` column to dynamic `error` column based on user selection
+- Added UI selector for error bar type with 4 options: SE, SD, 95% CI, or None
+- Added helpful descriptions for each error bar type in UI
+- Standard Error: SE = SD/√n
+- Standard Deviation: SD (spread of data)
+- 95% Confidence Interval: uses t-distribution for accurate intervals
+- Error bars now display correctly in all mean/summary plots
+- Updated hover templates to show error type in parentheses
+- R code generation includes error_type parameter
+
+### v0.0.0.9040 (2025-11-14)
+- **FIXED: PPPT group summary plot now works correctly**
+- Fixed rendering of group_summary plot type in Shiny UI
+- Added error bars to overall PPP index markers in overlaid plots
+- Error bars now display properly for both frequency bands and overall index
+- Improved conditional panel logic for color_by selector (includes group_summary)
+- Fixed group_summary to render as single plot instead of multiple plots
+- Enhanced error bar implementation in `.create_overlaid_profile_plot()`
+- All plot types now properly display error bars when applicable
+
+### v0.0.0.9039 (2025-11-14)
+- **ENHANCED: PPPT Visualization with flexible grouping and error bars**
+- Added selectable grouping variable from data columns (not hardcoded to "group")
+- Added "Group summary" plot type showing mean line per group with error bars
+- Added error bars (±SE) to all mean/summary plots (all_combined and group_summary)
+- Increased overall PPP index symbol size from 10 to 14 for better visibility
+- Error bars shown for both frequency bands and overall index
+- Dynamic group variable selector that excludes PPP index columns
+- Updated R code generation to include group_var parameter
+- Improved plot customization and flexibility
+
+### v0.0.0.9038 (2025-11-14)
+- **FIXED: PPPT Visualization UI - buttons and plots now visible**
+- Removed outer conditional panel that was hiding plot controls
+- Changed "Update Plot" button to "Generate Plot" for clarity
+- Removed emoji from "Show R Code" button text for consistency
+- Added helpful messages in plot area when no data or plot generated
+- Improved user experience to match musical experience module style
+
+### v0.0.0.9037 (2025-11-14)
+- **FIXED: PPPT Visualization tab data recognition**
+- Fixed conditional panel to properly recognize scanned data from Data Scanning tab
+- Added CSV upload option for visualization with format validation
+- Added data source selector (scanned vs uploaded)
+- Added real-time data validation and status display
+- Updated R code generation to handle both scanned and uploaded data sources
+- Improved reactive data flow between tabs
+
+### v0.0.0.9036 (2025-11-14)
+- **NEW: PPPT Frequency Profile Visualization**
+- Added `pppt_plot_profile()` function for creating interactive PPPT profile plots
+- Frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) shown as connected lines
+- Overall PPP index shown as separate diamond marker (not connected)
+- Four plot types: all_combined (mean), all_overlaid, individual, by_group
+- Color-by options: participant, group, or custom color
+- Added visualization tab in PPPT Shiny module with:
+  - Plot type selector
+  - Color and legend controls
+  - Update Plot button
+  - Download Plot (HTML) button
+  - Show R Code button for reproducibility
+  - Download Code (.R) button
+- Helper functions: `.pppt_to_long()`, `.create_single_profile_plot()`, `.create_overlaid_profile_plot()`
+
+### v0.0.0.9035 (2025-11-14)
+- **IMPROVED: PPPT Scanner with comprehensive enhancements**
+- Added row display selector (10, 25, 50, 100, All)
+- Enhanced folder structure analysis showing 4 file type counts
+- Added duplicate detection and removal with reporting
+- Improved code extraction with fallback strategies
+- Added optional group extraction from folder paths
+- Created `pppt_validate()` function for data quality checks
+- Complete Shiny UI overhaul with validation results
 
 ### v0.0.0.9034 (2025-11-14)
 - **IMPROVED: PPPT Shiny module UI enhancements**
