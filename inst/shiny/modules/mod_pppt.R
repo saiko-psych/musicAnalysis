@@ -156,36 +156,7 @@ mod_pppt_ui <- function(id) {
     ),
 
     # Results
-    conditionalPanel(
-      condition = sprintf("output['%s'] != null", ns("data_table")),
-      hr(),
-      h4("4. Review Results"),
-
-      # Summary statistics
-      wellPanel(
-        style = "background-color: #e3f2fd;",
-        h5("📊 Summary Statistics"),
-        htmlOutput(ns("summary_stats"))
-      ),
-
-      # Data table
-      wellPanel(
-        h5("📄 PPPT Data"),
-        p(
-          style = "color: #666; font-size: 0.9em;",
-          tags$strong("💡 Tip:"), " Double-click any cell to edit its value.",
-          " Your changes will be reflected in the downloaded CSV."
-        ),
-        DT::dataTableOutput(ns("data_table"))
-      ),
-
-      # Download button
-      downloadButton(
-        ns("download_csv"),
-        "💾 Download CSV",
-        class = "btn-primary btn-lg"
-      )
-    )
+    uiOutput(ns("results_panel"))
   )
 }
 
@@ -304,21 +275,73 @@ mod_pppt_server <- function(id) {
       })
     })
 
-    # Summary statistics
-    output$summary_stats <- renderUI({
+    # Render results panel
+    output$results_panel <- renderUI({
       req(rv$pppt_data)
 
-      data <- rv$pppt_data
-
       tagList(
-        tags$p(
-          tags$strong("Total participants:"), nrow(data), tags$br(),
-          tags$strong("Mean PPP Index (Overall):"),
-          sprintf("%.2f", mean(data$ppp_index_overall, na.rm = TRUE)), tags$br(),
-          tags$strong("Range:"),
-          sprintf("[%.2f, %.2f]",
-                  min(data$ppp_index_overall, na.rm = TRUE),
-                  max(data$ppp_index_overall, na.rm = TRUE))
+        hr(),
+        h4("4. Review Results"),
+
+        # Summary statistics
+        wellPanel(
+          style = "background-color: #e3f2fd;",
+          h5("📊 Summary Statistics"),
+          tags$p(
+            tags$strong("Total participants:"), nrow(rv$pppt_data), tags$br(),
+            tags$strong("Mean PPP Index (Overall):"),
+            sprintf("%.2f", mean(rv$pppt_data$ppp_index_overall, na.rm = TRUE)), tags$br(),
+            tags$strong("Range:"),
+            sprintf("[%.2f, %.2f]",
+                    min(rv$pppt_data$ppp_index_overall, na.rm = TRUE),
+                    max(rv$pppt_data$ppp_index_overall, na.rm = TRUE))
+          )
+        ),
+
+        # Data table
+        wellPanel(
+          h5("📄 PPPT Data"),
+          p(
+            style = "color: #666; font-size: 0.9em;",
+            tags$strong("💡 Tip:"), " Double-click any cell to edit its value.",
+            " Your changes will be reflected in the downloaded CSV."
+          ),
+          DT::dataTableOutput(ns("data_table"))
+        ),
+
+        # Action buttons
+        fluidRow(
+          column(
+            width = 4,
+            downloadButton(
+              ns("download_csv"),
+              "💾 Download CSV",
+              class = "btn-primary btn-lg btn-block"
+            )
+          ),
+          column(
+            width = 4,
+            actionButton(
+              ns("show_code"),
+              "📝 Show R Code",
+              class = "btn-info btn-lg btn-block"
+            )
+          )
+        ),
+
+        br(),
+
+        # R Code display (conditional)
+        conditionalPanel(
+          condition = "input.show_code > 0",
+          ns = ns,
+          wellPanel(
+            style = "background-color: #f8f9fa;",
+            h4("R Code to Scan PPPT Files"),
+            p("Copy and paste this code into your R console to reproduce this scan:"),
+            verbatimTextOutput(ns("r_code")),
+            downloadButton(ns("download_code"), "Download Code (.R)")
+          )
         )
       )
     })
@@ -329,11 +352,12 @@ mod_pppt_server <- function(id) {
 
       DT::datatable(
         rv$edited_data,
-        editable = list(target = "cell", disable = list(columns = ncol(rv$edited_data))), # Protect file column
+        editable = list(target = "cell", disable = list(columns = c(0))), # Protect first column
         options = list(
           pageLength = 25,
           scrollX = TRUE,
-          dom = 'Bfrtip'
+          dom = 'Bfrtip',
+          buttons = c('copy', 'csv', 'excel')
         ),
         rownames = FALSE
       )
@@ -342,16 +366,72 @@ mod_pppt_server <- function(id) {
     # Handle edits
     observeEvent(input$data_table_cell_edit, {
       info <- input$data_table_cell_edit
-      rv$edited_data[info$row, info$col] <- info$value
+      rv$edited_data[info$row, info$col + 1] <- info$value
     })
 
-    # Download handler
+    # R Code output
+    output$r_code <- renderText({
+      req(rv$root_path)
+
+      code <- sprintf('library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "%s",
+  code_pattern = "%s",
+  date_format = "%s"
+)
+
+# View results
+View(pppt_data)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
+',
+        rv$root_path,
+        input$code_pattern,
+        input$date_format
+      )
+
+      code
+    })
+
+    # Download CSV handler
     output$download_csv <- downloadHandler(
       filename = function() {
         paste0("pppt_data_", format(Sys.Date(), "%Y%m%d"), ".csv")
       },
       content = function(file) {
         readr::write_csv(rv$edited_data, file)
+      }
+    )
+
+    # Download R code handler
+    output$download_code <- downloadHandler(
+      filename = function() {
+        paste0("pppt_scan_code_", format(Sys.Date(), "%Y%m%d"), ".R")
+      },
+      content = function(file) {
+        code <- sprintf('library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "%s",
+  code_pattern = "%s",
+  date_format = "%s"
+)
+
+# View results
+View(pppt_data)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
+',
+          rv$root_path,
+          input$code_pattern,
+          input$date_format
+        )
+        writeLines(code, file)
       }
     )
   })

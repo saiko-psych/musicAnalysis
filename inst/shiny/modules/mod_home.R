@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9033 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9034 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("NEW: "),
-            "PPPT (Pitch Perception Proficiency Test) Shiny module for data extraction"
+            tags$strong("IMPROVED: "),
+            "PPPT Shiny module now properly displays data table after scanning"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Complete PPPT integration with main app navigation and home page"
+            "'Show R Code' button in PPPT module to display reproducible scan code"
           ),
           tags$li(
-            tags$strong("FEATURE: "),
-            "Extracts PPP indices for all 6 UCF frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) plus overall index"
-          ),
-          tags$li(
-            tags$strong("FEATURE: "),
-            "Folder structure analysis, recursive scanning, and editable data table with CSV export"
+            tags$strong("ADDED: "),
+            "Download button for R code (.R file) in PPPT module"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Configurable code pattern and date format recognition for PPPT files"
+            "Enhanced PPPT data table with better editing and display capabilities"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Better UI layout with properly organized action buttons"
           )
         )
       ),
@@ -101,6 +101,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9033
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9033 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " PPPT Shiny module for data extraction"),
+                tags$li(tags$strong("ADDED:"), " Complete PPPT integration with main app"),
+                tags$li(tags$strong("ADDED:"), " Editable data table with CSV export")
+              )
+            ),
 
             # v0.0.0.9032
             tags$div(

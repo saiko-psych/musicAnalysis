@@ -27,13 +27,13 @@ Standard R package layout:
 - **.claude/memory/** - Extended documentation (VERSION_HISTORY.md)
 - **DESCRIPTION** - Package metadata and dependencies
 
-## Current Status (v0.0.0.9033 - 2025-11-14)
+## Current Status (v0.0.0.9034 - 2025-11-14)
 
-✅ **Recently Added**:
-- PPPT (Pitch Perception Proficiency Test) Shiny module fully implemented
-- Complete integration with main app navigation and home page
-- Extracts PPP indices for all 6 UCF frequency bands (294, 523, 932, 1661, 2960, 5274 Hz)
-- Folder structure analysis, recursive scanning, editable data table with CSV export
+✅ **Recently Improved**:
+- PPPT Shiny module UI enhancements
+- Fixed data table display issue
+- Added "Show R Code" button with download capability
+- Enhanced editing and CSV export functionality
 
 ## Git Workflow (IMPORTANT!)
 

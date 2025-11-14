@@ -3,7 +3,15 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9033 (2025-11-14)
+## Current Version: v0.0.0.9034 (2025-11-14)
+
+### v0.0.0.9034 (2025-11-14)
+- **IMPROVED: PPPT Shiny module UI enhancements**
+- Fixed data table display to show properly after scanning
+- Added "Show R Code" button to display reproducible scan code
+- Added download button for R code (.R file)
+- Improved data table with better editing capabilities
+- Enhanced UI layout with proper action buttons
 
 ### v0.0.0.9033 (2025-11-14)
 - **NEW: PPPT (Pitch Perception Proficiency Test) Shiny Module**
