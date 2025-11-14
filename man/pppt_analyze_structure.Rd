@@ -10,8 +10,17 @@ pppt_analyze_structure(root)
 \item{root}{Path to root folder}
 }
 \value{
-List with structure information
+List with structure information including:
+\itemize{
+\item n_pppt_rsl: Files with "PPPT" in filename AND .rsl.csv extension
+\item n_pppt_itl: Files with "PPPT" in filename AND .itl.csv extension
+\item n_rsl_total: All .rsl.csv files
+\item n_valid_pppt: .rsl.csv files that contain valid PPPT data (UCF column)
+\item pppt_rsl_files: List of PPPT .rsl.csv filenames
+\item pppt_itl_files: List of PPPT .itl.csv filenames
+}
 }
 \description{
-Scans folder to identify PPPT files and their organization
+Scans folder to identify PPPT files and their organization.
+Provides detailed counts of different file types.
 }

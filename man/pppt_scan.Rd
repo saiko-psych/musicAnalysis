@@ -4,7 +4,14 @@
 \alias{pppt_scan}
 \title{Scan folder for PPPT data files}
 \usage{
-pppt_scan(root, code_pattern = "\\\\d{4}[A-Za-z]{4}", date_format = "DDMMYY")
+pppt_scan(
+  root,
+  code_pattern = "\\\\d{4}[A-Za-z]{4}",
+  date_format = "DDMMYY",
+  extract_groups = FALSE,
+  group_names = character(),
+  remove_duplicates = TRUE
+)
 }
 \arguments{
 \item{root}{Path to root folder containing PPPT data}
@@ -12,10 +19,16 @@ pppt_scan(root, code_pattern = "\\\\d{4}[A-Za-z]{4}", date_format = "DDMMYY")
 \item{code_pattern}{Regex pattern for participant codes (default: 4 digits + 4 letters)}
 
 \item{date_format}{Date format in filenames (default: "DDMMYY")}
+
+\item{extract_groups}{Logical, whether to extract group information from folder structure}
+
+\item{group_names}{Character vector of group names to look for in paths}
+
+\item{remove_duplicates}{Logical, whether to remove duplicate participant codes (keeps first)}
 }
 \value{
 Tibble with columns: code, ppp_index_overall, ppp_index_294, ppp_index_523,
-ppp_index_932, ppp_index_1661, ppp_index_2960, ppp_index_5274, date, file
+ppp_index_932, ppp_index_1661, ppp_index_2960, ppp_index_5274, date, file, and optionally group
 }
 \description{
 Recursively scans a folder structure for PPPT .rsl.csv files and extracts
@@ -24,5 +37,7 @@ PPP (Pitch Perception Proficiency) indices per participant.
 \examples{
 \dontrun{
 pppt_data <- pppt_scan("data/PPPT")
+pppt_data_with_groups <- pppt_scan("data/PPPT", extract_groups = TRUE,
+                                    group_names = c("VG", "KG", "EG"))
 }
 }

@@ -13,7 +13,9 @@ mod_pppt_ui <- function(id) {
       tags$ul(
         tags$li(tags$strong("PPP Index:"), " Pitch Perception Proficiency index for each UCF frequency"),
         tags$li(tags$strong("UCF Frequencies:"), " 294, 523, 932, 1661, 2960, 5274 Hz"),
-        tags$li(tags$strong("Overall Index:"), " Overall PPP index across all frequencies")
+        tags$li(tags$strong("Overall Index:"), " Overall PPP index across all frequencies"),
+        tags$li(tags$strong("Groups:"), " Optionally extract group information from folder structure"),
+        tags$li(tags$strong("Validation:"), " Check data quality and identify problems")
       ),
       p(
         style = "margin-top: 10px; padding: 8px; background-color: #e8f5e9; border-left: 3px solid #4caf50;",
@@ -76,28 +78,16 @@ mod_pppt_ui <- function(id) {
     br(),
 
     # Folder Structure Display (conditional)
-    conditionalPanel(
-      condition = sprintf("output['%s'] != ''", ns("structure_summary")),
-      wellPanel(
-        style = "background-color: #e7ffe7;",
-        h5("📊 Detected Folder Structure"),
-        htmlOutput(ns("structure_summary")),
-        br(),
-        p(
-          style = "font-size: 0.9em; color: #666;",
-          "The scanner found PPPT .rsl.csv files. Configure settings below and click 'Scan Files'."
-        )
-      )
-    ),
+    uiOutput(ns("structure_panel")),
 
     hr(),
 
     # Advanced Settings
-    h4("2. Configure Settings (Optional)"),
+    h4("2. Configure Settings"),
     wellPanel(
       fluidRow(
         column(
-          width = 4,
+          width = 3,
           textInput(
             ns("code_pattern"),
             "Participant Code Pattern:",
@@ -110,7 +100,7 @@ mod_pppt_ui <- function(id) {
           )
         ),
         column(
-          width = 4,
+          width = 3,
           selectInput(
             ns("date_format"),
             "Date Format in Filenames:",
@@ -123,10 +113,40 @@ mod_pppt_ui <- function(id) {
               "MMDDYYYY (e.g., 03162025)" = "MMDDYYYY"
             ),
             selected = "DDMMYY"
+          )
+        ),
+        column(
+          width = 3,
+          checkboxInput(
+            ns("extract_groups"),
+            "Extract Group Information",
+            value = FALSE
+          ),
+          conditionalPanel(
+            condition = "input.extract_groups",
+            ns = ns,
+            textInput(
+              ns("group_names"),
+              "Group Names (comma-separated):",
+              value = "VG,KG,EG",
+              placeholder = "e.g., VG,KG,EG"
+            ),
+            tags$small(
+              class = "form-text text-muted",
+              "Group names to look for in folder paths"
+            )
+          )
+        ),
+        column(
+          width = 3,
+          checkboxInput(
+            ns("remove_duplicates"),
+            "Remove Duplicate Codes",
+            value = TRUE
           ),
           tags$small(
             class = "form-text text-muted",
-            "Select the date format used in your filenames"
+            "Keep only first occurrence of each code"
           )
         )
       )
@@ -169,7 +189,8 @@ mod_pppt_server <- function(id) {
       root_path = NULL,
       structure_info = NULL,
       pppt_data = NULL,
-      edited_data = NULL
+      edited_data = NULL,
+      validation_results = NULL
     )
 
     # Folder browser (if shinyFiles available)
@@ -215,17 +236,31 @@ mod_pppt_server <- function(id) {
       })
     })
 
-    # Display structure summary
-    output$structure_summary <- renderUI({
+    # Display structure panel
+    output$structure_panel <- renderUI({
       req(rv$structure_info)
 
-      tagList(
-        tags$p(
-          tags$strong("📊 Found:"),
-          tags$ul(
-            tags$li(sprintf("%d .rsl.csv files", rv$structure_info$n_rsl_files)),
-            tags$li(sprintf("%d .itl.csv files", rv$structure_info$n_itl_files))
+      info <- rv$structure_info
+
+      wellPanel(
+        style = "background-color: #e7ffe7;",
+        h5("📊 Detected Folder Structure"),
+        tags$div(
+          style = "padding: 10px;",
+          tags$p(
+            tags$strong("File Analysis:"),
+            tags$ul(
+              tags$li(sprintf("Files with 'PPPT' + .rsl.csv extension: %d", info$n_pppt_rsl)),
+              tags$li(sprintf("Files with 'PPPT' + .itl.csv extension: %d", info$n_pppt_itl)),
+              tags$li(sprintf("Total .rsl.csv files found: %d", info$n_rsl_total)),
+              tags$li(sprintf("Valid PPPT files (with UCF column): %d", info$n_valid_pppt),
+                      style = "color: #2e7d32; font-weight: bold;")
+            )
           )
+        ),
+        tags$p(
+          style = "font-size: 0.9em; color: #666;",
+          "Configure settings below and click 'Scan Files' to extract data."
         )
       )
     })
@@ -239,22 +274,42 @@ mod_pppt_server <- function(id) {
         paste("Scanning folder:", rv$root_path, "\n",
               "Code pattern:", input$code_pattern, "\n",
               "Date format:", input$date_format, "\n",
+              if (input$extract_groups) paste0("Groups: ", input$group_names, "\n"),
               "Please wait...")
       })
 
       tryCatch({
+        # Parse group names
+        group_names_vec <- if (input$extract_groups && nzchar(input$group_names)) {
+          trimws(strsplit(input$group_names, ",")[[1]])
+        } else {
+          character()
+        }
+
         # Perform scan
         result <- pppt_scan(
           root = rv$root_path,
           code_pattern = input$code_pattern,
-          date_format = input$date_format
+          date_format = input$date_format,
+          extract_groups = input$extract_groups,
+          group_names = group_names_vec,
+          remove_duplicates = input$remove_duplicates
         )
 
         rv$pppt_data <- result
         rv$edited_data <- result  # Initialize edited data
 
+        # Run validation
+        rv$validation_results <- pppt_validate(
+          root = rv$root_path,
+          scanned_data = result,
+          code_pattern = input$code_pattern
+        )
+
         output$scan_status <- renderText({
-          sprintf("✓ Successfully scanned %d PPPT file(s)", nrow(result))
+          sprintf("✓ Successfully scanned %d PPPT file(s)\n\nValidation: %s",
+                  nrow(result),
+                  rv$validation_results$validation_summary)
         })
 
         showNotification(
@@ -283,19 +338,25 @@ mod_pppt_server <- function(id) {
         hr(),
         h4("4. Review Results"),
 
+        # Validation Results
+        wellPanel(
+          style = "background-color: #fff3e0;",
+          h5("✅ Validation Results"),
+          verbatimTextOutput(ns("validation_summary")),
+          conditionalPanel(
+            condition = sprintf("output['%s'] != null && output['%s'].length > 0",
+                                ns("validation_details"), ns("validation_details")),
+            hr(),
+            h6("⚠️ Problematic Files:"),
+            verbatimTextOutput(ns("validation_details"))
+          )
+        ),
+
         # Summary statistics
         wellPanel(
           style = "background-color: #e3f2fd;",
           h5("📊 Summary Statistics"),
-          tags$p(
-            tags$strong("Total participants:"), nrow(rv$pppt_data), tags$br(),
-            tags$strong("Mean PPP Index (Overall):"),
-            sprintf("%.2f", mean(rv$pppt_data$ppp_index_overall, na.rm = TRUE)), tags$br(),
-            tags$strong("Range:"),
-            sprintf("[%.2f, %.2f]",
-                    min(rv$pppt_data$ppp_index_overall, na.rm = TRUE),
-                    max(rv$pppt_data$ppp_index_overall, na.rm = TRUE))
-          )
+          htmlOutput(ns("summary_stats"))
         ),
 
         # Data table
@@ -306,13 +367,24 @@ mod_pppt_server <- function(id) {
             tags$strong("💡 Tip:"), " Double-click any cell to edit its value.",
             " Your changes will be reflected in the downloaded CSV."
           ),
+          fluidRow(
+            column(
+              width = 3,
+              selectInput(
+                ns("page_length"),
+                "Rows per page:",
+                choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+                selected = 25
+              )
+            )
+          ),
           DT::dataTableOutput(ns("data_table"))
         ),
 
         # Action buttons
         fluidRow(
           column(
-            width = 4,
+            width = 3,
             downloadButton(
               ns("download_csv"),
               "💾 Download CSV",
@@ -320,11 +392,19 @@ mod_pppt_server <- function(id) {
             )
           ),
           column(
-            width = 4,
+            width = 3,
             actionButton(
               ns("show_code"),
               "📝 Show R Code",
               class = "btn-info btn-lg btn-block"
+            )
+          ),
+          column(
+            width = 3,
+            actionButton(
+              ns("show_validation"),
+              "🔍 Validation Details",
+              class = "btn-warning btn-lg btn-block"
             )
           )
         ),
@@ -342,19 +422,135 @@ mod_pppt_server <- function(id) {
             verbatimTextOutput(ns("r_code")),
             downloadButton(ns("download_code"), "Download Code (.R)")
           )
+        ),
+
+        # Validation details modal trigger
+        conditionalPanel(
+          condition = "input.show_validation > 0",
+          ns = ns,
+          wellPanel(
+            style = "background-color: #fff3e0;",
+            h4("Detailed Validation Report"),
+            htmlOutput(ns("validation_report"))
+          )
         )
       )
+    })
+
+    # Validation summary
+    output$validation_summary <- renderText({
+      req(rv$validation_results)
+      rv$validation_results$validation_summary
+    })
+
+    # Validation details
+    output$validation_details <- renderText({
+      req(rv$validation_results)
+
+      details <- character()
+
+      if (length(rv$validation_results$missing_code_files) > 0) {
+        details <- c(details, "Files with missing codes:",
+                     paste("  -", rv$validation_results$missing_code_files))
+      }
+
+      if (!is.null(rv$validation_results$duplicate_codes) &&
+          nrow(rv$validation_results$duplicate_codes) > 0) {
+        details <- c(details, "\nDuplicate codes found:")
+        for (code in unique(rv$validation_results$duplicate_codes$code)) {
+          files <- rv$validation_results$duplicate_codes$file[
+            rv$validation_results$duplicate_codes$code == code
+          ]
+          details <- c(details, sprintf("  %s:", code),
+                       paste("    -", files))
+        }
+      }
+
+      if (length(details) > 0) {
+        paste(details, collapse = "\n")
+      } else {
+        NULL
+      }
+    })
+
+    # Detailed validation report
+    output$validation_report <- renderUI({
+      req(rv$validation_results)
+
+      val <- rv$validation_results
+
+      tagList(
+        tags$h5("Summary:"),
+        tags$ul(
+          tags$li(sprintf("Expected PPPT files: %d", val$n_expected)),
+          tags$li(sprintf("Successfully scanned: %d", val$n_scanned)),
+          tags$li(sprintf("Files with missing codes: %d", val$n_missing_code)),
+          tags$li(sprintf("Duplicate codes: %d", val$n_duplicates))
+        ),
+
+        if (length(val$missing_code_files) > 0) {
+          tagList(
+            tags$hr(),
+            tags$h5("Files with Missing Codes:"),
+            tags$ul(
+              lapply(val$missing_code_files, function(f) tags$li(f))
+            )
+          )
+        },
+
+        if (!is.null(val$duplicate_codes) && nrow(val$duplicate_codes) > 0) {
+          tagList(
+            tags$hr(),
+            tags$h5("Duplicate Codes:"),
+            DT::renderDataTable(val$duplicate_codes, options = list(pageLength = 10))
+          )
+        }
+      )
+    })
+
+    # Summary statistics
+    output$summary_stats <- renderUI({
+      req(rv$pppt_data)
+
+      data <- rv$pppt_data
+
+      stats_html <- tags$p(
+        tags$strong("Total participants:"), nrow(data), tags$br(),
+        tags$strong("Mean PPP Index (Overall):"),
+        sprintf("%.2f", mean(data$ppp_index_overall, na.rm = TRUE)), tags$br(),
+        tags$strong("Range:"),
+        sprintf("[%.2f, %.2f]",
+                min(data$ppp_index_overall, na.rm = TRUE),
+                max(data$ppp_index_overall, na.rm = TRUE))
+      )
+
+      if ("group" %in% names(data)) {
+        group_counts <- table(data$group)
+        group_info <- tags$div(
+          tags$strong("Groups:"), tags$br(),
+          tags$ul(
+            lapply(names(group_counts), function(g) {
+              tags$li(sprintf("%s: %d participants", g, group_counts[g]))
+            })
+          )
+        )
+        tagList(stats_html, group_info)
+      } else {
+        stats_html
+      }
     })
 
     # Data table
     output$data_table <- DT::renderDataTable({
       req(rv$pppt_data)
 
+      page_len <- as.numeric(input$page_length)
+
       DT::datatable(
         rv$edited_data,
         editable = list(target = "cell", disable = list(columns = c(0))), # Protect first column
         options = list(
-          pageLength = 25,
+          pageLength = ifelse(page_len == -1, nrow(rv$edited_data), page_len),
           scrollX = TRUE,
           dom = 'Bfrtip',
           buttons = c('copy', 'csv', 'excel')
@@ -373,24 +569,44 @@ mod_pppt_server <- function(id) {
     output$r_code <- renderText({
       req(rv$root_path)
 
+      group_code <- if (input$extract_groups) {
+        sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+      } else {
+        ""
+      }
+
       code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
 pppt_data <- pppt_scan(
   root = "%s",
   code_pattern = "%s",
-  date_format = "%s"
+  date_format = "%s",
+%s  remove_duplicates = %s
 )
 
 # View results
 View(pppt_data)
+
+# Validate results
+validation <- pppt_validate(
+  root = "%s",
+  scanned_data = pppt_data,
+  code_pattern = "%s"
+)
+print(validation$validation_summary)
 
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
         rv$root_path,
         input$code_pattern,
-        input$date_format
+        input$date_format,
+        group_code,
+        input$remove_duplicates,
+        rv$root_path,
+        input$code_pattern
       )
 
       code
@@ -412,24 +628,44 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
         paste0("pppt_scan_code_", format(Sys.Date(), "%Y%m%d"), ".R")
       },
       content = function(file) {
+        group_code <- if (input$extract_groups) {
+          sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                  paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+        } else {
+          ""
+        }
+
         code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
 pppt_data <- pppt_scan(
   root = "%s",
   code_pattern = "%s",
-  date_format = "%s"
+  date_format = "%s",
+%s  remove_duplicates = %s
 )
 
 # View results
 View(pppt_data)
+
+# Validate results
+validation <- pppt_validate(
+  root = "%s",
+  scanned_data = pppt_data,
+  code_pattern = "%s"
+)
+print(validation$validation_summary)
 
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
           rv$root_path,
           input$code_pattern,
-          input$date_format
+          input$date_format,
+          group_code,
+          input$remove_duplicates,
+          rv$root_path,
+          input$code_pattern
         )
         writeLines(code, file)
       }
