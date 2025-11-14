@@ -3,7 +3,16 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9042 (2025-11-14)
+## Current Version: v0.0.0.9043 (2025-11-14)
+
+### v0.0.0.9043 (2025-11-14)
+- **FIXED: R code generation now properly escapes Windows paths**
+- Added `escape_for_r()` helper function to handle path escaping
+- Windows paths now use double backslashes (e.g., `C:\\Users\\David\\...`)
+- Regex patterns now properly escaped (e.g., `\\d{4}` instead of `\d{4}`)
+- Generated R code is now directly executable without modification
+- Cross-platform compatible: works on Windows, Mac, and Linux
+- Updated both "Show R Code" and "Download R Code" sections
 
 ### v0.0.0.9042 (2025-11-14)
 - **CRITICAL FIX: 95% Confidence Interval now works correctly**

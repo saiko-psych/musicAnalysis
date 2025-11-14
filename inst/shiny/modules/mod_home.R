@@ -65,24 +65,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9042 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9043 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("CRITICAL FIX: "),
-            "95% Confidence Interval now works correctly!"
-          ),
-          tags$li(
             tags$strong("FIXED: "),
-            "Vectorization bug causing 'condition has length > 1' error"
+            "R code generation now properly escapes Windows paths!"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "All error bar types (SE, SD, CI95) now work in all plot types"
+            "Generated R code is now directly executable"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Overall PPP index markers automatically match line colors"
+            "Cross-platform path handling (Windows/Mac/Linux)"
+          ),
+          tags$li(
+            tags$strong("TECHNICAL: "),
+            "Regex patterns and file paths now use proper escaping"
           )
         )
       ),
@@ -97,6 +97,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9042
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9042 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " 95% CI vectorization bug"),
+                tags$li(tags$strong("IMPROVED:"), " All error bar types work correctly"),
+                tags$li(tags$strong("IMPROVED:"), " Overall markers match line colors")
+              )
+            ),
 
             # v0.0.0.9041
             tags$div(

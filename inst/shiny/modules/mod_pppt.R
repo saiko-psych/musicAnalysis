@@ -387,6 +387,17 @@ mod_pppt_server <- function(id) {
       validation_results = NULL
     )
 
+    # Helper function to escape strings for R code
+    # Converts backslashes to double backslashes for proper R syntax
+    escape_for_r <- function(str) {
+      if (is.null(str) || is.na(str)) return("")
+      # Escape backslashes first (\ becomes \\)
+      str <- gsub("\\\\", "\\\\\\\\", str)
+      # Escape double quotes (" becomes \")
+      str <- gsub('"', '\\\\"', str)
+      return(str)
+    }
+
     # Folder browser (if shinyFiles available)
     if (requireNamespace("shinyFiles", quietly = TRUE)) {
       volumes <- c(Home = fs::path_home(), shinyFiles::getVolumes()())
@@ -770,6 +781,11 @@ mod_pppt_server <- function(id) {
         ""
       }
 
+      # Escape paths and patterns for R code
+      escaped_root <- escape_for_r(rv$root_path)
+      escaped_pattern <- escape_for_r(input$code_pattern)
+      escaped_date <- escape_for_r(input$date_format)
+
       code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
@@ -794,13 +810,13 @@ print(validation$validation_summary)
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
-        rv$root_path,
-        input$code_pattern,
-        input$date_format,
+        escaped_root,
+        escaped_pattern,
+        escaped_date,
         group_code,
         input$remove_duplicates,
-        rv$root_path,
-        input$code_pattern
+        escaped_root,
+        escaped_pattern
       )
 
       code
@@ -829,6 +845,11 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
           ""
         }
 
+        # Escape paths and patterns for R code
+        escaped_root <- escape_for_r(rv$root_path)
+        escaped_pattern <- escape_for_r(input$code_pattern)
+        escaped_date <- escape_for_r(input$date_format)
+
         code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
@@ -853,13 +874,13 @@ print(validation$validation_summary)
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
-          rv$root_path,
-          input$code_pattern,
-          input$date_format,
+          escaped_root,
+          escaped_pattern,
+          escaped_date,
           group_code,
           input$remove_duplicates,
-          rv$root_path,
-          input$code_pattern
+          escaped_root,
+          escaped_pattern
         )
         writeLines(code, file)
       }
