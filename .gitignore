@@ -93,3 +93,4 @@ __pycache__/
 # - Package metadata (DESCRIPTION, NAMESPACE, LICENSE)
 # - README and other .md files
 # - Scripts (.sh, but no data in them)
+.Rproj.user

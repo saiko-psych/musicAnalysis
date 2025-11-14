@@ -3,7 +3,18 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9031 (2025-11-13)
+## Current Version: v0.0.0.9032 (2025-11-14)
+
+### v0.0.0.9032 (2025-11-14)
+- **NEW: PPPT (Pitch Perception Proficiency Test) Shiny Module**
+- Complete Shiny module for PPPT data extraction (inst/shiny/modules/mod_pppt.R)
+- Integration with main app navigation and home page
+- Extracts PPP indices for all 6 UCF frequency bands (294, 523, 932, 1661, 2960, 5274 Hz)
+- Extracts overall PPP index across all frequencies
+- Folder structure analysis and recursive file scanning
+- Editable data table with CSV export
+- Configurable code pattern and date format recognition
+- Wide format output: one row per participant
 
 ### v0.0.0.9031 (2025-11-13)
 - **FIX: AAT calculation using TONE PAIR aggregation**
