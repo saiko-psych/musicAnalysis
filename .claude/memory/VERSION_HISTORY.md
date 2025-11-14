@@ -3,7 +3,16 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9036 (2025-11-14)
+## Current Version: v0.0.0.9037 (2025-11-14)
+
+### v0.0.0.9037 (2025-11-14)
+- **FIXED: PPPT Visualization tab data recognition**
+- Fixed conditional panel to properly recognize scanned data from Data Scanning tab
+- Added CSV upload option for visualization with format validation
+- Added data source selector (scanned vs uploaded)
+- Added real-time data validation and status display
+- Updated R code generation to handle both scanned and uploaded data sources
+- Improved reactive data flow between tabs
 
 ### v0.0.0.9036 (2025-11-14)
 - **NEW: PPPT Frequency Profile Visualization**

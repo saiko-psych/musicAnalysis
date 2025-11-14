@@ -208,6 +208,38 @@ mod_pppt_ui <- function(id) {
           )
         ),
 
+        # Data Source Selection
+        wellPanel(
+          style = "background-color: #fff9e6;",
+          h5("📁 Data Source"),
+          radioButtons(
+            ns("data_source"),
+            "Choose data source:",
+            choices = c(
+              "Use scanned data from Data Scanning tab" = "scanned",
+              "Upload CSV file" = "upload"
+            ),
+            selected = "scanned"
+          ),
+
+          conditionalPanel(
+            condition = "input.data_source == 'upload'",
+            ns = ns,
+            fileInput(
+              ns("upload_file"),
+              "Upload PPPT CSV file:",
+              accept = c(".csv", "text/csv", "text/comma-separated-values")
+            ),
+            tags$small(
+              class = "form-text text-muted",
+              "CSV must contain: code, ppp_index_294, ppp_index_523, ppp_index_932, ppp_index_1661, ppp_index_2960, ppp_index_5274, ppp_index_overall"
+            )
+          ),
+
+          # Data validation status
+          uiOutput(ns("data_status"))
+        ),
+
         # Require data first
         conditionalPanel(
           condition = sprintf("output['%s']", ns("has_data")),
@@ -814,9 +846,105 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 
     # ========== Visualization Tab Server Logic ==========
 
+    # Reactive values for visualization data
+    viz_data <- reactiveVal(NULL)
+    uploaded_data <- reactiveVal(NULL)
+
+    # Handle file upload
+    observeEvent(input$upload_file, {
+      req(input$upload_file)
+
+      tryCatch({
+        # Read uploaded file
+        data <- readr::read_csv(input$upload_file$datapath, show_col_types = FALSE)
+
+        # Validate required columns
+        required_cols <- c("code", "ppp_index_294", "ppp_index_523", "ppp_index_932",
+                          "ppp_index_1661", "ppp_index_2960", "ppp_index_5274", "ppp_index_overall")
+
+        missing_cols <- setdiff(required_cols, names(data))
+
+        if (length(missing_cols) > 0) {
+          showNotification(
+            paste("Missing required columns:", paste(missing_cols, collapse = ", ")),
+            type = "error",
+            duration = 10
+          )
+          uploaded_data(NULL)
+        } else {
+          uploaded_data(data)
+          showNotification(
+            sprintf("Successfully loaded %d rows from uploaded file", nrow(data)),
+            type = "message",
+            duration = 5
+          )
+        }
+
+      }, error = function(e) {
+        showNotification(
+          paste("Error reading file:", e$message),
+          type = "error",
+          duration = 10
+        )
+        uploaded_data(NULL)
+      })
+    })
+
+    # Reactive for current data source
+    current_viz_data <- reactive({
+      # Default to scanned if input not yet initialized
+      source <- if (!is.null(input$data_source)) input$data_source else "scanned"
+
+      if (source == "scanned") {
+        # Use scanned/edited data
+        if (!is.null(rv$edited_data) && nrow(rv$edited_data) > 0) {
+          return(rv$edited_data)
+        } else if (!is.null(rv$pppt_data) && nrow(rv$pppt_data) > 0) {
+          return(rv$pppt_data)
+        } else {
+          return(NULL)
+        }
+      } else {
+        # Use uploaded data
+        return(uploaded_data())
+      }
+    })
+
+    # Data validation status
+    output$data_status <- renderUI({
+      data <- current_viz_data()
+      source <- if (!is.null(input$data_source)) input$data_source else "scanned"
+
+      if (is.null(data)) {
+        if (source == "scanned") {
+          tags$div(
+            style = "padding: 10px; background-color: #fff3cd; border-radius: 4px; margin-top: 10px;",
+            tags$strong("⚠️ No data available"),
+            tags$br(),
+            "Please scan PPPT files in the 'Data Scanning' tab first."
+          )
+        } else {
+          tags$div(
+            style = "padding: 10px; background-color: #fff3cd; border-radius: 4px; margin-top: 10px;",
+            tags$strong("⚠️ No file uploaded"),
+            tags$br(),
+            "Please upload a CSV file above."
+          )
+        }
+      } else {
+        tags$div(
+          style = "padding: 10px; background-color: #d4edda; border-radius: 4px; margin-top: 10px;",
+          tags$strong("✓ Data ready for visualization"),
+          tags$br(),
+          sprintf("%d participants, %d variables", nrow(data), ncol(data))
+        )
+      }
+    })
+
     # Check if data exists for conditional panels
     output$has_data <- reactive({
-      !is.null(rv$pppt_data) && nrow(rv$pppt_data) > 0
+      data <- current_viz_data()
+      !is.null(data) && nrow(data) > 0
     })
     outputOptions(output, "has_data", suspendWhenHidden = FALSE)
 
@@ -825,10 +953,10 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 
     # Generate plots when Update Plot is clicked
     observeEvent(input$update_plot, {
-      req(rv$pppt_data)
+      req(current_viz_data())
 
       tryCatch({
-        data <- rv$edited_data  # Use edited data if user made changes
+        data <- current_viz_data()
 
         # Determine color_by parameter
         color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
@@ -942,8 +1070,10 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 
     # Generate R code for plot
     output$plot_r_code <- renderText({
-      req(rv$pppt_data)
+      req(current_viz_data())
       req(input$update_plot)  # Only show after plot created
+
+      source <- if (!is.null(input$data_source)) input$data_source else "scanned"
 
       # Determine color_by parameter
       color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
@@ -952,54 +1082,13 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
         ""
       }
 
-      code <- sprintf('library(musicAnalysis)
-library(plotly)
-
-# Load your PPPT data
-# (Assuming you already have pppt_data from scanning)
-
-# Generate PPPT frequency profile plot
-plot <- pppt_plot_profile(
-  data = pppt_data,
-  plot_type = "%s",
-%s  line_color = "%s",
-  show_legend = %s,
-  title = NULL
-)
-
-# Display plot
-plot
-
-# Save plot as HTML
-htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
-',
-        input$plot_type,
-        color_by_param,
-        input$line_color,
-        input$show_legend
-      )
-
-      code
-    })
-
-    # Download plot code
-    output$download_plot_code <- downloadHandler(
-      filename = function() {
-        paste0("pppt_plot_code_", format(Sys.Date(), "%Y%m%d"), ".R")
-      },
-      content = function(file) {
-        # Same code as above
-        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
-          sprintf('  color_by = "%s",\n', input$color_by)
-        } else {
-          ""
-        }
-
+      # Generate appropriate code based on data source
+      if (source == "scanned") {
         code <- sprintf('library(musicAnalysis)
 library(plotly)
 
-# Load your PPPT data
-# (Assuming you already have pppt_data from scanning)
+# Load your PPPT data from scanning
+# (Assuming you already have pppt_data from pppt_scan())
 
 # Generate PPPT frequency profile plot
 plot <- pppt_plot_profile(
@@ -1021,6 +1110,116 @@ htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
           input$line_color,
           input$show_legend
         )
+      } else {
+        # Code for uploaded data
+        code <- sprintf('library(musicAnalysis)
+library(plotly)
+
+# Load your PPPT data from CSV
+pppt_data <- read.csv("path/to/your/pppt_data.csv")
+
+# Required columns: code, ppp_index_294, ppp_index_523, ppp_index_932,
+#                   ppp_index_1661, ppp_index_2960, ppp_index_5274, ppp_index_overall
+
+# Generate PPPT frequency profile plot
+plot <- pppt_plot_profile(
+  data = pppt_data,
+  plot_type = "%s",
+%s  line_color = "%s",
+  show_legend = %s,
+  title = NULL
+)
+
+# Display plot
+plot
+
+# Save plot as HTML
+htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
+',
+          input$plot_type,
+          color_by_param,
+          input$line_color,
+          input$show_legend
+        )
+      }
+
+      code
+    })
+
+    # Download plot code
+    output$download_plot_code <- downloadHandler(
+      filename = function() {
+        paste0("pppt_plot_code_", format(Sys.Date(), "%Y%m%d"), ".R")
+      },
+      content = function(file) {
+        source <- if (!is.null(input$data_source)) input$data_source else "scanned"
+
+        # Determine color_by parameter
+        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
+          sprintf('  color_by = "%s",\n', input$color_by)
+        } else {
+          ""
+        }
+
+        # Generate code based on data source
+        if (source == "scanned") {
+          code <- sprintf('library(musicAnalysis)
+library(plotly)
+
+# Load your PPPT data from scanning
+# (Assuming you already have pppt_data from pppt_scan())
+
+# Generate PPPT frequency profile plot
+plot <- pppt_plot_profile(
+  data = pppt_data,
+  plot_type = "%s",
+%s  line_color = "%s",
+  show_legend = %s,
+  title = NULL
+)
+
+# Display plot
+plot
+
+# Save plot as HTML
+htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
+',
+            input$plot_type,
+            color_by_param,
+            input$line_color,
+            input$show_legend
+          )
+        } else {
+          code <- sprintf('library(musicAnalysis)
+library(plotly)
+
+# Load your PPPT data from CSV
+pppt_data <- read.csv("path/to/your/pppt_data.csv")
+
+# Required columns: code, ppp_index_294, ppp_index_523, ppp_index_932,
+#                   ppp_index_1661, ppp_index_2960, ppp_index_5274, ppp_index_overall
+
+# Generate PPPT frequency profile plot
+plot <- pppt_plot_profile(
+  data = pppt_data,
+  plot_type = "%s",
+%s  line_color = "%s",
+  show_legend = %s,
+  title = NULL
+)
+
+# Display plot
+plot
+
+# Save plot as HTML
+htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
+',
+            input$plot_type,
+            color_by_param,
+            input$line_color,
+            input$show_legend
+          )
+        }
 
         writeLines(code, file)
       }

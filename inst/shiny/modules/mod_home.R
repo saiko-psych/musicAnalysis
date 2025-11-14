@@ -65,36 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9036 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9037 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("NEW: "),
-            "PPPT Frequency Profile Visualization - interactive plots showing PPP indices across frequency bands"
+            tags$strong("FIXED: "),
+            "PPPT Visualization tab now properly recognizes scanned data from Data Scanning tab"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Visualization tab in PPPT module with 4 plot types: mean profile, overlaid lines, individual plots, and group plots"
+            "CSV upload option for visualization with automatic format validation"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) displayed as connected lines"
+            "Data source selector (scanned vs uploaded) with real-time status display"
           ),
           tags$li(
-            tags$strong("ADDED: "),
-            "Overall PPP index shown as separate diamond marker (not connected to frequency lines)"
+            tags$strong("IMPROVED: "),
+            "R code generation adapts to data source (scanning vs upload)"
           ),
           tags$li(
-            tags$strong("ADDED: "),
-            "Plot controls for color customization, legend display, and plot type selection"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "'Show R Code' button for plot visualization reproducibility"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "Download buttons for plots (HTML) and R code (.R file)"
+            tags$strong("IMPROVED: "),
+            "Better reactive data flow between PPPT tabs"
           )
         )
       ),
@@ -109,6 +101,19 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9036
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9036 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " PPPT Frequency Profile Visualization"),
+                tags$li(tags$strong("ADDED:"), " Visualization tab with 4 plot types"),
+                tags$li(tags$strong("ADDED:"), " Interactive plots with frequency lines and overall marker"),
+                tags$li(tags$strong("ADDED:"), " Show R Code and download buttons for plots")
+              )
+            ),
 
             # v0.0.0.9035
             tags$div(
