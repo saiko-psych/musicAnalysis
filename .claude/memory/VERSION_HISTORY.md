@@ -3,7 +3,15 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9037 (2025-11-14)
+## Current Version: v0.0.0.9038 (2025-11-14)
+
+### v0.0.0.9038 (2025-11-14)
+- **FIXED: PPPT Visualization UI - buttons and plots now visible**
+- Removed outer conditional panel that was hiding plot controls
+- Changed "Update Plot" button to "Generate Plot" for clarity
+- Removed emoji from "Show R Code" button text for consistency
+- Added helpful messages in plot area when no data or plot generated
+- Improved user experience to match musical experience module style
 
 ### v0.0.0.9037 (2025-11-14)
 - **FIXED: PPPT Visualization tab data recognition**

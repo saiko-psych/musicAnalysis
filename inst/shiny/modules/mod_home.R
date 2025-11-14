@@ -65,28 +65,20 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9037 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9038 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("FIXED: "),
-            "PPPT Visualization tab now properly recognizes scanned data from Data Scanning tab"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "CSV upload option for visualization with automatic format validation"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "Data source selector (scanned vs uploaded) with real-time status display"
+            "PPPT Visualization - Plot controls and Generate Plot button now always visible"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "R code generation adapts to data source (scanning vs upload)"
+            "Better user guidance with helpful messages when no data or plot generated"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Better reactive data flow between PPPT tabs"
+            "UI style now matches musical experience module for consistency"
           )
         )
       ),
@@ -101,6 +93,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9037
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9037 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " PPPT Visualization data recognition"),
+                tags$li(tags$strong("ADDED:"), " CSV upload option with validation"),
+                tags$li(tags$strong("ADDED:"), " Data source selector")
+              )
+            ),
 
             # v0.0.0.9036
             tags$div(

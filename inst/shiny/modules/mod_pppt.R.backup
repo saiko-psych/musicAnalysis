@@ -240,101 +240,114 @@ mod_pppt_ui <- function(id) {
           uiOutput(ns("data_status"))
         ),
 
-        # Plot controls and output (always visible)
-        fluidRow(
-          column(
-            width = 3,
-            wellPanel(
-              h4("Plot Controls"),
+        # Require data first
+        conditionalPanel(
+          condition = sprintf("output['%s']", ns("has_data")),
+          ns = ns,
 
-              selectInput(
-                ns("plot_type"),
-                "Plot Type:",
-                choices = c(
-                  "All participants - Mean profile" = "all_combined",
-                  "All participants - Overlaid lines" = "all_overlaid",
-                  "Individual plots per participant" = "individual",
-                  "Plots by group" = "by_group"
-                ),
-                selected = "all_combined"
-              ),
-
-              conditionalPanel(
-                condition = "input.plot_type == 'all_overlaid' || input.plot_type == 'by_group'",
-                ns = ns,
-                selectInput(
-                  ns("color_by"),
-                  "Color lines by:",
-                  choices = c(
-                    "Participant" = "participant",
-                    "Group" = "group",
-                    "Custom color" = "custom"
-                  ),
-                  selected = "participant"
-                )
-              ),
-
-              conditionalPanel(
-                condition = "input.color_by == 'custom' || input.plot_type == 'all_combined' || input.plot_type == 'individual'",
-                ns = ns,
-                textInput(
-                  ns("line_color"),
-                  "Line color:",
-                  value = "steelblue",
-                  placeholder = "e.g., blue, #FF5733"
-                )
-              ),
-
-              checkboxInput(
-                ns("show_legend"),
-                "Show legend",
-                value = TRUE
-              ),
-
-              br(),
-              actionButton(
-                ns("update_plot"),
-                "Generate Plot",
-                class = "btn-primary btn-block"
-              ),
-
-              br(),
-              downloadButton(
-                ns("download_plot"),
-                "Download Plot (HTML)",
-                class = "btn-success btn-block"
-              ),
-
-              br(),
-              actionButton(
-                ns("show_plot_code"),
-                "Show R Code",
-                class = "btn-info btn-block"
-              )
-            )
-          ),
-
-          column(
-            width = 9,
-            # Plot output area
-            uiOutput(ns("plot_output")),
-
-            br(),
-            # R Code display
-            conditionalPanel(
-              condition = "input.show_plot_code > 0",
-              ns = ns,
+          fluidRow(
+            column(
+              width = 3,
               wellPanel(
-                style = "background-color: #f8f9fa;",
-                h4("R Code to Reproduce This Plot"),
-                p("Copy and paste this code into your R console to recreate the plot:"),
-                verbatimTextOutput(ns("plot_r_code")),
-                downloadButton(ns("download_plot_code"), "Download Code (.R)")
+                h4("Plot Controls"),
+
+                selectInput(
+                  ns("plot_type"),
+                  "Plot Type:",
+                  choices = c(
+                    "All participants - Mean profile" = "all_combined",
+                    "All participants - Overlaid lines" = "all_overlaid",
+                    "Individual plots per participant" = "individual",
+                    "Plots by group" = "by_group"
+                  ),
+                  selected = "all_combined"
+                ),
+
+                conditionalPanel(
+                  condition = "input.plot_type == 'all_overlaid' || input.plot_type == 'by_group'",
+                  ns = ns,
+                  selectInput(
+                    ns("color_by"),
+                    "Color lines by:",
+                    choices = c(
+                      "Participant" = "participant",
+                      "Group" = "group",
+                      "Custom color" = "custom"
+                    ),
+                    selected = "participant"
+                  )
+                ),
+
+                conditionalPanel(
+                  condition = "input.color_by == 'custom' || input.plot_type == 'all_combined' || input.plot_type == 'individual'",
+                  ns = ns,
+                  textInput(
+                    ns("line_color"),
+                    "Line color:",
+                    value = "steelblue",
+                    placeholder = "e.g., blue, #FF5733"
+                  )
+                ),
+
+                checkboxInput(
+                  ns("show_legend"),
+                  "Show legend",
+                  value = TRUE
+                ),
+
+                br(),
+                actionButton(
+                  ns("update_plot"),
+                  "Update Plot",
+                  class = "btn-primary btn-block"
+                ),
+
+                br(),
+                downloadButton(
+                  ns("download_plot"),
+                  "Download Plot (HTML)",
+                  class = "btn-success btn-block"
+                ),
+
+                br(),
+                actionButton(
+                  ns("show_plot_code"),
+                  "📝 Show R Code",
+                  class = "btn-info btn-block"
+                )
+              )
+            ),
+
+            column(
+              width = 9,
+              uiOutput(ns("plot_output")),
+
+              br(),
+              conditionalPanel(
+                condition = "input.show_plot_code > 0",
+                ns = ns,
+                wellPanel(
+                  style = "background-color: #f8f9fa;",
+                  h4("R Code to Reproduce This Plot"),
+                  p("Copy and paste this code into your R console to recreate the plot:"),
+                  verbatimTextOutput(ns("plot_r_code")),
+                  downloadButton(ns("download_plot_code"), "Download Code (.R)")
+                )
               )
             )
           )
-        )
+        ),
 
+        # Message when no data
+        conditionalPanel(
+          condition = sprintf("!output['%s']", ns("has_data")),
+          ns = ns,
+          wellPanel(
+            style = "background-color: #fff3cd; border-left: 4px solid #ffc107;",
+            h5("⚠️ No Data Available"),
+            p("Please scan PPPT files in the 'Data Scanning' tab first before creating visualizations.")
+          )
+        )
       ) # End Visualization tab
     ) # End tabsetPanel
   )
@@ -982,30 +995,7 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 
     # Render plot output
     output$plot_output <- renderUI({
-      # Check if data is available
-      data <- current_viz_data()
-      
-      if (is.null(data) || nrow(data) == 0) {
-        return(wellPanel(
-          style = "background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 20px;",
-          h5("⚠️ No Data Available"),
-          p("Please load data using one of the following methods:"),
-          tags$ul(
-            tags$li("Scan PPPT files in the 'Data Scanning' tab, OR"),
-            tags$li("Upload a CSV file using the 'Upload CSV file' option above")
-          )
-        ))
-      }
-      
-      # Check if plot has been generated
-      if (is.null(current_plot())) {
-        return(wellPanel(
-          style = "background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 20px;",
-          h5("📊 Ready to Visualize"),
-          p(sprintf("Data loaded: %d participants", nrow(data))),
-          p("Click the 'Generate Plot' button to create a visualization.")
-        ))
-      }
+      req(current_plot())
 
       plot_result <- current_plot()
 
