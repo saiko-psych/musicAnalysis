@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9045 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9046 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("NEW: "),
-            "Font Awesome icons in navbar (Home, KLAWA, AAT, PPPT, etc.)"
+            "Vintage sheet music background image across all pages"
           ),
           tags$li(
             tags$strong("NEW: "),
-            "Musical notes background in navbar with gradient"
-          ),
-          tags$li(
-            tags$strong("NEW: "),
-            "Contact menu in navbar with GitHub and Email links"
+            "Attribution footer with proper CC BY 2.0 license credit"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Better spacing between all sections throughout the app"
+            "Navbar colors updated to vintage sepia tones matching the sheet music"
           ),
           tags$li(
-            tags$strong("REVERTED: "),
-            "ASCII art banner back (as requested)"
+            tags$strong("IMPROVED: "),
+            "Contact menu repositioned to right side of navbar"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Semi-transparent overlay for better content readability"
           )
         )
       ),
@@ -101,6 +101,19 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9045
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9045 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " Font Awesome icons in navbar (real icons, not emojis)"),
+                tags$li(tags$strong("NEW:"), " Contact menu in navbar with GitHub and Email"),
+                tags$li(tags$strong("IMPROVED:"), " Better spacing between all sections"),
+                tags$li(tags$strong("REVERTED:"), " ASCII art banner (kept as requested)")
+              )
+            ),
 
             # v0.0.0.9044
             tags$div(

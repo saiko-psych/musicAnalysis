@@ -19,47 +19,51 @@ source(file.path(mod_path, "mod_pppt.R"), local = TRUE)
 source(file.path(mod_path, "mod_merge.R"), local = TRUE)
 
 ui <- tagList(
-  # Custom CSS for navbar and spacing
+  # Custom CSS for navbar, background, and spacing
   tags$head(
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"),
     tags$style(HTML("
-      /* Musical notes background for navbar */
-      .navbar-default {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      /* Music sheet background for all pages */
+      body {
+        background-image: url('music_sheet.jpg');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
       }
-      .navbar-default::before {
-        content: '♪ ♫ ♪ ♬ ♪ ♫ ♪ ♬ ♪ ♫ ♪ ♬';
-        position: absolute;
-        top: 5px;
-        left: 0;
-        right: 0;
-        text-align: center;
-        font-size: 12px;
-        color: rgba(255,255,255,0.15);
-        letter-spacing: 20px;
-        z-index: 0;
-        pointer-events: none;
+
+      /* Semi-transparent overlay for better readability */
+      .container-fluid {
+        background-color: rgba(255, 255, 255, 0.92);
+        min-height: 100vh;
+        padding-bottom: 60px;
+      }
+
+      /* Navbar with vintage sepia tones matching the sheet music */
+      .navbar-default {
+        background: linear-gradient(135deg, #8B7355 0%, #6B5D52 100%);
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       }
       .navbar-default .navbar-brand,
       .navbar-default .navbar-nav > li > a {
-        color: white !important;
+        color: #F5E6D3 !important;
         font-weight: 500;
         position: relative;
         z-index: 1;
       }
       .navbar-default .navbar-nav > .active > a {
-        background-color: rgba(255,255,255,0.2) !important;
-        color: white !important;
+        background-color: rgba(245, 230, 211, 0.2) !important;
+        color: #F5E6D3 !important;
       }
       .navbar-default .navbar-nav > li > a:hover {
-        background-color: rgba(255,255,255,0.15) !important;
+        background-color: rgba(245, 230, 211, 0.15) !important;
       }
 
       /* Better spacing between sections */
       .well, .panel, .info-card {
         margin-bottom: 25px !important;
+        background-color: rgba(255, 255, 255, 0.95);
       }
       .tab-content {
         padding-top: 20px;
@@ -71,6 +75,32 @@ ui <- tagList(
       /* Icon styling in navbar */
       .navbar-nav .fa, .navbar-nav .fab {
         margin-right: 6px;
+      }
+
+      /* Attribution footer */
+      .attribution {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(139, 115, 85, 0.9);
+        color: #F5E6D3;
+        padding: 8px 15px;
+        font-size: 11px;
+        text-align: center;
+        z-index: 1000;
+      }
+      .attribution a {
+        color: #FFE4B5;
+        text-decoration: none;
+      }
+      .attribution a:hover {
+        text-decoration: underline;
+      }
+      .attribution img {
+        height: 1em;
+        margin-right: 0.125em;
+        display: inline;
       }
     "))
   ),
@@ -114,25 +144,33 @@ ui <- tagList(
       mod_merge_ui("merge")
     ),
 
-    # Contact links in navbar (right side)
+    # Right-aligned Contact menu
     navbarMenu(
-      tags$span(tags$i(class = "fa fa-address-book"), "Contact"),
+      "Contact",
+      icon = NULL,
       tabPanel(
         tags$a(
           href = "https://github.com/saiko-psych/musicAnalysis",
           target = "_blank",
-          tags$i(class = "fab fa-github"), "GitHub",
+          tags$i(class = "fab fa-github"), " GitHub",
           style = "color: inherit; text-decoration: none;"
         )
       ),
       tabPanel(
         tags$a(
           href = "mailto:david.matischek@uni-graz.at",
-          tags$i(class = "fa fa-envelope"), "Email",
+          tags$i(class = "fa fa-envelope"), " Email",
           style = "color: inherit; text-decoration: none;"
         )
-      )
+      ),
+      position = "right"
     )
+  ),
+
+  # Attribution footer
+  tags$div(
+    class = "attribution",
+    HTML('<p style="margin: 0;">"<a rel="noopener noreferrer" href="https://www.flickr.com/photos/24029425@N06/3573510810">Take Me Out to the Ball-Game [Page 4]</a>" by <a rel="noopener noreferrer" href="https://www.flickr.com/photos/24029425@N06">Boston Public Library</a> is licensed under <a rel="noopener noreferrer" href="https://creativecommons.org/licenses/by/2.0/?ref=openverse">CC BY 2.0 <img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" style="height: 1em; margin-right: 0.125em; display: inline;" /><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" style="height: 1em; margin-right: 0.125em; display: inline;" /></a>.</p>')
   )
 )
 

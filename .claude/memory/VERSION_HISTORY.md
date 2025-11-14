@@ -3,7 +3,16 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9045 (2025-11-14)
+## Current Version: v0.0.0.9046 (2025-11-14)
+
+### v0.0.0.9046 (2025-11-14)
+- **NEW: Music sheet background image across all pages**
+- Added vintage sheet music background (music_sheet.jpg) with proper CC BY 2.0 attribution
+- Attribution footer with link to Boston Public Library source on Flickr
+- Navbar colors updated to vintage sepia tones (#8B7355, #6B5D52) matching the sheet music
+- Background is fixed attachment with semi-transparent white overlay for readability
+- Contact menu moved to right side of navbar (no address-book icon, just "Contact" text)
+- Removed extra icons from Contact dropdown (kept only GitHub and Email icons)
 
 ### v0.0.0.9045 (2025-11-14)
 - **NEW: Font Awesome icons in navbar**
