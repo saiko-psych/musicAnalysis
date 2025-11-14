@@ -32,9 +32,9 @@ ui <- tagList(
         background-repeat: no-repeat;
       }
 
-      /* Semi-transparent overlay for better readability */
+      /* Semi-transparent overlay for better readability - more transparent to show background */
       .container-fluid {
-        background-color: rgba(255, 255, 255, 0.92);
+        background-color: rgba(255, 255, 255, 0.75);
         min-height: 100vh;
         padding-bottom: 60px;
       }
@@ -49,8 +49,6 @@ ui <- tagList(
       .navbar-default .navbar-nav > li > a {
         color: #F5E6D3 !important;
         font-weight: 500;
-        position: relative;
-        z-index: 1;
       }
       .navbar-default .navbar-nav > .active > a {
         background-color: rgba(245, 230, 211, 0.2) !important;
@@ -60,10 +58,35 @@ ui <- tagList(
         background-color: rgba(245, 230, 211, 0.15) !important;
       }
 
-      /* Better spacing between sections */
+      /* Better spacing between sections - vintage sepia backgrounds */
       .well, .panel, .info-card {
         margin-bottom: 25px !important;
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: rgba(250, 245, 235, 0.95);
+        border: 1px solid rgba(139, 115, 85, 0.3);
+      }
+
+      /* ASCII art banner - darker vintage tone */
+      .well[style*="background-color: #2c3e50"] {
+        background-color: #3d3226 !important;
+        border: 2px solid #6B5D52;
+      }
+
+      /* Info panels with vintage styling */
+      .well[style*="background-color: #f8f9fa"] {
+        background-color: rgba(245, 240, 230, 0.95) !important;
+        border-left: 4px solid #8B7355 !important;
+      }
+
+      /* What's New panel */
+      .well[style*="background-color: #e8f5e9"] {
+        background-color: rgba(240, 235, 220, 0.95) !important;
+        border-left: 4px solid #6B5D52 !important;
+      }
+
+      /* Version History panel */
+      .well[style*="background-color: #f5f5f5"] {
+        background-color: rgba(235, 230, 215, 0.95) !important;
+        border-left: 4px solid #8B7355 !important;
       }
       .tab-content {
         padding-top: 20px;
@@ -106,40 +129,37 @@ ui <- tagList(
   ),
 
   navbarPage(
-    title = tags$span(
-      tags$i(class = "fa fa-music", style = "margin-right: 8px;"),
-      "musicAnalysis"
-    ),
+    title = "musicAnalysis",
     id = "main_nav",
     theme = bslib::bs_theme(version = 5, bootswatch = "flatly"),
 
     tabPanel(
-      tags$span(tags$i(class = "fa fa-home"), "Home"),
+      "Home",
       value = "home",
       mod_home_ui("home")
     ),
     tabPanel(
-      tags$span(tags$i(class = "fa fa-file-pdf"), "KLAWA"),
+      "KLAWA",
       value = "klawa",
       mod_klawa_ui("klawa")
     ),
     tabPanel(
-      tags$span(tags$i(class = "fa fa-guitar"), "Musical Experience"),
+      "Musical Experience",
       value = "mexp",
       mod_mexp_ui("mexp")
     ),
     tabPanel(
-      tags$span(tags$i(class = "fa fa-headphones"), "AAT"),
+      "AAT",
       value = "aat",
       mod_aat_ui("aat")
     ),
     tabPanel(
-      tags$span(tags$i(class = "fa fa-wave-square"), "PPPT"),
+      "PPPT",
       value = "pppt",
       mod_pppt_ui("pppt")
     ),
     tabPanel(
-      tags$span(tags$i(class = "fa fa-code-merge"), "Merge"),
+      "Merge",
       value = "merge",
       mod_merge_ui("merge")
     ),

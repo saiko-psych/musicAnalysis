@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9046 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9047 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("NEW: "),
-            "Vintage sheet music background image across all pages"
-          ),
-          tags$li(
-            tags$strong("NEW: "),
-            "Attribution footer with proper CC BY 2.0 license credit"
+            tags$strong("IMPROVED: "),
+            "Background image much more visible (transparency reduced)"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Navbar colors updated to vintage sepia tones matching the sheet music"
+            "Removed icons from navbar tabs (kept only GitHub/Email in Contact)"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Contact menu repositioned to right side of navbar"
+            "All panels now have vintage sepia colors matching the sheet music"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Semi-transparent overlay for better content readability"
+            "ASCII art banner with darker vintage brown tone"
+          ),
+          tags$li(
+            tags$strong("FIXED: "),
+            "Navbar styling simplified and cleaned up"
           )
         )
       ),
@@ -101,6 +101,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9046
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9046 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " Vintage sheet music background with CC BY 2.0 attribution"),
+                tags$li(tags$strong("IMPROVED:"), " Navbar colors in vintage sepia tones"),
+                tags$li(tags$strong("IMPROVED:"), " Contact menu in navbar (no address-book icon)")
+              )
+            ),
 
             # v0.0.0.9045
             tags$div(

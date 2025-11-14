@@ -3,7 +3,15 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9046 (2025-11-14)
+## Current Version: v0.0.0.9047 (2025-11-14)
+
+### v0.0.0.9047 (2025-11-14)
+- **IMPROVED: Background image much more visible** (transparency reduced from 92% to 75%)
+- **IMPROVED: Removed icons from navbar tabs** (kept only GitHub/Email icons in Contact menu)
+- **IMPROVED: All panels now have vintage sepia theme colors** matching the sheet music
+- **IMPROVED: ASCII art banner with darker vintage brown tone** (#3d3226)
+- **IMPROVED: Consistent vintage borders** on all wellPanels (#8B7355, #6B5D52)
+- **FIXED: Navbar styling simplified** and cleaned up
 
 ### v0.0.0.9046 (2025-11-14)
 - **NEW: Music sheet background image across all pages**
