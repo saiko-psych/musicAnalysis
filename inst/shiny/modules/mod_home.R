@@ -4,6 +4,12 @@ mod_home_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidPage(
+      # Center content with visible background on sides
+      fluidRow(
+        column(
+          width = 10,
+          offset = 1,
+
       # ASCII Art Banner
       wellPanel(
         style = "background-color: #2c3e50; color: #ecf0f1; font-family: monospace; padding: 20px; margin-bottom: 30px;",
@@ -65,28 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9047 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9048 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("IMPROVED: "),
-            "Background image much more visible (transparency reduced)"
+            "Compact navbar - reduced height for cleaner appearance"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Removed icons from navbar tabs (kept only GitHub/Email in Contact)"
+            "Darker navbar text for better readability against sepia background"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "All panels now have vintage sepia colors matching the sheet music"
+            "Home page layout centered with visible background on sides"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "ASCII art banner with darker vintage brown tone"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "Navbar styling simplified and cleaned up"
+            "Smaller font sizes and reduced padding throughout navbar"
           )
         )
       ),
@@ -101,6 +103,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9047
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9047 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " Background image more visible, vintage panel colors"),
+                tags$li(tags$strong("IMPROVED:"), " Removed navbar icons (kept only GitHub/Email)"),
+                tags$li(tags$strong("FIXED:"), " CSS parsing error in app.R")
+              )
+            ),
 
             # v0.0.0.9046
             tags$div(
@@ -718,8 +732,10 @@ mod_home_ui <- function(id) {
           "Package: musicAnalysis | License: MIT"
         )
       )
-    )
-  )
+        )  # Close column
+      )  # Close fluidRow
+    )  # Close fluidPage
+  )  # Close tagList
 }
 
 mod_home_server <- function(id, parent_session = NULL) {

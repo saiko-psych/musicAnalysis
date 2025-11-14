@@ -3,7 +3,13 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9047 (2025-11-14)
+## Current Version: v0.0.0.9048 (2025-11-14)
+
+### v0.0.0.9048 (2025-11-14)
+- **IMPROVED: Compact navbar** - reduced height from default to 40px
+- **IMPROVED: Darker navbar text** - changed from light cream (#F5E6D3) to dark brown (#2c1810, #3d2817) for better readability
+- **IMPROVED: Home page layout** - centered content in 10-column width with visible background on left and right sides
+- **IMPROVED: Navbar font sizes** - brand: 16px, links: 14px, reduced padding to 10px for compact appearance
 
 ### v0.0.0.9047 (2025-11-14)
 - **IMPROVED: Background image much more visible** (transparency reduced from 92% to 75%)
