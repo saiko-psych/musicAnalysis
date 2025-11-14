@@ -3,7 +3,41 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9038 (2025-11-14)
+## Current Version: v0.0.0.9041 (2025-11-14)
+
+### v0.0.0.9041 (2025-11-14)
+- **FIXED: Error bars now calculate correctly (were showing ±0)**
+- Fixed error bar calculation to properly compute SE, SD, and CI95
+- Changed from hardcoded `se` column to dynamic `error` column based on user selection
+- Added UI selector for error bar type with 4 options: SE, SD, 95% CI, or None
+- Added helpful descriptions for each error bar type in UI
+- Standard Error: SE = SD/√n
+- Standard Deviation: SD (spread of data)
+- 95% Confidence Interval: uses t-distribution for accurate intervals
+- Error bars now display correctly in all mean/summary plots
+- Updated hover templates to show error type in parentheses
+- R code generation includes error_type parameter
+
+### v0.0.0.9040 (2025-11-14)
+- **FIXED: PPPT group summary plot now works correctly**
+- Fixed rendering of group_summary plot type in Shiny UI
+- Added error bars to overall PPP index markers in overlaid plots
+- Error bars now display properly for both frequency bands and overall index
+- Improved conditional panel logic for color_by selector (includes group_summary)
+- Fixed group_summary to render as single plot instead of multiple plots
+- Enhanced error bar implementation in `.create_overlaid_profile_plot()`
+- All plot types now properly display error bars when applicable
+
+### v0.0.0.9039 (2025-11-14)
+- **ENHANCED: PPPT Visualization with flexible grouping and error bars**
+- Added selectable grouping variable from data columns (not hardcoded to "group")
+- Added "Group summary" plot type showing mean line per group with error bars
+- Added error bars (±SE) to all mean/summary plots (all_combined and group_summary)
+- Increased overall PPP index symbol size from 10 to 14 for better visibility
+- Error bars shown for both frequency bands and overall index
+- Dynamic group variable selector that excludes PPP index columns
+- Updated R code generation to include group_var parameter
+- Improved plot customization and flexibility
 
 ### v0.0.0.9038 (2025-11-14)
 - **FIXED: PPPT Visualization UI - buttons and plots now visible**

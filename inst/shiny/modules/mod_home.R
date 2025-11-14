@@ -65,20 +65,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9038 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9041 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("FIXED: "),
-            "PPPT Visualization - Plot controls and Generate Plot button now always visible"
+            "Error bars now calculate correctly - no more ±0 values!"
+          ),
+          tags$li(
+            tags$strong("NEW: "),
+            "Error bar type selector with SE, SD, 95% CI, or None options"
+          ),
+          tags$li(
+            tags$strong("NEW: "),
+            "Helpful descriptions for each error bar type in UI"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Better user guidance with helpful messages when no data or plot generated"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "UI style now matches musical experience module for consistency"
+            "Hover tooltips now show error type (SE/SD/CI)"
           )
         )
       ),
@@ -93,6 +97,42 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9040
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9040 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Group summary plot rendering"),
+                tags$li(tags$strong("FIXED:"), " Error bars display on plots"),
+                tags$li(tags$strong("IMPROVED:"), " Overall index error bars")
+              )
+            ),
+
+            # v0.0.0.9039
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9039 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ENHANCED:"), " Flexible grouping variable selection"),
+                tags$li(tags$strong("NEW:"), " Group summary plot type with error bars"),
+                tags$li(tags$strong("IMPROVED:"), " Bigger overall symbol size")
+              )
+            ),
+
+            # v0.0.0.9038
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9038 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " PPPT Visualization UI - buttons now visible"),
+                tags$li(tags$strong("IMPROVED:"), " Better user guidance messages"),
+                tags$li(tags$strong("IMPROVED:"), " UI style consistency")
+              )
+            ),
 
             # v0.0.0.9037
             tags$div(

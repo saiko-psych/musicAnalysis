@@ -4,7 +4,16 @@
 \alias{.create_overlaid_profile_plot}
 \title{Create overlaid PPPT profile plot}
 \usage{
-.create_overlaid_profile_plot(data, color_by, line_color, show_legend, title)
+.create_overlaid_profile_plot(
+  data,
+  color_by,
+  line_color,
+  show_legend,
+  title,
+  group_var = NULL,
+  show_error = FALSE,
+  error_label = "SE"
+)
 }
 \arguments{
 \item{data}{Long format data for multiple lines}
@@ -16,6 +25,12 @@
 \item{show_legend}{Show legend}
 
 \item{title}{Plot title}
+
+\item{group_var}{Grouping variable name (or NULL for custom color)}
+
+\item{show_error}{Show error bars (requires 'error' column)}
+
+\item{error_label}{Label for error bars (e.g., "SE", "SD", "95\% CI")}
 }
 \value{
 Plotly object

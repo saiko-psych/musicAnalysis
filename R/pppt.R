@@ -395,23 +395,31 @@ pppt_validate <- function(root, scanned_data, code_pattern = "\\d{4}[A-Za-z]{4}"
 #' X-axis: PPP Index (-1 to 1), Y-axis: Frequency bands plus Overall.
 #'
 #' @param data Tibble from pppt_scan() with PPP index columns
-#' @param plot_type Type of plot: "all_combined" (one line), "all_overlaid" (one plot, multiple lines),
-#'   "individual" (separate plots per participant), "by_group" (one plot per group)
+#' @param plot_type Type of plot: "all_combined" (mean with error bars), "all_overlaid" (one plot, multiple lines),
+#'   "individual" (separate plots per participant), "by_group" (one plot per group),
+#'   "group_summary" (one plot with mean line per group with error bars),
+#'   "group_summary_separate" (separate plots per group, each showing mean with error bars)
 #' @param color_by How to color lines: "participant", "group", or specific color
+#' @param group_var Name of column to use for grouping (default: "group")
 #' @param line_color Specific color if color_by is not "participant" or "group"
 #' @param show_legend Whether to show legend
 #' @param title Plot title (optional)
+#' @param error_type Type of error bars for mean plots: "se" (standard error),
+#'   "sd" (standard deviation), "ci95" (95% confidence interval), or "none" (default: "se")
 #' @return Plotly object or list of plotly objects
 #' @export
 pppt_plot_profile <- function(data,
-                               plot_type = c("all_combined", "all_overlaid", "individual", "by_group"),
+                               plot_type = c("all_combined", "all_overlaid", "individual", "by_group", "group_summary", "group_summary_separate"),
                                color_by = c("participant", "group", "custom"),
+                               group_var = "group",
                                line_color = "blue",
                                show_legend = TRUE,
-                               title = NULL) {
+                               title = NULL,
+                               error_type = c("se", "sd", "ci95", "none")) {
 
   plot_type <- match.arg(plot_type)
   color_by <- match.arg(color_by)
+  error_type <- match.arg(error_type)
 
   # Validate data
   required_cols <- c("code", "ppp_index_294", "ppp_index_523", "ppp_index_932",
@@ -424,20 +432,46 @@ pppt_plot_profile <- function(data,
   # Convert to long format
   long_data <- .pppt_to_long(data)
 
+  # Determine error label for titles
+  error_label <- switch(error_type,
+    "se" = "SE",
+    "sd" = "SD",
+    "ci95" = "95% CI",
+    "none" = ""
+  )
+
   # Create plots based on type
   if (plot_type == "all_combined") {
-    # Average across all participants
+    # Average across all participants with error bars
     avg_data <- long_data %>%
       dplyr::group_by(frequency_label, frequency_order, is_overall) %>%
-      dplyr::summarise(ppp_index = mean(ppp_index, na.rm = TRUE), .groups = "drop") %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        # Calculate SD BEFORE mean (sd() has bugs in some dplyr versions)
+        sd_val = sqrt(sum((ppp_index - mean(ppp_index, na.rm = TRUE))^2, na.rm = TRUE) / (dplyr::n() - 1)),
+        ppp_index = mean(ppp_index, na.rm = TRUE),
+        .groups = "drop"
+      ) %>%
+      dplyr::mutate(
+        error = .calculate_error(sd_val, n, error_type)
+      ) %>%
       dplyr::arrange(frequency_order)
+
+    # Build title
+    plot_title <- if (error_type != "none") {
+      title %||% sprintf("PPPT Profile - All Participants (Mean \u00b1 %s)", error_label)
+    } else {
+      title %||% "PPPT Profile - All Participants (Mean)"
+    }
 
     plot <- .create_single_profile_plot(
       avg_data,
-      title = title %||% "PPPT Profile - All Participants (Mean)",
+      title = plot_title,
       color = line_color,
       show_legend = FALSE,
-      label = "Mean"
+      label = "Mean",
+      show_error = (error_type != "none"),
+      error_label = error_label
     )
 
     return(plot)
@@ -478,29 +512,144 @@ pppt_plot_profile <- function(data,
 
   } else if (plot_type == "by_group") {
     # Check if group column exists
-    if (!"group" %in% names(data)) {
-      cli::cli_abort("Group column not found. Run pppt_scan() with extract_groups = TRUE.")
+    if (!group_var %in% names(data)) {
+      cli::cli_abort("Group column '{group_var}' not found in data.")
     }
 
     plots <- list()
 
-    for (grp in unique(data$group)) {
+    for (grp in unique(data[[group_var]])) {
       group_data <- long_data %>%
-        dplyr::filter(group == grp)
+        dplyr::filter(.data[[group_var]] == grp)
 
       plot <- .create_overlaid_profile_plot(
         group_data,
         color_by = "participant",
         line_color = line_color,
         show_legend = show_legend,
-        title = sprintf("PPPT Profiles - Group: %s", grp)
+        title = sprintf("PPPT Profiles - %s: %s", group_var, grp),
+        group_var = NULL  # Don't use grouping within this plot
       )
 
-      plots[[grp]] <- plot
+      plots[[as.character(grp)]] <- plot
+    }
+
+    return(plots)
+
+  } else if (plot_type == "group_summary") {
+    # One plot with summarized line per group (mean + error bars)
+    if (!group_var %in% names(data)) {
+      cli::cli_abort("Group column '{group_var}' not found in data.")
+    }
+
+    # Calculate group means and error
+    group_summary <- long_data %>%
+      dplyr::group_by(.data[[group_var]], frequency_label, frequency_order, is_overall) %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        # Calculate SD BEFORE mean (sd() has bugs in some dplyr versions)
+        sd_val = sqrt(sum((ppp_index - mean(ppp_index, na.rm = TRUE))^2, na.rm = TRUE) / (dplyr::n() - 1)),
+        ppp_index = mean(ppp_index, na.rm = TRUE),
+        .groups = "drop"
+      ) %>%
+      dplyr::mutate(
+        error = .calculate_error(sd_val, n, error_type)
+      ) %>%
+      dplyr::arrange(frequency_order)
+
+    # Build title
+    plot_title <- if (error_type != "none") {
+      title %||% sprintf("PPPT Profiles by %s (Mean \u00b1 %s)", group_var, error_label)
+    } else {
+      title %||% sprintf("PPPT Profiles by %s (Mean)", group_var)
+    }
+
+    plot <- .create_overlaid_profile_plot(
+      group_summary,
+      color_by = "group",
+      line_color = line_color,
+      show_legend = show_legend,
+      title = plot_title,
+      group_var = group_var,
+      show_error = (error_type != "none"),
+      error_label = error_label
+    )
+
+    return(plot)
+
+  } else if (plot_type == "group_summary_separate") {
+    # Separate plot for each group showing mean with error bars
+    if (!group_var %in% names(data)) {
+      cli::cli_abort("Group column '{group_var}' not found in data.")
+    }
+
+    # Calculate group means and error
+    group_summary <- long_data %>%
+      dplyr::group_by(.data[[group_var]], frequency_label, frequency_order, is_overall) %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        # Calculate SD BEFORE mean (sd() has bugs in some dplyr versions)
+        sd_val = sqrt(sum((ppp_index - mean(ppp_index, na.rm = TRUE))^2, na.rm = TRUE) / (dplyr::n() - 1)),
+        ppp_index = mean(ppp_index, na.rm = TRUE),
+        .groups = "drop"
+      ) %>%
+      dplyr::mutate(
+        error = .calculate_error(sd_val, n, error_type)
+      ) %>%
+      dplyr::arrange(frequency_order)
+
+    # Create separate plot for each group
+    plots <- list()
+    for (grp in unique(group_summary[[group_var]])) {
+      grp_data <- group_summary %>% dplyr::filter(.data[[group_var]] == grp)
+
+      # Build title
+      plot_title_grp <- if (error_type != "none") {
+        title %||% sprintf("%s: %s (Mean \u00b1 %s)", group_var, grp, error_label)
+      } else {
+        title %||% sprintf("%s: %s (Mean)", group_var, grp)
+      }
+
+      plot <- .create_single_profile_plot(
+        grp_data,
+        title = plot_title_grp,
+        color = line_color,
+        show_legend = FALSE,
+        label = as.character(grp),
+        show_error = (error_type != "none"),
+        error_label = error_label
+      )
+
+      plots[[as.character(grp)]] <- plot
     }
 
     return(plots)
   }
+}
+
+#' Calculate error bars based on type
+#'
+#' @param sd_val Standard deviation
+#' @param n Sample size
+#' @param error_type Type of error: "se", "sd", "ci95", or "none"
+#' @return Error value
+#' @keywords internal
+.calculate_error <- function(sd_val, n, error_type) {
+  if (error_type == "none") {
+    return(0)
+  } else if (error_type == "se") {
+    # Standard Error
+    return(sd_val / sqrt(n))
+  } else if (error_type == "sd") {
+    # Standard Deviation
+    return(sd_val)
+  } else if (error_type == "ci95") {
+    # 95% Confidence Interval (using t-distribution)
+    # For large n, t ≈ 1.96; for small n, use qt
+    t_val <- if (n > 30) 1.96 else qt(0.975, df = n - 1)
+    return(t_val * sd_val / sqrt(n))
+  }
+  return(0)
 }
 
 #' Convert PPPT data to long format for plotting
@@ -539,9 +688,11 @@ pppt_plot_profile <- function(data,
 #' @param color Line color
 #' @param show_legend Show legend
 #' @param label Line label
+#' @param show_error Show error bars (requires 'error' column in data)
+#' @param error_label Label for error bars (e.g., "SE", "SD", "95% CI")
 #' @return Plotly object
 #' @keywords internal
-.create_single_profile_plot <- function(data, title, color, show_legend, label) {
+.create_single_profile_plot <- function(data, title, color, show_legend, label, show_error = FALSE, error_label = "SE") {
   # Separate overall from frequencies
   freq_data <- data %>% dplyr::filter(!is_overall)
   overall_data <- data %>% dplyr::filter(is_overall)
@@ -549,45 +700,98 @@ pppt_plot_profile <- function(data,
   # Create plotly
   plot <- plotly::plot_ly()
 
-  # Add frequency profile line
+  # Add frequency profile line (with error bars if requested)
   if (nrow(freq_data) > 0) {
-    plot <- plot %>%
-      plotly::add_trace(
-        data = freq_data,
-        x = ~ppp_index,
-        y = ~frequency_label,
-        type = "scatter",
-        mode = "lines+markers",
-        line = list(color = color, width = 2),
-        marker = list(size = 8, color = color),
-        name = label,
-        showlegend = show_legend,
-        hovertemplate = paste0(
-          "<b>%{y}</b><br>",
-          "PPP Index: %{x:.3f}<br>",
-          "<extra></extra>"
+    if (show_error && "error" %in% names(freq_data)) {
+      plot <- plot %>%
+        plotly::add_trace(
+          data = freq_data,
+          x = ~ppp_index,
+          y = ~frequency_label,
+          error_x = list(
+            type = "data",
+            array = ~error,
+            color = color,
+            thickness = 1.5,
+            width = 4
+          ),
+          type = "scatter",
+          mode = "lines+markers",
+          line = list(color = color, width = 2),
+          marker = list(size = 8, color = color),
+          name = label,
+          showlegend = show_legend,
+          hovertemplate = paste0(
+            "<b>%{y}</b><br>",
+            "PPP Index: %{x:.3f} \u00b1 %{error_x.array:.3f} (", error_label, ")<br>",
+            "<extra></extra>"
+          )
         )
-      )
+    } else {
+      plot <- plot %>%
+        plotly::add_trace(
+          data = freq_data,
+          x = ~ppp_index,
+          y = ~frequency_label,
+          type = "scatter",
+          mode = "lines+markers",
+          line = list(color = color, width = 2),
+          marker = list(size = 8, color = color),
+          name = label,
+          showlegend = show_legend,
+          hovertemplate = paste0(
+            "<b>%{y}</b><br>",
+            "PPP Index: %{x:.3f}<br>",
+            "<extra></extra>"
+          )
+        )
+    }
   }
 
-  # Add overall point (not connected)
+  # Add overall point (not connected, bigger symbol)
   if (nrow(overall_data) > 0) {
-    plot <- plot %>%
-      plotly::add_trace(
-        data = overall_data,
-        x = ~ppp_index,
-        y = ~frequency_label,
-        type = "scatter",
-        mode = "markers",
-        marker = list(size = 10, color = color, symbol = "diamond"),
-        name = paste0(label, " (Overall)"),
-        showlegend = show_legend,
-        hovertemplate = paste0(
-          "<b>Overall</b><br>",
-          "PPP Index: %{x:.3f}<br>",
-          "<extra></extra>"
+    if (show_error && "error" %in% names(overall_data)) {
+      plot <- plot %>%
+        plotly::add_trace(
+          data = overall_data,
+          x = ~ppp_index,
+          y = ~frequency_label,
+          error_x = list(
+            type = "data",
+            array = ~error,
+            color = color,
+            thickness = 1.5,
+            width = 4
+          ),
+          type = "scatter",
+          mode = "markers",
+          marker = list(size = 14, color = color, symbol = "diamond"),
+          name = paste0(label, " (Overall)"),
+          showlegend = show_legend,
+          hovertemplate = paste0(
+            "<b>Overall</b><br>",
+            "PPP Index: %{x:.3f} \u00b1 %{error_x.array:.3f} (", error_label, ")<br>",
+            "<extra></extra>"
+          )
         )
-      )
+    } else {
+      plot <- plot %>%
+        plotly::add_trace(
+          data = overall_data,
+          x = ~ppp_index,
+          y = ~frequency_label,
+          type = "scatter",
+          mode = "markers",
+          marker = list(size = 14, color = color, symbol = "diamond"),
+          name = paste0(label, " (Overall)"),
+          showlegend = show_legend,
+          hovertemplate = paste0(
+            "<b>Overall</b><br>",
+            "PPP Index: %{x:.3f}<br>",
+            "<extra></extra>"
+          )
+        )
+    }
   }
 
   # Layout
@@ -619,18 +823,22 @@ pppt_plot_profile <- function(data,
 #' @param line_color Default line color
 #' @param show_legend Show legend
 #' @param title Plot title
+#' @param group_var Grouping variable name (or NULL for custom color)
+#' @param show_error Show error bars (requires 'error' column)
+#' @param error_label Label for error bars (e.g., "SE", "SD", "95% CI")
 #' @return Plotly object
 #' @keywords internal
-.create_overlaid_profile_plot <- function(data, color_by, line_color, show_legend, title) {
+.create_overlaid_profile_plot <- function(data, color_by, line_color, show_legend, title,
+                                          group_var = NULL, show_error = FALSE, error_label = "SE") {
   plot <- plotly::plot_ly()
 
-  # Determine grouping variable
-  if (color_by == "participant") {
-    group_var <- "code"
-  } else if (color_by == "group" && "group" %in% names(data)) {
-    group_var <- "group"
-  } else {
-    group_var <- NULL
+  # Determine grouping variable if not explicitly provided
+  if (is.null(group_var)) {
+    if (color_by == "participant") {
+      group_var <- "code"
+    } else if (color_by == "group" && "group" %in% names(data)) {
+      group_var <- "group"
+    }
   }
 
   # Split by overall vs frequencies
@@ -644,25 +852,53 @@ pppt_plot_profile <- function(data,
       for (grp in unique(freq_data[[group_var]])) {
         grp_data <- freq_data %>% dplyr::filter(.data[[group_var]] == grp)
 
-        plot <- plot %>%
-          plotly::add_trace(
-            data = grp_data,
-            x = ~ppp_index,
-            y = ~frequency_label,
-            type = "scatter",
-            mode = "lines+markers",
-            line = list(width = 2),
-            marker = list(size = 6),
-            name = as.character(grp),
-            showlegend = show_legend,
-            legendgroup = as.character(grp),
-            hovertemplate = paste0(
-              "<b>%{y}</b><br>",
-              group_var, ": ", grp, "<br>",
-              "PPP Index: %{x:.3f}<br>",
-              "<extra></extra>"
+        if (show_error && "error" %in% names(grp_data)) {
+          plot <- plot %>%
+            plotly::add_trace(
+              data = grp_data,
+              x = ~ppp_index,
+              y = ~frequency_label,
+              error_x = list(
+                type = "data",
+                array = ~error,
+                thickness = 1.5,
+                width = 4
+              ),
+              type = "scatter",
+              mode = "lines+markers",
+              line = list(width = 2),
+              marker = list(size = 6),
+              name = as.character(grp),
+              showlegend = show_legend,
+              legendgroup = as.character(grp),
+              hovertemplate = paste0(
+                "<b>%{y}</b><br>",
+                group_var, ": ", grp, "<br>",
+                "PPP Index: %{x:.3f} ± %{error_x.array:.3f} (", error_label, ")<br>",
+                "<extra></extra>"
+              )
             )
-          )
+        } else {
+          plot <- plot %>%
+            plotly::add_trace(
+              data = grp_data,
+              x = ~ppp_index,
+              y = ~frequency_label,
+              type = "scatter",
+              mode = "lines+markers",
+              line = list(width = 2),
+              marker = list(size = 6),
+              name = as.character(grp),
+              showlegend = show_legend,
+              legendgroup = as.character(grp),
+              hovertemplate = paste0(
+                "<b>%{y}</b><br>",
+                group_var, ": ", grp, "<br>",
+                "PPP Index: %{x:.3f}<br>",
+                "<extra></extra>"
+              )
+            )
+        }
       }
     } else {
       # Single color for all
@@ -692,42 +928,94 @@ pppt_plot_profile <- function(data,
       for (grp in unique(overall_data[[group_var]])) {
         grp_data <- overall_data %>% dplyr::filter(.data[[group_var]] == grp)
 
+        if (show_error && "error" %in% names(grp_data)) {
+          plot <- plot %>%
+            plotly::add_trace(
+              data = grp_data,
+              x = ~ppp_index,
+              y = ~frequency_label,
+              error_x = list(
+                type = "data",
+                array = ~error,
+                thickness = 1.5,
+                width = 4
+              ),
+              type = "scatter",
+              mode = "markers",
+              marker = list(size = 14, symbol = "diamond"),
+              name = paste0(as.character(grp), " (Overall)"),
+              showlegend = show_legend,
+              legendgroup = as.character(grp),
+              hovertemplate = paste0(
+                "<b>Overall</b><br>",
+                group_var, ": ", grp, "<br>",
+                "PPP Index: %{x:.3f} ± %{error_x.array:.3f} (", error_label, ")<br>",
+                "<extra></extra>"
+              )
+            )
+        } else {
+          plot <- plot %>%
+            plotly::add_trace(
+              data = grp_data,
+              x = ~ppp_index,
+              y = ~frequency_label,
+              type = "scatter",
+              mode = "markers",
+              marker = list(size = 14, symbol = "diamond"),
+              name = paste0(as.character(grp), " (Overall)"),
+              showlegend = show_legend,
+              legendgroup = as.character(grp),
+              hovertemplate = paste0(
+                "<b>Overall</b><br>",
+                group_var, ": ", grp, "<br>",
+                "PPP Index: %{x:.3f}<br>",
+                "<extra></extra>"
+              )
+            )
+        }
+      }
+    } else {
+      if (show_error && "error" %in% names(overall_data)) {
         plot <- plot %>%
           plotly::add_trace(
-            data = grp_data,
+            data = overall_data,
+            x = ~ppp_index,
+            y = ~frequency_label,
+            error_x = list(
+              type = "data",
+              array = ~error,
+              thickness = 1.5,
+              width = 4
+            ),
+            type = "scatter",
+            mode = "markers",
+            marker = list(size = 14, color = line_color, symbol = "diamond"),
+            name = "Overall",
+            showlegend = show_legend,
+            hovertemplate = paste0(
+              "<b>Overall</b><br>",
+              "PPP Index: %{x:.3f} ± %{error_x.array:.3f}<br>",
+              "<extra></extra>"
+            )
+          )
+      } else {
+        plot <- plot %>%
+          plotly::add_trace(
+            data = overall_data,
             x = ~ppp_index,
             y = ~frequency_label,
             type = "scatter",
             mode = "markers",
-            marker = list(size = 8, symbol = "diamond"),
-            name = paste0(as.character(grp), " (Overall)"),
+            marker = list(size = 14, color = line_color, symbol = "diamond"),
+            name = "Overall",
             showlegend = show_legend,
-            legendgroup = as.character(grp),
             hovertemplate = paste0(
               "<b>Overall</b><br>",
-              group_var, ": ", grp, "<br>",
               "PPP Index: %{x:.3f}<br>",
               "<extra></extra>"
             )
           )
       }
-    } else {
-      plot <- plot %>%
-        plotly::add_trace(
-          data = overall_data,
-          x = ~ppp_index,
-          y = ~frequency_label,
-          type = "scatter",
-          mode = "markers",
-          marker = list(size = 8, color = line_color, symbol = "diamond"),
-          name = "Overall",
-          showlegend = show_legend,
-          hovertemplate = paste0(
-            "<b>Overall</b><br>",
-            "PPP Index: %{x:.3f}<br>",
-            "<extra></extra>"
-          )
-        )
     }
   }
 

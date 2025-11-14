@@ -4,7 +4,15 @@
 \alias{.create_single_profile_plot}
 \title{Create single PPPT profile plot}
 \usage{
-.create_single_profile_plot(data, title, color, show_legend, label)
+.create_single_profile_plot(
+  data,
+  title,
+  color,
+  show_legend,
+  label,
+  show_error = FALSE,
+  error_label = "SE"
+)
 }
 \arguments{
 \item{data}{Long format data for one line}
@@ -16,6 +24,10 @@
 \item{show_legend}{Show legend}
 
 \item{label}{Line label}
+
+\item{show_error}{Show error bars (requires 'error' column in data)}
+
+\item{error_label}{Label for error bars (e.g., "SE", "SD", "95\% CI")}
 }
 \value{
 Plotly object

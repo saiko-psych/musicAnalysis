@@ -6,26 +6,36 @@
 \usage{
 pppt_plot_profile(
   data,
-  plot_type = c("all_combined", "all_overlaid", "individual", "by_group"),
+  plot_type = c("all_combined", "all_overlaid", "individual", "by_group",
+    "group_summary", "group_summary_separate"),
   color_by = c("participant", "group", "custom"),
+  group_var = "group",
   line_color = "blue",
   show_legend = TRUE,
-  title = NULL
+  title = NULL,
+  error_type = c("se", "sd", "ci95", "none")
 )
 }
 \arguments{
 \item{data}{Tibble from pppt_scan() with PPP index columns}
 
-\item{plot_type}{Type of plot: "all_combined" (one line), "all_overlaid" (one plot, multiple lines),
-"individual" (separate plots per participant), "by_group" (one plot per group)}
+\item{plot_type}{Type of plot: "all_combined" (mean with error bars), "all_overlaid" (one plot, multiple lines),
+"individual" (separate plots per participant), "by_group" (one plot per group),
+"group_summary" (one plot with mean line per group with error bars),
+"group_summary_separate" (separate plots per group, each showing mean with error bars)}
 
 \item{color_by}{How to color lines: "participant", "group", or specific color}
+
+\item{group_var}{Name of column to use for grouping (default: "group")}
 
 \item{line_color}{Specific color if color_by is not "participant" or "group"}
 
 \item{show_legend}{Whether to show legend}
 
 \item{title}{Plot title (optional)}
+
+\item{error_type}{Type of error bars for mean plots: "se" (standard error),
+"sd" (standard deviation), "ci95" (95\% confidence interval), or "none" (default: "se")}
 }
 \value{
 Plotly object or list of plotly objects
