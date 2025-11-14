@@ -65,28 +65,36 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9034 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9036 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "PPPT Shiny module now properly displays data table after scanning"
+            tags$strong("NEW: "),
+            "PPPT Frequency Profile Visualization - interactive plots showing PPP indices across frequency bands"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "'Show R Code' button in PPPT module to display reproducible scan code"
+            "Visualization tab in PPPT module with 4 plot types: mean profile, overlaid lines, individual plots, and group plots"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Download button for R code (.R file) in PPPT module"
+            "Frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) displayed as connected lines"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Enhanced PPPT data table with better editing and display capabilities"
+            tags$strong("ADDED: "),
+            "Overall PPP index shown as separate diamond marker (not connected to frequency lines)"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Better UI layout with properly organized action buttons"
+            tags$strong("ADDED: "),
+            "Plot controls for color customization, legend display, and plot type selection"
+          ),
+          tags$li(
+            tags$strong("ADDED: "),
+            "'Show R Code' button for plot visualization reproducibility"
+          ),
+          tags$li(
+            tags$strong("ADDED: "),
+            "Download buttons for plots (HTML) and R code (.R file)"
           )
         )
       ),
@@ -101,6 +109,35 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9035
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9035 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " PPPT scanner with comprehensive enhancements"),
+                tags$li(tags$strong("ADDED:"), " Row display selector (10, 25, 50, 100, All)"),
+                tags$li(tags$strong("ADDED:"), " Enhanced folder structure analysis with 4 file type counts"),
+                tags$li(tags$strong("ADDED:"), " Duplicate detection and removal with reporting"),
+                tags$li(tags$strong("ADDED:"), " Improved code extraction with fallback strategies"),
+                tags$li(tags$strong("ADDED:"), " Optional group extraction from folder paths"),
+                tags$li(tags$strong("ADDED:"), " pppt_validate() function for data quality checks")
+              )
+            ),
+
+            # v0.0.0.9034
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9034 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " PPPT Shiny module UI enhancements"),
+                tags$li(tags$strong("FIXED:"), " Data table display now shows properly after scanning"),
+                tags$li(tags$strong("ADDED:"), " 'Show R Code' button for reproducible scan code"),
+                tags$li(tags$strong("ADDED:"), " Download button for R code (.R file)")
+              )
+            ),
 
             # v0.0.0.9033
             tags$div(

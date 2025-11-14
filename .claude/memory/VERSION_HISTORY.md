@@ -3,7 +3,33 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9034 (2025-11-14)
+## Current Version: v0.0.0.9036 (2025-11-14)
+
+### v0.0.0.9036 (2025-11-14)
+- **NEW: PPPT Frequency Profile Visualization**
+- Added `pppt_plot_profile()` function for creating interactive PPPT profile plots
+- Frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) shown as connected lines
+- Overall PPP index shown as separate diamond marker (not connected)
+- Four plot types: all_combined (mean), all_overlaid, individual, by_group
+- Color-by options: participant, group, or custom color
+- Added visualization tab in PPPT Shiny module with:
+  - Plot type selector
+  - Color and legend controls
+  - Update Plot button
+  - Download Plot (HTML) button
+  - Show R Code button for reproducibility
+  - Download Code (.R) button
+- Helper functions: `.pppt_to_long()`, `.create_single_profile_plot()`, `.create_overlaid_profile_plot()`
+
+### v0.0.0.9035 (2025-11-14)
+- **IMPROVED: PPPT Scanner with comprehensive enhancements**
+- Added row display selector (10, 25, 50, 100, All)
+- Enhanced folder structure analysis showing 4 file type counts
+- Added duplicate detection and removal with reporting
+- Improved code extraction with fallback strategies
+- Added optional group extraction from folder paths
+- Created `pppt_validate()` function for data quality checks
+- Complete Shiny UI overhaul with validation results
 
 ### v0.0.0.9034 (2025-11-14)
 - **IMPROVED: PPPT Shiny module UI enhancements**

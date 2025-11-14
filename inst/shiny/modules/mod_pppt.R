@@ -5,6 +5,17 @@ mod_pppt_ui <- function(id) {
   fluidPage(
     h2("PPPT Scanner (Pitch Perception Proficiency Test)"),
 
+    # Tabset for Data Scanning and Visualization
+    tabsetPanel(
+      id = ns("pppt_tabs"),
+      type = "tabs",
+
+      # Tab 1: Data Scanning
+      tabPanel(
+        "Data Scanning",
+        value = "scanning",
+        br(),
+
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
@@ -177,6 +188,136 @@ mod_pppt_ui <- function(id) {
 
     # Results
     uiOutput(ns("results_panel"))
+      ), # End Data Scanning tab
+
+      # Tab 2: Visualization
+      tabPanel(
+        "Visualization",
+        value = "visualization",
+        br(),
+
+        wellPanel(
+          style = "background-color: #f0f8ff;",
+          h4("📊 PPPT Profile Visualization"),
+          p("Visualize PPP indices across frequency bands. The frequencies are shown as connected lines, while the Overall index appears as a separate diamond marker."),
+          tags$ul(
+            tags$li("X-axis: PPP Index (-1 to 1)"),
+            tags$li("Y-axis: Frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) + Overall"),
+            tags$li("Frequencies: Connected with lines"),
+            tags$li("Overall: Diamond marker (not connected)")
+          )
+        ),
+
+        # Require data first
+        conditionalPanel(
+          condition = sprintf("output['%s']", ns("has_data")),
+          ns = ns,
+
+          fluidRow(
+            column(
+              width = 3,
+              wellPanel(
+                h4("Plot Controls"),
+
+                selectInput(
+                  ns("plot_type"),
+                  "Plot Type:",
+                  choices = c(
+                    "All participants - Mean profile" = "all_combined",
+                    "All participants - Overlaid lines" = "all_overlaid",
+                    "Individual plots per participant" = "individual",
+                    "Plots by group" = "by_group"
+                  ),
+                  selected = "all_combined"
+                ),
+
+                conditionalPanel(
+                  condition = "input.plot_type == 'all_overlaid' || input.plot_type == 'by_group'",
+                  ns = ns,
+                  selectInput(
+                    ns("color_by"),
+                    "Color lines by:",
+                    choices = c(
+                      "Participant" = "participant",
+                      "Group" = "group",
+                      "Custom color" = "custom"
+                    ),
+                    selected = "participant"
+                  )
+                ),
+
+                conditionalPanel(
+                  condition = "input.color_by == 'custom' || input.plot_type == 'all_combined' || input.plot_type == 'individual'",
+                  ns = ns,
+                  textInput(
+                    ns("line_color"),
+                    "Line color:",
+                    value = "steelblue",
+                    placeholder = "e.g., blue, #FF5733"
+                  )
+                ),
+
+                checkboxInput(
+                  ns("show_legend"),
+                  "Show legend",
+                  value = TRUE
+                ),
+
+                br(),
+                actionButton(
+                  ns("update_plot"),
+                  "Update Plot",
+                  class = "btn-primary btn-block"
+                ),
+
+                br(),
+                downloadButton(
+                  ns("download_plot"),
+                  "Download Plot (HTML)",
+                  class = "btn-success btn-block"
+                ),
+
+                br(),
+                actionButton(
+                  ns("show_plot_code"),
+                  "📝 Show R Code",
+                  class = "btn-info btn-block"
+                )
+              )
+            ),
+
+            column(
+              width = 9,
+              uiOutput(ns("plot_output")),
+
+              br(),
+              conditionalPanel(
+                condition = "input.show_plot_code > 0",
+                ns = ns,
+                wellPanel(
+                  style = "background-color: #f8f9fa;",
+                  h4("R Code to Reproduce This Plot"),
+                  p("Copy and paste this code into your R console to recreate the plot:"),
+                  verbatimTextOutput(ns("plot_r_code")),
+                  downloadButton(ns("download_plot_code"), "Download Code (.R)")
+                )
+              )
+            )
+          )
+        ),
+
+        # Message when no data
+        conditionalPanel(
+          condition = sprintf("!output['%s']", ns("has_data")),
+          ns = ns,
+          wellPanel(
+            style = "background-color: #fff3cd; border-left: 4px solid #ffc107;",
+            h5("⚠️ No Data Available"),
+            p("Please scan PPPT files in the 'Data Scanning' tab first before creating visualizations.")
+          )
+        )
+      ) # End Visualization tab
+    ) # End tabsetPanel
   )
 }
 
@@ -668,6 +809,247 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
           input$code_pattern
         )
         writeLines(code, file)
+      }
+    )
+
+    # ========== Visualization Tab Server Logic ==========
+
+    # Check if data exists for conditional panels
+    output$has_data <- reactive({
+      !is.null(rv$pppt_data) && nrow(rv$pppt_data) > 0
+    })
+    outputOptions(output, "has_data", suspendWhenHidden = FALSE)
+
+    # Reactive for current plot
+    current_plot <- reactiveVal(NULL)
+
+    # Generate plots when Update Plot is clicked
+    observeEvent(input$update_plot, {
+      req(rv$pppt_data)
+
+      tryCatch({
+        data <- rv$edited_data  # Use edited data if user made changes
+
+        # Determine color_by parameter
+        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
+          input$color_by
+        } else {
+          "custom"  # For all_combined and individual
+        }
+
+        # Generate plot(s)
+        plot_result <- pppt_plot_profile(
+          data = data,
+          plot_type = input$plot_type,
+          color_by = color_by_param,
+          line_color = input$line_color,
+          show_legend = input$show_legend,
+          title = NULL  # Let function generate default titles
+        )
+
+        # Store for download and code generation
+        current_plot(plot_result)
+
+        showNotification(
+          "Plot updated successfully!",
+          type = "message",
+          duration = 3
+        )
+
+      }, error = function(e) {
+        showNotification(
+          paste("Error generating plot:", e$message),
+          type = "error",
+          duration = 10
+        )
+      })
+    })
+
+    # Render plot output
+    output$plot_output <- renderUI({
+      req(current_plot())
+
+      plot_result <- current_plot()
+
+      # Handle different return types
+      if (input$plot_type %in% c("all_combined", "all_overlaid")) {
+        # Single plot
+        tagList(
+          h4("PPPT Frequency Profile"),
+          plotly::plotlyOutput(ns("main_plot"), height = "600px")
+        )
+      } else if (input$plot_type == "individual") {
+        # Multiple individual plots
+        tagList(
+          h4("Individual PPPT Profiles"),
+          lapply(seq_along(plot_result), function(i) {
+            tagList(
+              plotly::plotlyOutput(ns(paste0("individual_plot_", i)), height = "500px"),
+              br()
+            )
+          })
+        )
+      } else if (input$plot_type == "by_group") {
+        # Group plots
+        tagList(
+          h4("PPPT Profiles by Group"),
+          lapply(seq_along(plot_result), function(i) {
+            tagList(
+              plotly::plotlyOutput(ns(paste0("group_plot_", i)), height = "500px"),
+              br()
+            )
+          })
+        )
+      }
+    })
+
+    # Render main plot (for all_combined and all_overlaid)
+    output$main_plot <- plotly::renderPlotly({
+      req(current_plot())
+      req(input$plot_type %in% c("all_combined", "all_overlaid"))
+      current_plot()
+    })
+
+    # Render individual plots dynamically
+    observe({
+      req(current_plot())
+      req(input$plot_type == "individual")
+
+      plot_list <- current_plot()
+
+      lapply(seq_along(plot_list), function(i) {
+        output_name <- paste0("individual_plot_", i)
+        output[[output_name]] <- plotly::renderPlotly({
+          plot_list[[i]]
+        })
+      })
+    })
+
+    # Render group plots dynamically
+    observe({
+      req(current_plot())
+      req(input$plot_type == "by_group")
+
+      plot_list <- current_plot()
+
+      lapply(seq_along(plot_list), function(i) {
+        output_name <- paste0("group_plot_", i)
+        output[[output_name]] <- plotly::renderPlotly({
+          plot_list[[i]]
+        })
+      })
+    })
+
+    # Generate R code for plot
+    output$plot_r_code <- renderText({
+      req(rv$pppt_data)
+      req(input$update_plot)  # Only show after plot created
+
+      # Determine color_by parameter
+      color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
+        sprintf('  color_by = "%s",\n', input$color_by)
+      } else {
+        ""
+      }
+
+      code <- sprintf('library(musicAnalysis)
+library(plotly)
+
+# Load your PPPT data
+# (Assuming you already have pppt_data from scanning)
+
+# Generate PPPT frequency profile plot
+plot <- pppt_plot_profile(
+  data = pppt_data,
+  plot_type = "%s",
+%s  line_color = "%s",
+  show_legend = %s,
+  title = NULL
+)
+
+# Display plot
+plot
+
+# Save plot as HTML
+htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
+',
+        input$plot_type,
+        color_by_param,
+        input$line_color,
+        input$show_legend
+      )
+
+      code
+    })
+
+    # Download plot code
+    output$download_plot_code <- downloadHandler(
+      filename = function() {
+        paste0("pppt_plot_code_", format(Sys.Date(), "%Y%m%d"), ".R")
+      },
+      content = function(file) {
+        # Same code as above
+        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
+          sprintf('  color_by = "%s",\n', input$color_by)
+        } else {
+          ""
+        }
+
+        code <- sprintf('library(musicAnalysis)
+library(plotly)
+
+# Load your PPPT data
+# (Assuming you already have pppt_data from scanning)
+
+# Generate PPPT frequency profile plot
+plot <- pppt_plot_profile(
+  data = pppt_data,
+  plot_type = "%s",
+%s  line_color = "%s",
+  show_legend = %s,
+  title = NULL
+)
+
+# Display plot
+plot
+
+# Save plot as HTML
+htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
+',
+          input$plot_type,
+          color_by_param,
+          input$line_color,
+          input$show_legend
+        )
+
+        writeLines(code, file)
+      }
+    )
+
+    # Download plot as HTML
+    output$download_plot <- downloadHandler(
+      filename = function() {
+        paste0("pppt_profile_plot_", format(Sys.Date(), "%Y%m%d"), ".html")
+      },
+      content = function(file) {
+        req(current_plot())
+
+        # For single plots, save directly
+        if (input$plot_type %in% c("all_combined", "all_overlaid")) {
+          htmlwidgets::saveWidget(current_plot(), file)
+        } else {
+          # For multiple plots, combine or save first one
+          # (Could enhance this to save all as separate files or combined HTML)
+          plot_list <- current_plot()
+          if (length(plot_list) > 0) {
+            htmlwidgets::saveWidget(plot_list[[1]], file)
+            showNotification(
+              "Note: Only the first plot was saved. Future enhancement will save all plots.",
+              type = "warning",
+              duration = 5
+            )
+          }
+        }
       }
     )
   })

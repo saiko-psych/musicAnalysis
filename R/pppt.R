@@ -388,3 +388,367 @@ pppt_validate <- function(root, scanned_data, code_pattern = "\\d{4}[A-Za-z]{4}"
     all_valid_pppt_files = basename(valid_pppt_files)
   )
 }
+
+#' Create PPPT frequency profile plot
+#'
+#' Creates a line plot showing PPP indices across UCF frequencies.
+#' X-axis: PPP Index (-1 to 1), Y-axis: Frequency bands plus Overall.
+#'
+#' @param data Tibble from pppt_scan() with PPP index columns
+#' @param plot_type Type of plot: "all_combined" (one line), "all_overlaid" (one plot, multiple lines),
+#'   "individual" (separate plots per participant), "by_group" (one plot per group)
+#' @param color_by How to color lines: "participant", "group", or specific color
+#' @param line_color Specific color if color_by is not "participant" or "group"
+#' @param show_legend Whether to show legend
+#' @param title Plot title (optional)
+#' @return Plotly object or list of plotly objects
+#' @export
+pppt_plot_profile <- function(data,
+                               plot_type = c("all_combined", "all_overlaid", "individual", "by_group"),
+                               color_by = c("participant", "group", "custom"),
+                               line_color = "blue",
+                               show_legend = TRUE,
+                               title = NULL) {
+
+  plot_type <- match.arg(plot_type)
+  color_by <- match.arg(color_by)
+
+  # Validate data
+  required_cols <- c("code", "ppp_index_294", "ppp_index_523", "ppp_index_932",
+                     "ppp_index_1661", "ppp_index_2960", "ppp_index_5274", "ppp_index_overall")
+  missing <- setdiff(required_cols, names(data))
+  if (length(missing) > 0) {
+    cli::cli_abort("Missing required columns: {.field {missing}}")
+  }
+
+  # Convert to long format
+  long_data <- .pppt_to_long(data)
+
+  # Create plots based on type
+  if (plot_type == "all_combined") {
+    # Average across all participants
+    avg_data <- long_data %>%
+      dplyr::group_by(frequency_label, frequency_order, is_overall) %>%
+      dplyr::summarise(ppp_index = mean(ppp_index, na.rm = TRUE), .groups = "drop") %>%
+      dplyr::arrange(frequency_order)
+
+    plot <- .create_single_profile_plot(
+      avg_data,
+      title = title %||% "PPPT Profile - All Participants (Mean)",
+      color = line_color,
+      show_legend = FALSE,
+      label = "Mean"
+    )
+
+    return(plot)
+
+  } else if (plot_type == "all_overlaid") {
+    # All participants on one plot
+    plot <- .create_overlaid_profile_plot(
+      long_data,
+      color_by = color_by,
+      line_color = line_color,
+      show_legend = show_legend,
+      title = title %||% "PPPT Profiles - All Participants"
+    )
+
+    return(plot)
+
+  } else if (plot_type == "individual") {
+    # Separate plot for each participant
+    plots <- list()
+
+    for (participant in unique(long_data$code)) {
+      participant_data <- long_data %>%
+        dplyr::filter(code == participant) %>%
+        dplyr::arrange(frequency_order)
+
+      plot <- .create_single_profile_plot(
+        participant_data,
+        title = sprintf("PPPT Profile - %s", participant),
+        color = line_color,
+        show_legend = FALSE,
+        label = participant
+      )
+
+      plots[[participant]] <- plot
+    }
+
+    return(plots)
+
+  } else if (plot_type == "by_group") {
+    # Check if group column exists
+    if (!"group" %in% names(data)) {
+      cli::cli_abort("Group column not found. Run pppt_scan() with extract_groups = TRUE.")
+    }
+
+    plots <- list()
+
+    for (grp in unique(data$group)) {
+      group_data <- long_data %>%
+        dplyr::filter(group == grp)
+
+      plot <- .create_overlaid_profile_plot(
+        group_data,
+        color_by = "participant",
+        line_color = line_color,
+        show_legend = show_legend,
+        title = sprintf("PPPT Profiles - Group: %s", grp)
+      )
+
+      plots[[grp]] <- plot
+    }
+
+    return(plots)
+  }
+}
+
+#' Convert PPPT data to long format for plotting
+#'
+#' @param data Wide format PPPT data
+#' @return Long format tibble
+#' @keywords internal
+.pppt_to_long <- function(data) {
+  # Define frequency labels and order
+  freq_info <- tibble::tibble(
+    freq_col = c("ppp_index_294", "ppp_index_523", "ppp_index_932",
+                 "ppp_index_1661", "ppp_index_2960", "ppp_index_5274", "ppp_index_overall"),
+    frequency_label = c("294 Hz", "523 Hz", "932 Hz", "1661 Hz", "2960 Hz", "5274 Hz", "Overall"),
+    frequency_order = 1:7,
+    is_overall = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE)
+  )
+
+  # Reshape to long
+  long_data <- data %>%
+    tidyr::pivot_longer(
+      cols = tidyr::starts_with("ppp_index_"),
+      names_to = "freq_col",
+      values_to = "ppp_index"
+    ) %>%
+    dplyr::left_join(freq_info, by = "freq_col") %>%
+    dplyr::select(-freq_col) %>%
+    dplyr::filter(!is.na(ppp_index))
+
+  long_data
+}
+
+#' Create single PPPT profile plot
+#'
+#' @param data Long format data for one line
+#' @param title Plot title
+#' @param color Line color
+#' @param show_legend Show legend
+#' @param label Line label
+#' @return Plotly object
+#' @keywords internal
+.create_single_profile_plot <- function(data, title, color, show_legend, label) {
+  # Separate overall from frequencies
+  freq_data <- data %>% dplyr::filter(!is_overall)
+  overall_data <- data %>% dplyr::filter(is_overall)
+
+  # Create plotly
+  plot <- plotly::plot_ly()
+
+  # Add frequency profile line
+  if (nrow(freq_data) > 0) {
+    plot <- plot %>%
+      plotly::add_trace(
+        data = freq_data,
+        x = ~ppp_index,
+        y = ~frequency_label,
+        type = "scatter",
+        mode = "lines+markers",
+        line = list(color = color, width = 2),
+        marker = list(size = 8, color = color),
+        name = label,
+        showlegend = show_legend,
+        hovertemplate = paste0(
+          "<b>%{y}</b><br>",
+          "PPP Index: %{x:.3f}<br>",
+          "<extra></extra>"
+        )
+      )
+  }
+
+  # Add overall point (not connected)
+  if (nrow(overall_data) > 0) {
+    plot <- plot %>%
+      plotly::add_trace(
+        data = overall_data,
+        x = ~ppp_index,
+        y = ~frequency_label,
+        type = "scatter",
+        mode = "markers",
+        marker = list(size = 10, color = color, symbol = "diamond"),
+        name = paste0(label, " (Overall)"),
+        showlegend = show_legend,
+        hovertemplate = paste0(
+          "<b>Overall</b><br>",
+          "PPP Index: %{x:.3f}<br>",
+          "<extra></extra>"
+        )
+      )
+  }
+
+  # Layout
+  plot <- plot %>%
+    plotly::layout(
+      title = title,
+      xaxis = list(
+        title = "PPP Index",
+        range = c(-1.05, 1.05),
+        zeroline = TRUE,
+        zerolinewidth = 1,
+        zerolinecolor = "gray"
+      ),
+      yaxis = list(
+        title = "",
+        categoryorder = "array",
+        categoryarray = rev(c("294 Hz", "523 Hz", "932 Hz", "1661 Hz", "2960 Hz", "5274 Hz", "Overall"))
+      ),
+      hovermode = "closest"
+    )
+
+  plot
+}
+
+#' Create overlaid PPPT profile plot
+#'
+#' @param data Long format data for multiple lines
+#' @param color_by How to color lines
+#' @param line_color Default line color
+#' @param show_legend Show legend
+#' @param title Plot title
+#' @return Plotly object
+#' @keywords internal
+.create_overlaid_profile_plot <- function(data, color_by, line_color, show_legend, title) {
+  plot <- plotly::plot_ly()
+
+  # Determine grouping variable
+  if (color_by == "participant") {
+    group_var <- "code"
+  } else if (color_by == "group" && "group" %in% names(data)) {
+    group_var <- "group"
+  } else {
+    group_var <- NULL
+  }
+
+  # Split by overall vs frequencies
+  freq_data <- data %>% dplyr::filter(!is_overall)
+  overall_data <- data %>% dplyr::filter(is_overall)
+
+  # Plot frequency profiles
+  if (nrow(freq_data) > 0) {
+    if (!is.null(group_var)) {
+      # Color by group variable
+      for (grp in unique(freq_data[[group_var]])) {
+        grp_data <- freq_data %>% dplyr::filter(.data[[group_var]] == grp)
+
+        plot <- plot %>%
+          plotly::add_trace(
+            data = grp_data,
+            x = ~ppp_index,
+            y = ~frequency_label,
+            type = "scatter",
+            mode = "lines+markers",
+            line = list(width = 2),
+            marker = list(size = 6),
+            name = as.character(grp),
+            showlegend = show_legend,
+            legendgroup = as.character(grp),
+            hovertemplate = paste0(
+              "<b>%{y}</b><br>",
+              group_var, ": ", grp, "<br>",
+              "PPP Index: %{x:.3f}<br>",
+              "<extra></extra>"
+            )
+          )
+      }
+    } else {
+      # Single color for all
+      plot <- plot %>%
+        plotly::add_trace(
+          data = freq_data,
+          x = ~ppp_index,
+          y = ~frequency_label,
+          type = "scatter",
+          mode = "lines+markers",
+          line = list(color = line_color, width = 2),
+          marker = list(size = 6, color = line_color),
+          name = "Frequencies",
+          showlegend = show_legend,
+          hovertemplate = paste0(
+            "<b>%{y}</b><br>",
+            "PPP Index: %{x:.3f}<br>",
+            "<extra></extra>"
+          )
+        )
+    }
+  }
+
+  # Plot overall points (not connected)
+  if (nrow(overall_data) > 0) {
+    if (!is.null(group_var)) {
+      for (grp in unique(overall_data[[group_var]])) {
+        grp_data <- overall_data %>% dplyr::filter(.data[[group_var]] == grp)
+
+        plot <- plot %>%
+          plotly::add_trace(
+            data = grp_data,
+            x = ~ppp_index,
+            y = ~frequency_label,
+            type = "scatter",
+            mode = "markers",
+            marker = list(size = 8, symbol = "diamond"),
+            name = paste0(as.character(grp), " (Overall)"),
+            showlegend = show_legend,
+            legendgroup = as.character(grp),
+            hovertemplate = paste0(
+              "<b>Overall</b><br>",
+              group_var, ": ", grp, "<br>",
+              "PPP Index: %{x:.3f}<br>",
+              "<extra></extra>"
+            )
+          )
+      }
+    } else {
+      plot <- plot %>%
+        plotly::add_trace(
+          data = overall_data,
+          x = ~ppp_index,
+          y = ~frequency_label,
+          type = "scatter",
+          mode = "markers",
+          marker = list(size = 8, color = line_color, symbol = "diamond"),
+          name = "Overall",
+          showlegend = show_legend,
+          hovertemplate = paste0(
+            "<b>Overall</b><br>",
+            "PPP Index: %{x:.3f}<br>",
+            "<extra></extra>"
+          )
+        )
+    }
+  }
+
+  # Layout
+  plot <- plot %>%
+    plotly::layout(
+      title = title,
+      xaxis = list(
+        title = "PPP Index",
+        range = c(-1.05, 1.05),
+        zeroline = TRUE,
+        zerolinewidth = 1,
+        zerolinecolor = "gray"
+      ),
+      yaxis = list(
+        title = "",
+        categoryorder = "array",
+        categoryarray = rev(c("294 Hz", "523 Hz", "932 Hz", "1661 Hz", "2960 Hz", "5274 Hz", "Overall"))
+      ),
+      hovermode = "closest"
+    )
+
+  plot
+}
