@@ -65,7 +65,7 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9032 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9033 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
@@ -101,6 +101,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9032
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9032 (2025-11-07)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FEAT:"), " PPPT data parser implementation (backend only)"),
+                tags$li(tags$strong("ADDED:"), " Core PPPT parsing functions in R/pppt.R"),
+                tags$li(tags$strong("ADDED:"), " 46 passing tests for PPPT functionality")
+              )
+            ),
 
             # v0.0.0.9026
             tags$div(
