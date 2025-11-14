@@ -15,7 +15,7 @@
       "Bash(git branch:*)",
       "Bash(gh issue view:*)",
       "Bash(git add:*)",
-      "Bash(git merge:*)"
+      "Bash(Rscript:*)"
     ],
     "deny": [],
     "ask": []

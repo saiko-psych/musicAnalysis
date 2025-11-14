@@ -55,7 +55,7 @@ mod_home_ui <- function(id) {
               tags$strong("🕐 Build Date: "),
               tags$span(
                 style = "color: #27ae60; font-family: monospace;",
-                "2025-11-06"
+                "2025-11-14"
               )
             )
           )
@@ -65,28 +65,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9026 (2025-11-06)"),
+        h4("✨ What's New in v0.0.0.9034 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "AAT .rsl file parsing now correctly extracts Ambiguous % and Control % from summary format files"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "AAT .itl file parsing now handles column names with suffixes (e.g., 'Pitch Classification [-1;0;1;2]')"
-          ),
-          tags$li(
             tags$strong("IMPROVED: "),
-            "AAT .rsl parser now detects two formats: summary (Type of Pair) and item-level (% F0)"
+            "PPPT Shiny module now properly displays data table after scanning"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "AAT module description on home page with clickable panel"
+            "'Show R Code' button in PPPT module to display reproducible scan code"
           ),
           tags$li(
-            tags$strong("UPDATED: "),
-            "All 26 AAT tests now passing with real data structure"
+            tags$strong("ADDED: "),
+            "Download button for R code (.R file) in PPPT module"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Enhanced PPPT data table with better editing and display capabilities"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Better UI layout with properly organized action buttons"
           )
         )
       ),
@@ -101,6 +101,44 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9033
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9033 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " PPPT Shiny module for data extraction"),
+                tags$li(tags$strong("ADDED:"), " Complete PPPT integration with main app"),
+                tags$li(tags$strong("ADDED:"), " Editable data table with CSV export")
+              )
+            ),
+
+            # v0.0.0.9032
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9032 (2025-11-07)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FEAT:"), " PPPT data parser implementation (backend only)"),
+                tags$li(tags$strong("ADDED:"), " Core PPPT parsing functions in R/pppt.R"),
+                tags$li(tags$strong("ADDED:"), " 46 passing tests for PPPT functionality")
+              )
+            ),
+
+            # v0.0.0.9026
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9026 (2025-11-06)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " AAT .rsl file parsing now correctly extracts Ambiguous % and Control % from summary format files"),
+                tags$li(tags$strong("FIXED:"), " AAT .itl file parsing now handles column names with suffixes (e.g., 'Pitch Classification [-1;0;1;2]')"),
+                tags$li(tags$strong("IMPROVED:"), " AAT .rsl parser now detects two formats: summary (Type of Pair) and item-level (% F0)"),
+                tags$li(tags$strong("ADDED:"), " AAT module description on home page with clickable panel"),
+                tags$li(tags$strong("UPDATED:"), " All 26 AAT tests now passing with real data structure")
+              )
+            ),
 
             # v0.0.0.9025
             tags$div(
@@ -391,6 +429,46 @@ mod_home_ui <- function(id) {
               tags$li("Provides quality metrics: ambivalent responses, 'don't know' responses, total evaluable items"),
               tags$li("Configurable date format recognition (DDMMYY, DDMMYYYY, etc.)"),
               tags$li("CSV export of all extracted metrics")
+            )
+          )
+        )
+      ),
+
+      wellPanel(
+        style = "background-color: #e8eaf6; cursor: pointer;",
+        onclick = "Shiny.setInputValue('home-navigate_to', 'pppt', {priority: 'event'});",
+        tags$div(
+          style = "padding: 10px;",
+          tags$h5(
+            style = "margin-top: 0; color: #3f51b5;",
+            "🎵 PPPT - Pitch Perception Proficiency Test ",
+            tags$span(
+              style = "font-size: 12px; color: #666; font-weight: normal;",
+              "(Click to open)"
+            )
+          ),
+          tags$p(
+            style = "margin-bottom: 10px; font-weight: 500;",
+            "Extract PPP indices from PPPT .rsl.csv result files"
+          ),
+          tags$p(
+            style = "margin-bottom: 10px;",
+            "The Pitch Perception Proficiency Test (PPPT) measures pitch perception ability across different ",
+            "Upper Cutoff Frequencies (UCF). This module extracts PPP indices for each UCF frequency band ",
+            "(294, 523, 932, 1661, 2960, 5274 Hz) plus an overall index."
+          ),
+          tags$div(
+            style = "background-color: rgba(255,255,255,0.5); padding: 10px; border-radius: 4px; margin-top: 10px;",
+            tags$strong("Key Features:"),
+            tags$ul(
+              style = "margin-top: 5px; margin-bottom: 0;",
+              tags$li("Scans folders recursively for PPPT .rsl.csv files"),
+              tags$li("Extracts participant code and date from filenames"),
+              tags$li("Automatically detects PPPT files by content (works even without 'PPPT' in filename)"),
+              tags$li("Extracts PPP indices for all 6 UCF frequency bands"),
+              tags$li("Extracts overall PPP index across all frequencies"),
+              tags$li("Configurable date format recognition"),
+              tags$li("Wide format output: one row per participant with all UCF indices")
             )
           )
         )

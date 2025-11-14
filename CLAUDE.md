@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 1. **KLAWA PDFs** - Voice/singing performance metrics
 2. **Musical Experience** - Practice history and instrument proficiency questionnaires
 3. **AAT CSV** - Auditory Ambiguity Test (ambiguous % and control % metrics)
-4. **PPPT data** - (To be implemented)
+4. **PPPT CSV** - Pitch Perception Proficiency Test (PPP indices across 6 UCF frequency bands)
 
 **Note**: LimeSurvey processing and scale analysis (MDBF, etc.) should NOT be part of this package. Those will be moved to a separate limesurvey-focused package.
 
@@ -27,12 +27,13 @@ Standard R package layout:
 - **.claude/memory/** - Extended documentation (VERSION_HISTORY.md)
 - **DESCRIPTION** - Package metadata and dependencies
 
-## Current Status (v0.0.0.9031 - 2025-11-13)
+## Current Status (v0.0.0.9034 - 2025-11-14)
 
-✅ **Recently Fixed**:
-- AAT calculation using correct TONE PAIR aggregation
-- Verified with item-level .rsl files (100% match for all 6 test participants)
-- All tests passing (28 AAT tests updated with correct Nmin pattern)
+✅ **Recently Improved**:
+- PPPT Shiny module UI enhancements
+- Fixed data table display issue
+- Added "Show R Code" button with download capability
+- Enhanced editing and CSV export functionality
 
 ## Git Workflow (IMPORTANT!)
 
@@ -237,10 +238,28 @@ data/KLAWA/
 - Codes 2 and -1 are excluded from denominators but counted separately
 - Formula: `(count of 1's) / (count of 0's and 1's) * 100`
 
-### 4. PPPT Data
+### 4. PPPT (Pitch Perception Proficiency Test) (R/pppt.R)
 
-**Status**: To be implemented
-**Expected location**: R/pppt.R
+**Purpose**: Extract PPP (Pitch Perception Proficiency) indices from PPPT .rsl.csv result files.
+
+**Key functions**:
+- `pppt_scan(root)` - Main entry point, recursively scans folder for .rsl.csv files
+- `pppt_parse_one(file_path, ...)` - Parses single PPPT CSV file
+- `pppt_analyze_structure(root)` - Analyzes folder organization
+
+**Participant code format**: 4 digits + 4 letters (same as KLAWA and AAT)
+
+**Required CSV structure**:
+- Must contain "UCF [Hz]" column with values: 294, 523, 932, 1661, 2960, 5274
+- Must contain "PPP-Index [-]" column with numeric PPP index values
+- Files automatically detected by content (presence of UCF column)
+
+**Extracted metrics**:
+- **ppp_294**, **ppp_523**, **ppp_932**, **ppp_1661**, **ppp_2960**, **ppp_5274**: PPP indices for each UCF frequency band
+- **ppp_overall**: Overall PPP index across all frequencies
+- **date**: Extracted from filename (configurable format)
+
+**Shiny module**: `inst/shiny/modules/mod_pppt.R` provides GUI interface with folder scanning, data editing, and CSV export
 
 ## Data Merging (R/merge.R)
 
@@ -257,7 +276,8 @@ data/KLAWA/
 2. ✅ Musical experience time and profile processing
 3. ✅ Safe merging by participant code
 4. ✅ AAT CSV extraction with correct calculations
-5. ✅ Configuration system for labels/thresholds
+5. ✅ PPPT CSV extraction with PPP indices for all UCF bands
+6. ✅ Configuration system for labels/thresholds
 
 ### Next steps (Future enhancements)
 
@@ -293,9 +313,8 @@ data/KLAWA/
 
 #### Medium Priority
 10. ⬜ **Musical Experience - Additional useful variables**
-11. ⬜ PPPT data parser
-12. ⬜ Further validation improvements
-13. ⬜ Automatic folder structure maker/file sorting
+11. ⬜ Further validation improvements
+12. ⬜ Automatic folder structure maker/file sorting
 
 ## Code Style and Conventions
 
