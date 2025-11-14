@@ -144,7 +144,7 @@ ui <- tagList(
       mod_merge_ui("merge")
     ),
 
-    # Right-aligned Contact menu
+    # Contact menu
     navbarMenu(
       "Contact",
       icon = NULL,
@@ -162,8 +162,7 @@ ui <- tagList(
           tags$i(class = "fa fa-envelope"), " Email",
           style = "color: inherit; text-decoration: none;"
         )
-      ),
-      position = "right"
+      )
     )
   ),
 
