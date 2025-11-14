@@ -3,7 +3,16 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9041 (2025-11-14)
+## Current Version: v0.0.0.9042 (2025-11-14)
+
+### v0.0.0.9042 (2025-11-14)
+- **CRITICAL FIX: 95% Confidence Interval now works correctly**
+- Fixed `.calculate_error()` function to use `ifelse()` instead of `if` for vectorization
+- The `if (n > 30)` statement was causing "condition has length > 1" error
+- CI95 now calculates correctly using t-distribution: `t_val * SD / sqrt(n)`
+- All error bar types (SE, SD, CI95) now work properly in all plot types
+- Overall PPP index markers now automatically match line colors via `legendgroup` in overlaid plots
+- Fixed vectorization to handle multiple data points simultaneously
 
 ### v0.0.0.9041 (2025-11-14)
 - **FIXED: Error bars now calculate correctly (were showing ±0)**

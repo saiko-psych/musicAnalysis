@@ -7,14 +7,14 @@
 .calculate_error(sd_val, n, error_type)
 }
 \arguments{
-\item{sd_val}{Standard deviation}
+\item{sd_val}{Standard deviation (can be vector)}
 
-\item{n}{Sample size}
+\item{n}{Sample size (can be vector)}
 
 \item{error_type}{Type of error: "se", "sd", "ci95", or "none"}
 }
 \value{
-Error value
+Error value (vector if inputs are vectors)
 }
 \description{
 Calculate error bars based on type

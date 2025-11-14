@@ -629,14 +629,14 @@ pppt_plot_profile <- function(data,
 
 #' Calculate error bars based on type
 #'
-#' @param sd_val Standard deviation
-#' @param n Sample size
+#' @param sd_val Standard deviation (can be vector)
+#' @param n Sample size (can be vector)
 #' @param error_type Type of error: "se", "sd", "ci95", or "none"
-#' @return Error value
+#' @return Error value (vector if inputs are vectors)
 #' @keywords internal
 .calculate_error <- function(sd_val, n, error_type) {
   if (error_type == "none") {
-    return(0)
+    return(rep(0, length(sd_val)))
   } else if (error_type == "se") {
     # Standard Error
     return(sd_val / sqrt(n))
@@ -646,10 +646,11 @@ pppt_plot_profile <- function(data,
   } else if (error_type == "ci95") {
     # 95% Confidence Interval (using t-distribution)
     # For large n, t ≈ 1.96; for small n, use qt
-    t_val <- if (n > 30) 1.96 else qt(0.975, df = n - 1)
+    # Use ifelse for vectorization
+    t_val <- ifelse(n > 30, 1.96, qt(0.975, df = n - 1))
     return(t_val * sd_val / sqrt(n))
   }
-  return(0)
+  return(rep(0, length(sd_val)))
 }
 
 #' Convert PPPT data to long format for plotting

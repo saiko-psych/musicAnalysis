@@ -65,24 +65,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9041 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9042 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
+            tags$strong("CRITICAL FIX: "),
+            "95% Confidence Interval now works correctly!"
+          ),
+          tags$li(
             tags$strong("FIXED: "),
-            "Error bars now calculate correctly - no more ±0 values!"
-          ),
-          tags$li(
-            tags$strong("NEW: "),
-            "Error bar type selector with SE, SD, 95% CI, or None options"
-          ),
-          tags$li(
-            tags$strong("NEW: "),
-            "Helpful descriptions for each error bar type in UI"
+            "Vectorization bug causing 'condition has length > 1' error"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Hover tooltips now show error type (SE/SD/CI)"
+            "All error bar types (SE, SD, CI95) now work in all plot types"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Overall PPP index markers automatically match line colors"
           )
         )
       ),
@@ -97,6 +97,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9041
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9041 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Error bars calculate correctly (no more ±0)"),
+                tags$li(tags$strong("NEW:"), " Error bar type selector (SE, SD, CI95, None)"),
+                tags$li(tags$strong("IMPROVED:"), " Hover tooltips show error type")
+              )
+            ),
 
             # v0.0.0.9040
             tags$div(

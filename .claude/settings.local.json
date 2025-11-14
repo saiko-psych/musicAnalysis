@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(python3:*)",
-      "Bash(start pppt_test_with_error_bars.html)"
+      "Bash(start pppt_test_with_error_bars.html)",
+      "Bash(Rscript:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
