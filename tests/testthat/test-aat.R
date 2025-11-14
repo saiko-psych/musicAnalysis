@@ -16,6 +16,7 @@ test_that("aat_scan returns empty tibble for directory with no AAT files", {
   expect_s3_class(result, "tbl_df")
   expect_equal(nrow(result), 0)
   expect_named(result, c("code", "date", "file_type", "ambiguous_pct", "control_pct",
+                         "a_tone_pairs", "c_tone_pairs", "a_avg_items_per_pair", "c_avg_items_per_pair",
                          "n_ambivalent", "n_dont_know", "n_evaluable", "n_total", "file"))
 
   unlink(empty_dir, recursive = TRUE)
@@ -45,17 +46,20 @@ test_that(".rsl file parsing works with summary format (Type of Pair)", {
   unlink(test_file)
 })
 
-test_that(".rsl file parsing returns NA for item-level format", {
+test_that(".rsl file parsing calculates from item-level format", {
   # This tests the Format 2 .rsl files with "% F0" column
   temp_dir <- tempdir()
   test_file <- file.path(temp_dir, "test_itemlevel.rsl.csv")
 
   # Create test data in item-level format
+  # Row 1-2: Ambiguous (Nmin different), Row 3: Control (Nmin same)
   test_data <- data.frame(
     Index = c(1, 2, 3),
     `Reference F0 [Hz]` = c(100, 200, 300),
     `F0 Difference [%]` = c(50, 25, 12.5),
-    `# F0` = c(2, 1, 0),
+    `Nmin [-]` = c("7 3", "9 4", "5 5"),  # Row 3 is control (5 5)
+    `# Items` = c(2, 2, 2),  # Total items per pair
+    `# F0` = c(2, 1, 0),    # F0 responses per pair
     `% F0` = c(100, 50, 0),
     check.names = FALSE
   )
@@ -63,10 +67,16 @@ test_that(".rsl file parsing returns NA for item-level format", {
 
   result <- .aat_parse_rsl(test_file, "test.csv", "0102SICH", "17/03/25")
 
-  # Item-level format should return NA (we can't distinguish ambiguous from control)
-  expect_true(is.na(result$ambiguous_pct))
-  expect_true(is.na(result$control_pct))
+  # Item-level format now properly calculates using Nmin pattern
+  # Ambiguous (rows 1-2, Nmin different): (2+1) f0 / (2+2) items = 3/4 = 75%
+  expect_equal(result$ambiguous_pct, 75.0)
+  # Control (row 3, Nmin same "5 5"): 0 f0 / 2 items = 0%
+  expect_equal(result$control_pct, 0.0)
   expect_equal(result$file_type, "rsl")
+
+  # Check tone pair counts
+  expect_equal(result$a_tone_pairs, 2)  # 2 ambiguous pairs
+  expect_equal(result$c_tone_pairs, 1)  # 1 control pair
 
   unlink(test_file)
 })
@@ -75,9 +85,10 @@ test_that(".itl file parsing extracts quality metrics", {
   temp_dir <- tempdir()
   test_file <- file.path(temp_dir, "test.itl.csv")
 
-  # Create test data with Pitch Classification column
+  # Create test data with Pitch Classification column and Nmin
   test_data <- data.frame(
     Index = c("1 *", "2 *", "3 *", "4 *", "5 *", "6 *", "7 *"),
+    `Nmin [-]` = c("7 3", "9 4", "5 2", "9 4", "7 3", "5 5", "3 3"),  # Last 2 are control (same)
     `Pitch Classification [-1;0;1;2]` = c(0, 1, 1, 0, 1, 2, -1),
     check.names = FALSE
   )
@@ -91,8 +102,11 @@ test_that(".itl file parsing extracts quality metrics", {
   expect_equal(result$n_evaluable, 5)    # Five codes "0" or "1"
   expect_equal(result$file_type, "itl")
 
-  # Without ambiguous_items specified, percentages should be NA
-  expect_true(is.na(result$ambiguous_pct))
+  # With corrected formula: F0 codes are 1 AND 2
+  # Rows 2,3,5,6 have codes 1 or 2 = 4 F0 responses out of 7 total = 57.1%
+  expect_equal(result$ambiguous_pct, 57.1)
+  # Control_pct is NA because test data lacks required columns for tone-pair aggregation
+  # (Reference F0, F0 Difference, Phase)
   expect_true(is.na(result$control_pct))
 
   unlink(test_file)
@@ -115,7 +129,8 @@ test_that(".itl file parsing calculates percentages when ambiguous_items specifi
 
   expect_equal(result$n_total, 8)
   expect_equal(result$n_evaluable, 8)
-  # 5 out of 8 are "1" (f0 responses)
+  # With corrected formula: codes 1 AND 2 count as F0
+  # Codes: 0,1,1,0,1,1,1,0 → Five "1"s, zero "2"s = 5 F0 responses
   expect_equal(result$ambiguous_pct, round((5/8) * 100, 1))
 
   unlink(test_file)
