@@ -3,177 +3,97 @@
 mod_home_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    # Custom CSS for modern styling
-    tags$head(
-      tags$style(HTML("
-        .music-banner {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-          margin-bottom: 30px;
-          padding: 40px 30px;
-          position: relative;
-          overflow: hidden;
-        }
-        .music-banner::before {
-          content: '♪ ♫ ♪ ♬ ♪ ♫ ♪ ♬';
-          position: absolute;
-          top: 10px;
-          right: 20px;
-          font-size: 24px;
-          color: rgba(255,255,255,0.2);
-          letter-spacing: 10px;
-        }
-        .music-banner h1 {
-          color: white;
-          font-size: 42px;
-          font-weight: 700;
-          margin: 0 0 10px 0;
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        .music-banner p {
-          color: rgba(255,255,255,0.95);
-          font-size: 18px;
-          margin: 0;
-        }
-        .info-card {
-          background: white;
-          border-radius: 10px;
-          padding: 25px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-          margin-bottom: 25px;
-          border-left: 5px solid #667eea;
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .info-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-        }
-        .contact-links {
-          display: flex;
-          gap: 15px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .contact-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 18px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white !important;
-          text-decoration: none !important;
-          border-radius: 8px;
-          font-weight: 500;
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .contact-link:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        .version-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 20px;
-          margin-bottom: 20px;
-        }
-        .version-item {
-          background: #f8f9ff;
-          padding: 20px;
-          border-radius: 8px;
-          border-left: 4px solid #667eea;
-        }
-      "))
-    ),
-
     fluidPage(
-      # Musical Banner
-      tags$div(
-        class = "music-banner",
-        tags$h1("🎵 musicAnalysis"),
-        tags$p("Music Psychology Data Preparation · University of Graz")
+      # ASCII Art Banner
+      wellPanel(
+        style = "background-color: #2c3e50; color: #ecf0f1; font-family: monospace; padding: 20px; margin-bottom: 30px;",
+        tags$pre(
+          style = "margin: 0; font-size: 14px; line-height: 1.2;",
+"
+                            ╔═══════════════════════════════════════════════════════════════════════╗
+                            ║                                                                       ║
+                            ║   ███╗   ███╗██╗   ██╗███████╗██╗ ██████╗                             ║
+                            ║   ████╗ ████║██║   ██║██╔════╝██║██╔════╝                             ║
+                            ║   ██╔████╔██║██║   ██║███████╗██║██║                                  ║
+                            ║   ██║╚██╔╝██║██║   ██║╚════██║██║██║                                  ║
+                            ║   ██║ ╚═╝ ██║╚██████╔╝███████║██║╚██████╗                             ║
+                            ║   ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝                             ║
+                            ║                                                                       ║
+                            ║            █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗ ║
+                            ║           ██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝ ║
+                            ║           ███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗ ║
+                            ║           ██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║ ║
+                            ║           ██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║ ║
+                            ║           ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝ ║
+                            ║                                                                       ║
+                            ║        Music Psychology Data Preparation for University of Graz       ║
+                            ║                                                                       ║
+                            ╚═══════════════════════════════════════════════════════════════════════╝
+"
+        )
       ),
 
-      # Version Information & Contact
-      tags$div(
-        class = "info-card",
-        tags$div(
-          class = "version-grid",
-          tags$div(
-            class = "version-item",
+      # Version Information
+      wellPanel(
+        style = "background-color: #f8f9fa; border-left: 4px solid #3498db; margin-bottom: 30px;",
+        fluidRow(
+          column(
+            width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("📦 Package Version"),
-              tags$br(),
+              tags$strong("📦 Package Version: "),
               tags$span(
-                style = "color: #667eea; font-family: monospace; font-size: 20px; font-weight: 600;",
+                style = "color: #3498db; font-family: monospace;",
                 as.character(utils::packageVersion("musicAnalysis"))
               )
             )
           ),
-          tags$div(
-            class = "version-item",
+          column(
+            width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("🕐 Build Date"),
-              tags$br(),
+              tags$strong("🕐 Build Date: "),
               tags$span(
-                style = "color: #764ba2; font-family: monospace; font-size: 20px; font-weight: 600;",
+                style = "color: #27ae60; font-family: monospace;",
                 "2025-11-14"
               )
             )
-          )
-        ),
-        tags$hr(style = "margin: 20px 0; border-color: #e0e0e0;"),
-        tags$h5("📬 Contact & Links", style = "margin-bottom: 15px; color: #2c3e50;"),
-        tags$div(
-          class = "contact-links",
-          tags$a(
-            href = "https://github.com/saiko-psych/musicAnalysis",
-            target = "_blank",
-            class = "contact-link",
-            HTML("&#128187;"), # Computer icon
-            "GitHub Repository"
-          ),
-          tags$a(
-            href = "mailto:david.matischek@uni-graz.at",
-            class = "contact-link",
-            HTML("&#128231;"), # Envelope icon
-            "david.matischek@uni-graz.at"
           )
         )
       ),
 
       # What's New Section
-      tags$div(
-        class = "info-card",
-        style = "border-left-color: #4caf50; background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);",
-        tags$h4("✨ What's New in v0.0.0.9044 (2025-11-14)", style = "color: #2c3e50; margin-top: 0;"),
+      wellPanel(
+        style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
+        h4("✨ What's New in v0.0.0.9045 (2025-11-14)"),
         tags$ul(
-          style = "line-height: 2.0; font-size: 15px;",
+          style = "line-height: 1.8;",
           tags$li(
-            tags$strong(style = "color: #4caf50;", "NEW: "),
-            "Modern, musical-themed UI design with gradient banner"
+            tags$strong("NEW: "),
+            "Font Awesome icons in navbar (Home, KLAWA, AAT, PPPT, etc.)"
           ),
           tags$li(
-            tags$strong(style = "color: #4caf50;", "NEW: "),
-            "Contact links with icons (GitHub & Email)"
+            tags$strong("NEW: "),
+            "Musical notes background in navbar with gradient"
           ),
           tags$li(
-            tags$strong(style = "color: #2196f3;", "IMPROVED: "),
-            "Better spacing and grid layout throughout"
+            tags$strong("NEW: "),
+            "Contact menu in navbar with GitHub and Email links"
           ),
           tags$li(
-            tags$strong(style = "color: #2196f3;", "IMPROVED: "),
-            "Hover effects and modern card design"
+            tags$strong("IMPROVED: "),
+            "Better spacing between all sections throughout the app"
+          ),
+          tags$li(
+            tags$strong("REVERTED: "),
+            "ASCII art banner back (as requested)"
           )
         )
       ),
 
       # Version History - Collapsible
-      tags$div(
-        class = "info-card",
-        style = "border-left-color: #9e9e9e;",
+      wellPanel(
+        style = "background-color: #f5f5f5; border-left: 4px solid #9e9e9e; margin-bottom: 30px;",
         tags$details(
           tags$summary(
             style = "cursor: pointer; padding: 10px; font-size: 18px; font-weight: bold; color: #424242; user-select: none;",
@@ -181,6 +101,17 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9044
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9044 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPT:"), " Modern UI redesign (reverted per user request)"),
+                tags$li(tags$strong("CREATED:"), " GitHub Issue #16 for R code generation")
+              )
+            ),
 
             # v0.0.0.9043
             tags$div(

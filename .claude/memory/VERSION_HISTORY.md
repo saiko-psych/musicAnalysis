@@ -3,16 +3,20 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9044 (2025-11-14)
+## Current Version: v0.0.0.9045 (2025-11-14)
+
+### v0.0.0.9045 (2025-11-14)
+- **NEW: Font Awesome icons in navbar**
+- Added real icons (not emojis) for all tabs: Home, KLAWA, Musical Experience, AAT, PPPT, Merge
+- Musical notes background in navbar with gradient (purple/blue)
+- Contact menu in navbar with GitHub and Email links
+- Improved spacing between all sections throughout the app (30px margin-bottom)
+- Better spacing in forms and panels
+- Reverted ASCII art banner (kept as requested)
+- Navbar now has musical note decorations in background
 
 ### v0.0.0.9044 (2025-11-14)
-- **NEW: Modern, musical-themed UI design**
-- Added gradient purple/blue musical banner with musical note decorations
-- Replaced plain blue header with modern design
-- Added GitHub and email contact links with icons
-- Implemented responsive grid layout for version info
-- Added hover effects on info cards for better interactivity
-- Improved spacing and visual hierarchy throughout home page
+- **ATTEMPT: Modern UI redesign (reverted per user request)**
 - Created GitHub issue #16 for R code generation across all modules
 - All PPPT features confirmed working (grouping variable selector already implemented)
 
