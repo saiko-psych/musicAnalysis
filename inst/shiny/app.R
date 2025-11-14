@@ -22,10 +22,10 @@ ui <- tagList(
   # Custom CSS for navbar, background, and spacing
   tags$head(
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"),
-    tags$style(HTML("
+    tags$style(HTML('
       /* Music sheet background for all pages */
       body {
-        background-image: url('music_sheet.jpg');
+        background-image: url("music_sheet.jpg");
         background-size: cover;
         background-attachment: fixed;
         background-position: center;
@@ -61,33 +61,11 @@ ui <- tagList(
       /* Better spacing between sections - vintage sepia backgrounds */
       .well, .panel, .info-card {
         margin-bottom: 25px !important;
-        background-color: rgba(250, 245, 235, 0.95);
-        border: 1px solid rgba(139, 115, 85, 0.3);
+        background-color: rgba(250, 245, 235, 0.95) !important;
+        border: 1px solid rgba(139, 115, 85, 0.3) !important;
       }
 
-      /* ASCII art banner - darker vintage tone */
-      .well[style*="background-color: #2c3e50"] {
-        background-color: #3d3226 !important;
-        border: 2px solid #6B5D52;
-      }
-
-      /* Info panels with vintage styling */
-      .well[style*="background-color: #f8f9fa"] {
-        background-color: rgba(245, 240, 230, 0.95) !important;
-        border-left: 4px solid #8B7355 !important;
-      }
-
-      /* What's New panel */
-      .well[style*="background-color: #e8f5e9"] {
-        background-color: rgba(240, 235, 220, 0.95) !important;
-        border-left: 4px solid #6B5D52 !important;
-      }
-
-      /* Version History panel */
-      .well[style*="background-color: #f5f5f5"] {
-        background-color: rgba(235, 230, 215, 0.95) !important;
-        border-left: 4px solid #8B7355 !important;
-      }
+      /* Tab content and form spacing */
       .tab-content {
         padding-top: 20px;
       }
@@ -125,7 +103,7 @@ ui <- tagList(
         margin-right: 0.125em;
         display: inline;
       }
-    "))
+    '))
   ),
 
   navbarPage(
