@@ -3,7 +3,13 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9050 (2025-11-15)
+## Current Version: v0.0.0.9051 (2025-11-15)
+
+### v0.0.0.9051 (2025-11-15)
+- **FIXED: Switched back to Bootstrap 3** - Bootstrap 5 navbar structure incompatible with Shiny navbarPage
+- **FIXED: Properly compact navbar** - using Bootstrap 3 classes with !important flags
+- Navbar: 35px height, 15px/13px fonts, 7px padding, explicit line-height 21px
+- All styling now works correctly with Bootstrap 3 theme
 
 ### v0.0.0.9050 (2025-11-15)
 - **FIXED: Bootstrap 5 navbar CSS** - correctly targets .navbar, .nav-link classes instead of Bootstrap 3 classes

@@ -39,39 +39,50 @@ ui <- tagList(
         padding-bottom: 60px;
       }
 
-      /* Navbar – compact Bootstrap 5 version */
-      .navbar {
+      /* Navbar – compact Bootstrap 3 version */
+      .navbar-default {
         background: linear-gradient(135deg, #8B7355 0%, #6B5D52 100%);
         border: none;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        --bs-navbar-padding-y: 0.2rem;   /* vertical padding */
-        min-height: 35px;
+        min-height: 35px !important;
       }
 
-      .navbar .navbar-brand {
+      .navbar-default .navbar-brand {
         color: #2c1810 !important;
         font-weight: 600;
-        font-size: 0.9rem;
-        padding-top: 0.2rem;
-        padding-bottom: 0.2rem;
+        font-size: 15px !important;
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+        height: 35px !important;
+        line-height: 21px !important;
       }
 
-      .navbar .navbar-nav .nav-link {
+      .navbar-default .navbar-nav > li > a {
         color: #3d2817 !important;
         font-weight: 500;
-        font-size: 0.8rem;
-        padding-top: 0.2rem;
-        padding-bottom: 0.2rem;
+        font-size: 13px !important;
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+        height: 35px !important;
+        line-height: 21px !important;
       }
 
-      .navbar .navbar-nav .nav-link.active {
+      .navbar-default .navbar-nav > .active > a,
+      .navbar-default .navbar-nav > .active > a:hover,
+      .navbar-default .navbar-nav > .active > a:focus {
         background-color: rgba(61, 40, 23, 0.15) !important;
         color: #2c1810 !important;
       }
 
-      .navbar .navbar-nav .nav-link:hover {
+      .navbar-default .navbar-nav > li > a:hover,
+      .navbar-default .navbar-nav > li > a:focus {
         background-color: rgba(61, 40, 23, 0.10) !important;
         color: #2c1810 !important;
+      }
+
+      .navbar-default .navbar-toggle {
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
       }
 
       /* Better spacing between sections - vintage sepia backgrounds */
@@ -126,7 +137,7 @@ ui <- tagList(
   navbarPage(
     title = "musicAnalysis",
     id = "main_nav",
-    theme = bslib::bs_theme(version = 5, bootswatch = "flatly"),
+    theme = bslib::bs_theme(version = 3, bootswatch = "flatly"),
 
     tabPanel(
       "Home",

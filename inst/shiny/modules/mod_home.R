@@ -71,24 +71,20 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9050 (2025-11-15)"),
+        h4("✨ What's New in v0.0.0.9051 (2025-11-15)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("FIXED: "),
-            "Bootstrap 5 navbar CSS - navbar is now actually compact!"
+            "Switched back to Bootstrap 3 - Bootstrap 5 incompatible with Shiny navbar"
           ),
           tags$li(
             tags$strong("FIXED: "),
-            "Previous version used Bootstrap 3 classes that didn't apply"
+            "Navbar now properly compact with Bootstrap 3 classes"
           ),
           tags$li(
-            tags$strong("CONFIRMED: "),
-            "All styling working: background image, attribution, spacing"
-          ),
-          tags$li(
-            tags$strong("TECHNICAL: "),
-            "Uses .navbar, .nav-link classes and --bs-navbar-padding-y"
+            tags$strong("WORKING: "),
+            "35px navbar height, smaller fonts, all styling functional"
           )
         )
       ),
@@ -103,6 +99,16 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9050
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9050 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPTED:"), " Bootstrap 5 navbar CSS (didn't work)")
+              )
+            ),
 
             # v0.0.0.9049
             tags$div(
