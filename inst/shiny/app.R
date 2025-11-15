@@ -39,24 +39,28 @@ ui <- tagList(
         padding-bottom: 60px;
       }
 
-      /* Navbar with vintage sepia tones matching the sheet music - compact */
+      /* Navbar with vintage sepia tones matching the sheet music - very compact */
       .navbar-default {
         background: linear-gradient(135deg, #8B7355 0%, #6B5D52 100%);
         border: none;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        min-height: 40px;
+        min-height: 35px;
       }
       .navbar-default .navbar-brand {
         color: #2c1810 !important;
         font-weight: 600;
-        padding: 10px 15px;
-        font-size: 16px;
+        padding: 7px 15px;
+        font-size: 15px;
+        height: 35px;
+        line-height: 21px;
       }
       .navbar-default .navbar-nav > li > a {
         color: #3d2817 !important;
         font-weight: 500;
-        padding: 10px 15px;
-        font-size: 14px;
+        padding: 7px 12px;
+        font-size: 13px;
+        height: 35px;
+        line-height: 21px;
       }
       .navbar-default .navbar-nav > .active > a {
         background-color: rgba(61, 40, 23, 0.15) !important;
@@ -67,8 +71,8 @@ ui <- tagList(
         color: #2c1810 !important;
       }
       .navbar-default .navbar-toggle {
-        margin-top: 5px;
-        margin-bottom: 5px;
+        margin-top: 3px;
+        margin-bottom: 3px;
       }
 
       /* Better spacing between sections - vintage sepia backgrounds */

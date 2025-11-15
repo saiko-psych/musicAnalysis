@@ -71,24 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9048 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9049 (2025-11-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Compact navbar - reduced height for cleaner appearance"
+            tags$strong("NEW: "),
+            "Show R Code buttons added to KLAWA, AAT, and Musical Experience"
+          ),
+          tags$li(
+            tags$strong("NEW: "),
+            "R code modals with copy to clipboard and download functionality"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Darker navbar text for better readability against sepia background"
+            "Even more compact navbar (35px height, smaller fonts)"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Home page layout centered with visible background on sides"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "Smaller font sizes and reduced padding throughout navbar"
+            tags$strong("FIXED: "),
+            "Closes GitHub Issue #16 (R code generation)"
           )
         )
       ),
@@ -103,6 +103,17 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9048
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9048 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " Compact navbar, centered home layout"),
+                tags$li(tags$strong("IMPROVED:"), " Visible background on home page sides")
+              )
+            ),
 
             # v0.0.0.9047
             tags$div(

@@ -197,12 +197,21 @@ mod_klawa_ui <- function(id) {
       "🔍 Scan All PDFs",
       class = "btn-success btn-lg"
     ),
+    actionButton(
+      ns("show_r_code"),
+      "📜 Show R Code",
+      class = "btn-info",
+      style = "margin-left: 10px;"
+    ),
     tags$span(
       style = "margin-left: 15px; color: #6c757d;",
       "Runs", tags$code("musicAnalysis::klawa_scan()"), "on the selected folder"
     ),
 
     br(), br(),
+
+    # R Code Modal (hidden initially)
+    uiOutput(ns("r_code_output")),
 
     # Results Table
     h4("5. Scanned Data"),
@@ -525,6 +534,86 @@ mod_klawa_server <- function(id) {
         }
       })
     }, ignoreInit = TRUE)
+
+    # --- Show R Code ----------------------------------------------------------
+    observeEvent(input$show_r_code, {
+      root_path <- input$root
+      req(root_path)
+
+      # Escape backslashes for R code
+      escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+      r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan KLAWA PDFs
+klawa_data <- klawa_scan(
+  root = "%s"
+)
+
+# View the data
+View(klawa_data)
+
+# Save to CSV
+write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
+
+      showModal(modalDialog(
+        title = "📜 R Code for KLAWA Scanning",
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(ns("copy_code"), "📋 Copy to Clipboard", class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "💾 Download .R File", class = "btn-success"),
+          modalButton("Close")
+        ),
+        tags$div(
+          tags$p("Use this R code to reproduce the KLAWA scan outside of the Shiny app:"),
+          tags$pre(
+            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
+            tags$code(r_code)
+          ),
+          tags$div(
+            id = ns("copy_notification"),
+            style = "display: none; color: #28a745; margin-top: 10px;",
+            "✓ Code copied to clipboard!"
+          )
+        ),
+        tags$script(HTML(sprintf('
+          $("#%s").click(function() {
+            var code = $(this).closest(".modal-content").find("code").text();
+            navigator.clipboard.writeText(code).then(function() {
+              $("#%s").show().delay(2000).fadeOut();
+            });
+          });
+        ', ns("copy_code"), ns("copy_notification"))))
+      ))
+    })
+
+    output$download_r_code <- downloadHandler(
+      filename = function() {
+        paste0("klawa_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+      },
+      content = function(file) {
+        root_path <- input$root
+        escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+        r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan KLAWA PDFs
+klawa_data <- klawa_scan(
+  root = "%s"
+)
+
+# View the data
+View(klawa_data)
+
+# Save to CSV
+write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
+
+        writeLines(r_code, file)
+      }
+    )
 
     # --- Table + download -----------------------------------------------------
     # Reactive value to store edited data

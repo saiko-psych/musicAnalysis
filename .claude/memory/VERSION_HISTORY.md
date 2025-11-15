@@ -3,7 +3,15 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9048 (2025-11-14)
+## Current Version: v0.0.0.9049 (2025-11-14)
+
+### v0.0.0.9049 (2025-11-14)
+- **NEW: Show R Code buttons** - added to KLAWA, AAT, and Musical Experience scanning
+- **NEW: R code modals** - with copy to clipboard and download .R file functionality
+- **IMPROVED: Even more compact navbar** - reduced from 40px to 35px height
+- **IMPROVED: Smaller navbar fonts** - brand: 15px (was 16px), links: 13px (was 14px)
+- **IMPROVED: Reduced navbar padding** - 7px (was 10px) for tighter appearance
+- Closes GitHub Issue #16 (R code generation for all modules)
 
 ### v0.0.0.9048 (2025-11-14)
 - **IMPROVED: Compact navbar** - reduced height from default to 40px
