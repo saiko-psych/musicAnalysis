@@ -3,7 +3,14 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9054 (2025-11-15)
+## Current Version: v0.0.0.9055 (2025-11-15)
+
+### v0.0.0.9055 (2025-11-15)
+- **FIXED: Button sizes** - removed !important flags that made all buttons way too big
+- **IMPROVED: Data table readability** - increased opacity from 75% to 95-98% (much easier to read)
+- **IMPROVED: ASCII art banner** - transparent background now shows music sheet through it
+- **VISUAL: Much better appearance** - buttons normal size, data readable, background visible
+- Still TODO: Replace emojis with Font Awesome icons, standardize Show R Code buttons
 
 ### v0.0.0.9054 (2025-11-15)
 - **IMPROVED: Navbar text size** - brand: 16px (was 14px), links: 14px (was 13px)

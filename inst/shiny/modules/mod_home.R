@@ -12,7 +12,7 @@ mod_home_ui <- function(id) {
 
       # ASCII Art Banner
       wellPanel(
-        style = "background-color: #2c3e50; color: #ecf0f1; font-family: monospace; padding: 20px; margin-bottom: 30px;",
+        style = "background-color: transparent; color: #2c1810; font-family: monospace; padding: 20px; margin-bottom: 30px; border: 2px solid #8B7355; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);",
         tags$pre(
           style = "margin: 0; font-size: 14px; line-height: 1.2;",
 "
@@ -71,24 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9054 (2025-11-15)"),
+        h4("What's New in v0.0.0.9055 (2025-11-15)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Navbar text larger (brand: 16px, links: 14px) for better readability"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "Contact menu moved to right side of navbar"
-          ),
-          tags$li(
             tags$strong("FIXED: "),
-            "PPPT scanning now has 'Show R Code' button next to scan button (was missing)"
+            "Button sizes now reasonable (removed !important flags that made them huge)"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Consistent button layout across all modules (8-4 column split for scan/code buttons)"
+            "Data tables much more readable - reduced transparency from 75% to 95-98%"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "ASCII art banner now has transparent background showing music sheet"
+          ),
+          tags$li(
+            tags$strong("NOTE: "),
+            "Still working on: Icon replacements and Show R Code standardization"
           )
         )
       ),

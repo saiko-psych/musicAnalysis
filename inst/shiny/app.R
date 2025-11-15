@@ -124,6 +124,22 @@ ui <- tagList(
         border: 1px solid rgba(139, 115, 85, 0.3) !important;
       }
 
+      /* Make data tables less transparent for better readability */
+      .dataTables_wrapper {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        padding: 15px;
+        border-radius: 4px;
+      }
+
+      table.dataTable {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+      }
+
+      table.dataTable thead th,
+      table.dataTable tbody td {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+      }
+
       /* Tab content and form spacing */
       .tab-content {
         padding-top: 20px;
@@ -132,29 +148,20 @@ ui <- tagList(
         margin-bottom: 20px !important;
       }
 
-      /* Button spacing - prevent overly wide buttons */
+      /* Button spacing - use Bootstrap 3 defaults but ensure they're not overly large */
       .btn {
-        padding: 6px 12px !important;
-        font-size: 14px !important;
-        line-height: 1.42857143 !important;
+        padding: 6px 12px;
+        font-size: 14px;
       }
 
       .btn-lg {
-        padding: 10px 16px !important;
-        font-size: 16px !important;
-        line-height: 1.3333333 !important;
+        padding: 10px 16px;
+        font-size: 18px;
       }
 
       .btn-sm {
-        padding: 5px 10px !important;
-        font-size: 12px !important;
-        line-height: 1.5 !important;
-      }
-
-      /* Ensure btn-block does not override reasonable sizing */
-      .btn-block {
-        display: block !important;
-        width: 100% !important;
+        padding: 5px 10px;
+        font-size: 12px;
       }
 
       /* Icon styling in navbar */
