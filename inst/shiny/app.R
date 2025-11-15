@@ -68,7 +68,7 @@ ui <- tagList(
       .navbar-default .navbar-brand {
         color: #2c1810 !important;
         font-weight: 600;
-        font-size: 14px !important;
+        font-size: 16px !important;
         padding: 10px 15px !important;
         height: 40px !important;
         line-height: 20px !important;
@@ -81,10 +81,15 @@ ui <- tagList(
       .navbar-default .navbar-nav > li > a {
         color: #3d2817 !important;
         font-weight: 500;
-        font-size: 13px !important;
+        font-size: 14px !important;
         padding: 10px 12px !important;
         height: 40px !important;
         line-height: 20px !important;
+      }
+
+      /* Move Contact menu to the right */
+      .navbar-right {
+        float: right !important;
       }
 
       .navbar-default .navbar-nav > .active > a,
@@ -190,6 +195,7 @@ ui <- tagList(
     title = "musicAnalysis",
     id = "main_nav",
     theme = bslib::bs_theme(version = 3, bootswatch = "flatly"),
+    position = "static-top",
 
     tabPanel(
       "Home",
@@ -222,23 +228,30 @@ ui <- tagList(
       mod_merge_ui("merge")
     ),
 
-    # Contact menu
-    navbarMenu(
-      "Contact",
-      icon = NULL,
-      tabPanel(
-        tags$a(
-          href = "https://github.com/saiko-psych/musicAnalysis",
-          target = "_blank",
-          tags$i(class = "fab fa-github"), " GitHub",
-          style = "color: inherit; text-decoration: none;"
-        )
+    # Contact menu - on the right
+    tags$li(
+      class = "dropdown navbar-right",
+      tags$a(
+        href = "#",
+        class = "dropdown-toggle",
+        `data-toggle` = "dropdown",
+        "Contact ",
+        tags$b(class = "caret")
       ),
-      tabPanel(
-        tags$a(
-          href = "mailto:david.matischek@uni-graz.at",
-          tags$i(class = "fa fa-envelope"), " Email",
-          style = "color: inherit; text-decoration: none;"
+      tags$ul(
+        class = "dropdown-menu",
+        tags$li(
+          tags$a(
+            href = "https://github.com/saiko-psych/musicAnalysis",
+            target = "_blank",
+            tags$i(class = "fab fa-github"), " GitHub"
+          )
+        ),
+        tags$li(
+          tags$a(
+            href = "mailto:david.matischek@uni-graz.at",
+            tags$i(class = "fa fa-envelope"), " Email"
+          )
         )
       )
     )

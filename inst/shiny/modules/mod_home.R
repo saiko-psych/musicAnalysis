@@ -71,24 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9053 (2025-11-15)"),
+        h4("✨ What's New in v0.0.0.9054 (2025-11-15)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
+            tags$strong("IMPROVED: "),
+            "Navbar text larger (brand: 16px, links: 14px) for better readability"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Contact menu moved to right side of navbar"
+          ),
+          tags$li(
             tags$strong("FIXED: "),
-            "Navbar ACTUALLY compact now! Found the real issue - container-fluid CSS was affecting navbar"
+            "PPPT scanning now has 'Show R Code' button next to scan button (was missing)"
           ),
           tags$li(
-            tags$strong("ROOT CAUSE: "),
-            ".container-fluid had min-height: 100vh which made navbar huge"
-          ),
-          tags$li(
-            tags$strong("SOLUTION: "),
-            "Changed to body > .container-fluid to target only main content"
-          ),
-          tags$li(
-            tags$strong("VERIFIED: "),
-            "Explicitly set .navbar .container-fluid to min-height: auto"
+            tags$strong("IMPROVED: "),
+            "Consistent button layout across all modules (8-4 column split for scan/code buttons)"
           )
         )
       ),
@@ -103,6 +103,16 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9053
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9053 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Navbar actually compact - found real root cause")
+              )
+            ),
 
             # v0.0.0.9052
             tags$div(

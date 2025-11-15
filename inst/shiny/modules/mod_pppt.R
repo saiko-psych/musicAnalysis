@@ -167,11 +167,24 @@ mod_pppt_ui <- function(id) {
 
     # Scan Button
     h4("3. Scan Files"),
-    actionButton(
-      ns("scan"),
-      "📁 Scan PPPT Files",
-      class = "btn-success btn-lg btn-block",
-      icon = icon("search")
+    fluidRow(
+      column(
+        width = 8,
+        actionButton(
+          ns("scan"),
+          "📁 Scan PPPT Files",
+          class = "btn-success btn-lg btn-block",
+          icon = icon("search")
+        )
+      ),
+      column(
+        width = 4,
+        actionButton(
+          ns("show_r_code_scan"),
+          "📜 Show R Code",
+          class = "btn-info btn-lg btn-block"
+        )
+      )
     ),
 
     br(), br(),
@@ -769,6 +782,120 @@ mod_pppt_server <- function(id) {
       info <- input$data_table_cell_edit
       rv$edited_data[info$row, info$col + 1] <- info$value
     })
+
+    # Show R Code modal (from scan button)
+    observeEvent(input$show_r_code_scan, {
+      req(rv$root_path)
+
+      group_code <- if (input$extract_groups) {
+        sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+      } else {
+        ""
+      }
+
+      escaped_root <- escape_for_r(rv$root_path)
+      escaped_pattern <- escape_for_r(input$code_pattern)
+      escaped_date <- escape_for_r(input$date_format)
+
+      r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "%s",
+  code_pattern = "%s",
+  date_format = "%s",
+%s  remove_duplicates = %s
+)
+
+# View results
+View(pppt_data)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
+        escaped_root,
+        escaped_pattern,
+        escaped_date,
+        group_code,
+        input$remove_duplicates
+      )
+
+      showModal(modalDialog(
+        title = "📜 R Code for PPPT Scanning",
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(ns("copy_code_scan"), "📋 Copy to Clipboard", class = "btn-primary"),
+          downloadButton(ns("download_r_code_scan"), "💾 Download .R File", class = "btn-success"),
+          modalButton("Close")
+        ),
+        tags$div(
+          tags$p("Use this R code to reproduce the PPPT scan outside of the Shiny app:"),
+          tags$pre(
+            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
+            tags$code(r_code)
+          ),
+          tags$div(
+            id = ns("copy_notification_scan"),
+            style = "display: none; color: #28a745; margin-top: 10px;",
+            "✓ Code copied to clipboard!"
+          )
+        ),
+        tags$script(HTML(sprintf('
+          $("#%s").click(function() {
+            var code = $(this).closest(".modal-content").find("code").text();
+            navigator.clipboard.writeText(code).then(function() {
+              $("#%s").show().delay(2000).fadeOut();
+            });
+          });
+        ', ns("copy_code_scan"), ns("copy_notification_scan"))))
+      ))
+    })
+
+    # Download R code from modal
+    output$download_r_code_scan <- downloadHandler(
+      filename = function() {
+        paste0("pppt_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+      },
+      content = function(file) {
+        group_code <- if (input$extract_groups) {
+          sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                  paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+        } else {
+          ""
+        }
+
+        escaped_root <- escape_for_r(rv$root_path)
+        escaped_pattern <- escape_for_r(input$code_pattern)
+        escaped_date <- escape_for_r(input$date_format)
+
+        r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "%s",
+  code_pattern = "%s",
+  date_format = "%s",
+%s  remove_duplicates = %s
+)
+
+# View results
+View(pppt_data)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
+          escaped_root,
+          escaped_pattern,
+          escaped_date,
+          group_code,
+          input$remove_duplicates
+        )
+
+        writeLines(r_code, file)
+      }
+    )
 
     # R Code output
     output$r_code <- renderText({

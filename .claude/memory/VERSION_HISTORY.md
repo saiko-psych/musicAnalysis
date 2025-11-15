@@ -3,7 +3,18 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9053 (2025-11-15)
+## Current Version: v0.0.0.9054 (2025-11-15)
+
+### v0.0.0.9054 (2025-11-15)
+- **IMPROVED: Navbar text size** - brand: 16px (was 14px), links: 14px (was 13px)
+- **IMPROVED: Contact menu on right** - moved Contact dropdown to right side of navbar
+- **FIXED: PPPT Show R Code button** - added Show R Code button next to scan button (was missing)
+- **IMPROVED: Consistent button layouts** - all scan buttons use 8-4 column split (scan/code)
+- KLAWA: Scan + Show R Code side by side
+- AAT: Scan + Show R Code in 8-4 layout
+- Musical Experience: Parse + Show R Code in 6-6 layout
+- PPPT: Now has Scan + Show R Code in 8-4 layout (NEW!)
+- All Show R Code buttons open modals with copy/download functionality
 
 ### v0.0.0.9053 (2025-11-15)
 - **FIXED: Navbar ACTUALLY compact now!** - Found and fixed the real root cause

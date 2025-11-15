@@ -1,6 +1,6 @@
 Package: musicAnalysis
 Title: MusicPsychology Analysis in R (for University of Graz)
-Version: 0.0.0.9053
+Version: 0.0.0.9054
 Authors@R: 
     person("David", "Matischek", , "david.matischek@uni-graz.at", role = c("aut", "cre"))
 Description: Should be usefull for our Analysis in Musicpsychology at the KF-Graz (only for our Team).
