@@ -32,47 +32,46 @@ ui <- tagList(
         background-repeat: no-repeat;
       }
 
-      /* Semi-transparent overlay for better readability - more transparent to show background */
+      /* Semi-transparent overlay for better readability */
       .container-fluid {
         background-color: rgba(255, 255, 255, 0.75);
         min-height: 100vh;
         padding-bottom: 60px;
       }
 
-      /* Navbar with vintage sepia tones matching the sheet music - very compact */
-      .navbar-default {
+      /* Navbar – compact Bootstrap 5 version */
+      .navbar {
         background: linear-gradient(135deg, #8B7355 0%, #6B5D52 100%);
         border: none;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        --bs-navbar-padding-y: 0.2rem;   /* vertical padding */
         min-height: 35px;
       }
-      .navbar-default .navbar-brand {
+
+      .navbar .navbar-brand {
         color: #2c1810 !important;
         font-weight: 600;
-        padding: 7px 15px;
-        font-size: 15px;
-        height: 35px;
-        line-height: 21px;
+        font-size: 0.9rem;
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
       }
-      .navbar-default .navbar-nav > li > a {
+
+      .navbar .navbar-nav .nav-link {
         color: #3d2817 !important;
         font-weight: 500;
-        padding: 7px 12px;
-        font-size: 13px;
-        height: 35px;
-        line-height: 21px;
+        font-size: 0.8rem;
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
       }
-      .navbar-default .navbar-nav > .active > a {
+
+      .navbar .navbar-nav .nav-link.active {
         background-color: rgba(61, 40, 23, 0.15) !important;
         color: #2c1810 !important;
       }
-      .navbar-default .navbar-nav > li > a:hover {
-        background-color: rgba(61, 40, 23, 0.1) !important;
+
+      .navbar .navbar-nav .nav-link:hover {
+        background-color: rgba(61, 40, 23, 0.10) !important;
         color: #2c1810 !important;
-      }
-      .navbar-default .navbar-toggle {
-        margin-top: 3px;
-        margin-bottom: 3px;
       }
 
       /* Better spacing between sections - vintage sepia backgrounds */
@@ -120,7 +119,8 @@ ui <- tagList(
         margin-right: 0.125em;
         display: inline;
       }
-    '))
+    ')),
+
   ),
 
   navbarPage(

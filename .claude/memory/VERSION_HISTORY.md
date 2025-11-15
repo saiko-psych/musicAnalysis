@@ -3,7 +3,14 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9049 (2025-11-14)
+## Current Version: v0.0.0.9050 (2025-11-15)
+
+### v0.0.0.9050 (2025-11-15)
+- **FIXED: Bootstrap 5 navbar CSS** - correctly targets .navbar, .nav-link classes instead of Bootstrap 3 classes
+- **FIXED: Navbar now actually compact** - previous version used BS3 classes that didn't apply to BS5
+- **CONFIRMED: All styling restored** - background image, attribution footer, spacing all working
+- Navbar uses correct Bootstrap 5 CSS custom properties (--bs-navbar-padding-y)
+- Navbar height: 35px, fonts: 0.9rem/0.8rem, padding: 0.2rem
 
 ### v0.0.0.9049 (2025-11-14)
 - **NEW: Show R Code buttons** - added to KLAWA, AAT, and Musical Experience scanning

@@ -71,24 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9049 (2025-11-14)"),
+        h4("✨ What's New in v0.0.0.9050 (2025-11-15)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("NEW: "),
-            "Show R Code buttons added to KLAWA, AAT, and Musical Experience"
-          ),
-          tags$li(
-            tags$strong("NEW: "),
-            "R code modals with copy to clipboard and download functionality"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "Even more compact navbar (35px height, smaller fonts)"
+            tags$strong("FIXED: "),
+            "Bootstrap 5 navbar CSS - navbar is now actually compact!"
           ),
           tags$li(
             tags$strong("FIXED: "),
-            "Closes GitHub Issue #16 (R code generation)"
+            "Previous version used Bootstrap 3 classes that didn't apply"
+          ),
+          tags$li(
+            tags$strong("CONFIRMED: "),
+            "All styling working: background image, attribution, spacing"
+          ),
+          tags$li(
+            tags$strong("TECHNICAL: "),
+            "Uses .navbar, .nav-link classes and --bs-navbar-padding-y"
           )
         )
       ),
@@ -103,6 +103,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9049
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9049 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " Show R Code buttons for KLAWA, AAT, Musical Experience"),
+                tags$li(tags$strong("NEW:"), " R code modals with copy/download"),
+                tags$li(tags$strong("ISSUE:"), " Navbar CSS didn't work (Bootstrap 3 vs 5 mismatch)")
+              )
+            ),
 
             # v0.0.0.9048
             tags$div(
