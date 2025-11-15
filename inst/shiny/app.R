@@ -32,11 +32,18 @@ ui <- tagList(
         background-repeat: no-repeat;
       }
 
-      /* Semi-transparent overlay for better readability */
-      .container-fluid {
+      /* Semi-transparent overlay for better readability - but NOT for navbar container */
+      body > .container-fluid {
         background-color: rgba(255, 255, 255, 0.75);
         min-height: 100vh;
         padding-bottom: 60px;
+      }
+
+      /* Ensure navbar container-fluid stays compact */
+      .navbar .container-fluid {
+        min-height: auto !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
       }
 
       /* Navbar – compact Bootstrap 3 version */

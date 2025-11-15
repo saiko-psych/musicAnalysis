@@ -10,7 +10,8 @@
       "Bash(gh issue create:*)",
       "Bash(Rscript:*)",
       "Bash(git add:*)",
-      "WebFetch(domain:127.0.0.1)"
+      "WebFetch(domain:127.0.0.1)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
