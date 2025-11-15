@@ -45,7 +45,8 @@ mod_mexp_ui <- function(id) {
       ),
       column(
         width = 6,
-        actionButton(ns("show_r_code"), "📜 Show R Code", class = "btn-info btn-block")
+        actionButton(ns("show_r_code"), "Show R Code",
+      icon = icon("file-code"), class = "btn-info btn-block")
       )
     ),
     br(), br(),
@@ -308,8 +309,10 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
         size = "l",
         easyClose = TRUE,
         footer = tagList(
-          actionButton(ns("copy_code"), "📋 Copy to Clipboard", class = "btn-primary"),
-          downloadButton(ns("download_r_code"), "💾 Download .R File", class = "btn-success"),
+          actionButton(ns("copy_code"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
           modalButton("Close")
         ),
         tags$div(

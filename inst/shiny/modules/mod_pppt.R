@@ -172,7 +172,8 @@ mod_pppt_ui <- function(id) {
         width = 8,
         actionButton(
           ns("scan"),
-          "📁 Scan PPPT Files",
+          "Scan PPPT Files",
+      icon = icon("folder"),
           class = "btn-success btn-lg btn-block",
           icon = icon("search")
         )
@@ -181,7 +182,8 @@ mod_pppt_ui <- function(id) {
         width = 4,
         actionButton(
           ns("show_r_code_scan"),
-          "📜 Show R Code",
+          "Show R Code",
+      icon = icon("file-code"),
           class = "btn-info btn-lg btn-block"
         )
       )
@@ -224,7 +226,7 @@ mod_pppt_ui <- function(id) {
         # Data Source Selection
         wellPanel(
           style = "background-color: #fff9e6;",
-          h5("📁 Data Source"),
+          h5("Data Source"),
           radioButtons(
             ns("data_source"),
             "Choose data source:",
@@ -605,7 +607,8 @@ mod_pppt_server <- function(id) {
             width = 3,
             downloadButton(
               ns("download_csv"),
-              "💾 Download CSV",
+              "Download CSV",
+      icon = icon("download"),
               class = "btn-primary btn-lg btn-block"
             )
           ),
@@ -613,7 +616,8 @@ mod_pppt_server <- function(id) {
             width = 3,
             actionButton(
               ns("show_code"),
-              "📝 Show R Code",
+              "Show R Code",
+      icon = icon("code"),
               class = "btn-info btn-lg btn-block"
             )
           ),
@@ -621,7 +625,7 @@ mod_pppt_server <- function(id) {
             width = 3,
             actionButton(
               ns("show_validation"),
-              "🔍 Validation Details",
+              "Validation Details",
               class = "btn-warning btn-lg btn-block"
             )
           )
@@ -826,8 +830,10 @@ write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
         size = "l",
         easyClose = TRUE,
         footer = tagList(
-          actionButton(ns("copy_code_scan"), "📋 Copy to Clipboard", class = "btn-primary"),
-          downloadButton(ns("download_r_code_scan"), "💾 Download .R File", class = "btn-success"),
+          actionButton(ns("copy_code_scan"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code_scan"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
           modalButton("Close")
         ),
         tags$div(

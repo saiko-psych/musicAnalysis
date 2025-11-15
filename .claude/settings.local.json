@@ -11,7 +11,13 @@
       "Bash(Rscript:*)",
       "Bash(git add:*)",
       "WebFetch(domain:127.0.0.1)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(__NEW_LINE__ sed -i 's/📁/icon(\"\"folder\"\")/g; s/🔍/icon(\"\"search\"\")/g; s/▶/icon(\"\"play\"\")/g; s/📜/icon(\"\"file-code\"\")/g; s/💾/icon(\"\"download\"\")/g; s/📝/icon(\"\"code\"\")/g; s/📋/icon(\"\"copy\"\")/g; s/✨/icon(\"\"star\"\")/g; s/📦/icon(\"\"box\"\")/g; s/🕐/icon(\"\"clock\"\")/g' mod_*.R)",
+      "Bash(for file in C:\\Users\\David\\Nextcloud2\\Documents\\R\\musicpsychology\\musicAnalysis\\inst\\shiny\\modules\\mod_{aat,mexp,pppt,home,merge}.R)",
+      "Bash(do)",
+      "Bash(python:*)",
+      "Bash(done)",
+      "Bash(__NEW_LINE__ for file in inst/shiny/modules/mod_aat.R inst/shiny/modules/mod_mexp.R inst/shiny/modules/mod_pppt.R inst/shiny/modules/mod_home.R)"
     ],
     "deny": [],
     "ask": []

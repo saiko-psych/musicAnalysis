@@ -100,7 +100,7 @@ mod_aat_ui <- function(id) {
         htmlOutput(ns("structure_summary")),
         hr(),
         tags$details(
-          tags$summary(tags$strong("📁 Sample File Paths (click to expand)")),
+          tags$summary(tags$strong("Sample File Paths (click to expand)")),
           tags$pre(
             style = "background-color: #f8f9fa; padding: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;",
             verbatimTextOutput(ns("sample_paths"))
@@ -166,7 +166,7 @@ mod_aat_ui <- function(id) {
         width = 8,
         actionButton(
           ns("scan"),
-          "▶ Scan AAT Files",
+          "icon("play") Scan AAT Files",
           class = "btn-success btn-lg btn-block"
         )
       ),
@@ -174,7 +174,8 @@ mod_aat_ui <- function(id) {
         width = 4,
         actionButton(
           ns("show_r_code"),
-          "📜 Show R Code",
+          "Show R Code",
+      icon = icon("file-code"),
           class = "btn-info btn-block",
           style = "margin-top: 0;"
         )
@@ -203,14 +204,15 @@ mod_aat_ui <- function(id) {
         br(),
 
         # Download Button
-        downloadButton(ns("download_csv"), "💾 Download Results as CSV", class = "btn-primary"),
+        downloadButton(ns("download_csv"), "Download Results as CSV",
+      icon = icon("download"), class = "btn-primary"),
 
         br(), br(),
 
         # Quality Report
         h5("Quality Report"),
         tags$details(
-          tags$summary(tags$strong("🔍 Participants with Quality Issues (click to expand)")),
+          tags$summary(tags$strong("Participants with Quality Issues (click to expand)")),
           br(),
           DT::DTOutput(ns("quality_issues_table"))
         )
@@ -390,8 +392,10 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
         size = "l",
         easyClose = TRUE,
         footer = tagList(
-          actionButton(ns("copy_code"), "📋 Copy to Clipboard", class = "btn-primary"),
-          downloadButton(ns("download_r_code"), "💾 Download .R File", class = "btn-success"),
+          actionButton(ns("copy_code"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
           modalButton("Close")
         ),
         tags$div(

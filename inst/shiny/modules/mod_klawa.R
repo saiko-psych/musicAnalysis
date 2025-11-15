@@ -8,11 +8,11 @@ mod_klawa_ui <- function(id) {
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
-      h4("📁 How KLAWA Scanning Works"),
+      h4(icon("folder-open"), " How KLAWA Scanning Works"),
       p("This tool extracts voice/singing performance metrics from KLAWA PDF files. It can auto-detect your folder structure or work with any organization."),
       p(
         style = "margin-top: 10px; padding: 8px; background-color: #e8f5e9; border-left: 3px solid #4caf50;",
-        tags$strong("💡 Tip:"), " Auto-detection analyzes your folders and identifies groups, measurements, and PCs automatically!",
+        icon("lightbulb"), tags$strong(" Tip:"), " Auto-detection analyzes your folders and identifies groups, measurements, and PCs automatically!",
         " No need for pre-defined structure."
       )
     ),
@@ -62,8 +62,9 @@ mod_klawa_ui <- function(id) {
         br(), br(),
         actionButton(
           ns("analyze"),
-          "🔍 Analyze Folder Structure",
-          class = "btn-info btn-block"
+          "Analyze Folder Structure",
+          class = "btn-info btn-block",
+          icon = icon("search")
         )
       )
     ),
@@ -79,7 +80,7 @@ mod_klawa_ui <- function(id) {
         htmlOutput(ns("structure_summary")),
         hr(),
         tags$details(
-          tags$summary(tags$strong("📁 Folder Tree (click to expand)")),
+          tags$summary(tags$strong("Folder Tree (click to expand)")),
           tags$pre(
             style = "background-color: #f8f9fa; padding: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;",
             verbatimTextOutput(ns("structure_tree"))
@@ -194,12 +195,14 @@ mod_klawa_ui <- function(id) {
     h4("4. Scan PDFs"),
     actionButton(
       ns("scan"),
-      "🔍 Scan All PDFs",
+      "Scan All PDFs",
+      icon = icon("search"),
       class = "btn-success btn-lg"
     ),
     actionButton(
       ns("show_r_code"),
-      "📜 Show R Code",
+      "Show R Code",
+      icon = icon("file-code"),
       class = "btn-info",
       style = "margin-left: 10px;"
     ),
@@ -234,7 +237,7 @@ mod_klawa_ui <- function(id) {
     br(), br(),
 
     # Folder Structure Guide
-    h4("📁 KLAWA Folder Structure & Data Preparation Guide"),
+    h4("KLAWA Folder Structure & Data Preparation Guide"),
     wellPanel(
       style = "background-color: #f8f9fa; border-left: 4px solid #17a2b8;",
 
@@ -538,12 +541,27 @@ mod_klawa_server <- function(id) {
     # --- Show R Code ----------------------------------------------------------
     observeEvent(input$show_r_code, {
       root_path <- input$root
-      req(root_path)
 
-      # Escape backslashes for R code
-      escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+      # Show template code if no path selected, or actual code if path exists
+      if (is.null(root_path) || root_path == "") {
+        r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
 
-      r_code <- sprintf('# Load the musicAnalysis package
+# Scan KLAWA PDFs
+klawa_data <- klawa_scan(
+  root = "path/to/your/KLAWA/folder"
+)
+
+# View the data
+View(klawa_data)
+
+# Save to CSV
+write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)'
+      } else {
+        # Escape backslashes for R code
+        escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+        r_code <- sprintf('# Load the musicAnalysis package
 library(musicAnalysis)
 
 # Scan KLAWA PDFs
@@ -556,14 +574,17 @@ View(klawa_data)
 
 # Save to CSV
 write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
+      }
 
       showModal(modalDialog(
-        title = "📜 R Code for KLAWA Scanning",
+        title = tagList(icon("file-code"), " R Code for KLAWA Scanning"),
         size = "l",
         easyClose = TRUE,
         footer = tagList(
-          actionButton(ns("copy_code"), "📋 Copy to Clipboard", class = "btn-primary"),
-          downloadButton(ns("download_r_code"), "💾 Download .R File", class = "btn-success"),
+          actionButton(ns("copy_code"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
           modalButton("Close")
         ),
         tags$div(

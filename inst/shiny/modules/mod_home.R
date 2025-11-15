@@ -47,7 +47,7 @@ mod_home_ui <- function(id) {
             width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("📦 Package Version: "),
+              tags$strong("Package Version: "),
               tags$span(
                 style = "color: #3498db; font-family: monospace;",
                 as.character(utils::packageVersion("musicAnalysis"))
@@ -58,7 +58,7 @@ mod_home_ui <- function(id) {
             width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("🕐 Build Date: "),
+              tags$strong("Build Date: "),
               tags$span(
                 style = "color: #27ae60; font-family: monospace;",
                 "2025-11-15"
@@ -99,7 +99,7 @@ mod_home_ui <- function(id) {
         tags$details(
           tags$summary(
             style = "cursor: pointer; padding: 10px; font-size: 18px; font-weight: bold; color: #424242; user-select: none;",
-            "📜 Version History (Click to expand/collapse)"
+            "Version History (Click to expand/collapse)"
           ),
           tags$div(
             style = "padding: 15px 10px;",
