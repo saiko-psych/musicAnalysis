@@ -61,7 +61,7 @@ mod_home_ui <- function(id) {
               tags$strong("🕐 Build Date: "),
               tags$span(
                 style = "color: #27ae60; font-family: monospace;",
-                "2025-11-14"
+                "2025-11-15"
               )
             )
           )
@@ -71,20 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("✨ What's New in v0.0.0.9051 (2025-11-15)"),
+        h4("✨ What's New in v0.0.0.9052 (2025-11-15)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("FIXED: "),
-            "Switched back to Bootstrap 3 - Bootstrap 5 incompatible with Shiny navbar"
+            "Navbar now truly compact (40px height) with proper CSS targeting"
           ),
           tags$li(
             tags$strong("FIXED: "),
-            "Navbar now properly compact with Bootstrap 3 classes"
+            "Button spacing controlled - no more overly wide buttons"
           ),
           tags$li(
-            tags$strong("WORKING: "),
-            "35px navbar height, smaller fonts, all styling functional"
+            tags$strong("IMPROVED: "),
+            "Added max-height constraints to navbar and navbar-header"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Removed excessive margins from navbar navigation elements"
           )
         )
       ),
@@ -99,6 +103,16 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9051
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9051 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPTED:"), " Bootstrap 3 with 35px navbar (still too big)")
+              )
+            ),
 
             # v0.0.0.9050
             tags$div(

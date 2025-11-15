@@ -40,31 +40,44 @@ ui <- tagList(
       }
 
       /* Navbar – compact Bootstrap 3 version */
+      .navbar {
+        margin-bottom: 0 !important;
+        border-radius: 0 !important;
+      }
+
       .navbar-default {
         background: linear-gradient(135deg, #8B7355 0%, #6B5D52 100%);
         border: none;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        min-height: 35px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+      }
+
+      .navbar-header {
+        min-height: 40px !important;
+        max-height: 40px !important;
       }
 
       .navbar-default .navbar-brand {
         color: #2c1810 !important;
         font-weight: 600;
-        font-size: 15px !important;
-        padding-top: 7px !important;
-        padding-bottom: 7px !important;
-        height: 35px !important;
-        line-height: 21px !important;
+        font-size: 14px !important;
+        padding: 10px 15px !important;
+        height: 40px !important;
+        line-height: 20px !important;
+      }
+
+      .navbar-default .navbar-nav {
+        margin: 0 !important;
       }
 
       .navbar-default .navbar-nav > li > a {
         color: #3d2817 !important;
         font-weight: 500;
         font-size: 13px !important;
-        padding-top: 7px !important;
-        padding-bottom: 7px !important;
-        height: 35px !important;
-        line-height: 21px !important;
+        padding: 10px 12px !important;
+        height: 40px !important;
+        line-height: 20px !important;
       }
 
       .navbar-default .navbar-nav > .active > a,
@@ -83,6 +96,13 @@ ui <- tagList(
       .navbar-default .navbar-toggle {
         margin-top: 3px !important;
         margin-bottom: 3px !important;
+        padding: 6px 8px !important;
+      }
+
+      /* Ensure navbar dropdown menus also compact */
+      .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+        padding: 8px 20px !important;
+        line-height: 18px !important;
       }
 
       /* Better spacing between sections - vintage sepia backgrounds */
@@ -98,6 +118,31 @@ ui <- tagList(
       }
       .form-group {
         margin-bottom: 20px !important;
+      }
+
+      /* Button spacing - prevent overly wide buttons */
+      .btn {
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+        line-height: 1.42857143 !important;
+      }
+
+      .btn-lg {
+        padding: 10px 16px !important;
+        font-size: 16px !important;
+        line-height: 1.3333333 !important;
+      }
+
+      .btn-sm {
+        padding: 5px 10px !important;
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+      }
+
+      /* Ensure btn-block does not override reasonable sizing */
+      .btn-block {
+        display: block !important;
+        width: 100% !important;
       }
 
       /* Icon styling in navbar */

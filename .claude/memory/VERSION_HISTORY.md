@@ -3,7 +3,15 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9051 (2025-11-15)
+## Current Version: v0.0.0.9052 (2025-11-15)
+
+### v0.0.0.9052 (2025-11-15)
+- **FIXED: Navbar truly compact** - 40px height with max-height constraints
+- **FIXED: Button spacing** - controlled padding prevents overly wide buttons
+- **IMPROVED: Better CSS targeting** - added .navbar and .navbar-header rules
+- **IMPROVED: Navbar margins** - removed excessive margins from .navbar-nav
+- **TECHNICAL: Added max-height** to both .navbar-default and .navbar-header
+- All button sizes (.btn, .btn-lg, .btn-sm) now have explicit padding control
 
 ### v0.0.0.9051 (2025-11-15)
 - **FIXED: Switched back to Bootstrap 3** - Bootstrap 5 navbar structure incompatible with Shiny navbarPage
