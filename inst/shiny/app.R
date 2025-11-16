@@ -148,7 +148,7 @@ ui <- tagList(
         margin-bottom: 20px !important;
       }
 
-      /* Button spacing - use Bootstrap 3 defaults but ensure they're not overly large */
+      /* Button spacing - use Bootstrap 3 defaults but ensure they are not overly large */
       .btn {
         padding: 6px 12px;
         font-size: 14px;
