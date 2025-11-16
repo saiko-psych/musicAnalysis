@@ -12,18 +12,19 @@ An R package for automated data extraction and preparation from music psychology
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Data Sources](#data-sources)
-- [Usage Examples](#usage-examples)
-- [Shiny Web Application](#shiny-web-application)
-- [Development](#development)
-- [Documentation](#documentation)
-- [Version History](#version-history)
-- [Contributing](#contributing)
-- [License](#license)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [Data Sources](#-data-sources)
+- [Usage Examples](#-usage-examples)
+- [Shiny Web Application](#-shiny-web-application)
+- [Development](#-development)
+- [Documentation](#-documentation)
+- [Version History](#-version-history)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
@@ -154,18 +155,19 @@ plot_practice_curves(
 ```
 data/KLAWA/
   Computer/
-    Jeki 4/
+    <PC>/
       Gruppen/
-        LEN/
-          pre/
-            0102SICH_pre_080425.pdf
-            0103ANDE_pre_080425.pdf
-          post/
-            0102SICH_post_150625.pdf
-            0103ANDE_post_150625.pdf
-        LEO/
-          pre/
-          post/
+        <GROUP>/
+          <MEASUREMENT>/
+            <CODE>_<MEASUREMENT>_<DATE>.pdf
+            <CODE>_<MEASUREMENT>_<DATE>.pdf
+          <MEASUREMENT>/
+            <CODE>_<MEASUREMENT>_<DATE>.pdf
+```
+
+**Example**:
+```
+data/KLAWA/Computer/PC1/Gruppen/GroupA/pre/1234ABCD_pre_080425.pdf
 ```
 
 **Extracted metrics**:
