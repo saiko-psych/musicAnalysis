@@ -118,8 +118,13 @@ ui <- tagList(
       }
 
       /* Better spacing between sections - vintage sepia backgrounds */
-      .well, .panel, .info-card {
+      /* DO NOT force background on wellPanels - let them be transparent when specified */
+      .well:not(.force-bg), .panel:not(.force-bg), .info-card {
         margin-bottom: 25px !important;
+      }
+
+      /* Only apply vintage background to wellPanels with force-bg class */
+      .well.force-bg, .panel.force-bg {
         background-color: rgba(250, 245, 235, 0.95) !important;
         border: 1px solid rgba(139, 115, 85, 0.3) !important;
       }
@@ -169,9 +174,10 @@ ui <- tagList(
         margin-right: 6px;
       }
 
-      /* Underline all clickable links */
+      /* Underline all clickable links and make them visible */
       a {
         text-decoration: underline !important;
+        cursor: pointer;
       }
 
       /* Except navbar links */
@@ -182,6 +188,41 @@ ui <- tagList(
       /* And buttons styled as links */
       .btn {
         text-decoration: none !important;
+      }
+
+      /* Override Bootstrap Flatly turquoise colors with brown */
+      a {
+        color: #8B7355 !important;
+      }
+
+      a:hover, a:focus {
+        color: #6B5D52 !important;
+      }
+
+      /* Tab colors - brown instead of turquoise */
+      .nav-tabs > li.active > a,
+      .nav-tabs > li.active > a:hover,
+      .nav-tabs > li.active > a:focus {
+        color: #2c1810 !important;
+        background-color: #fff !important;
+        border-bottom-color: transparent !important;
+        border-top: 3px solid #8B7355 !important;
+      }
+
+      .nav-tabs > li > a:hover {
+        border-top: 3px solid #6B5D52 !important;
+        background-color: rgba(139, 115, 85, 0.1) !important;
+      }
+
+      /* Details/summary elements clickable */
+      summary {
+        cursor: pointer;
+        text-decoration: underline;
+        color: #8B7355 !important;
+      }
+
+      summary:hover {
+        color: #6B5D52 !important;
       }
 
       /* Attribution footer */
@@ -250,33 +291,37 @@ ui <- tagList(
       mod_merge_ui("merge")
     ),
 
-    # Contact menu - on the right
-    tags$li(
-      class = "dropdown navbar-right",
-      tags$a(
-        href = "#",
-        class = "dropdown-toggle",
-        `data-toggle` = "dropdown",
-        "Contact ",
-        tags$b(class = "caret")
-      ),
-      tags$ul(
-        class = "dropdown-menu",
-        tags$li(
-          tags$a(
-            href = "https://github.com/saiko-psych/musicAnalysis",
-            target = "_blank",
-            tags$i(class = "fab fa-github"), " GitHub"
-          )
+    # Contact menu - using navbarMenu for proper placement on right
+    navbarMenu(
+      "Contact",
+      icon = NULL,
+      tabPanel(
+        tags$a(
+          href = "https://github.com/saiko-psych/musicAnalysis",
+          target = "_blank",
+          style = "display: block; padding: 3px 20px; color: #3d2817 !important;",
+          tags$i(class = "fab fa-github"), " GitHub"
         ),
-        tags$li(
-          tags$a(
-            href = "mailto:david.matischek@uni-graz.at",
-            tags$i(class = "fa fa-envelope"), " Email"
-          )
-        )
+        value = "github_link"
+      ),
+      tabPanel(
+        tags$a(
+          href = "mailto:david.matischek@uni-graz.at",
+          style = "display: block; padding: 3px 20px; color: #3d2817 !important;",
+          tags$i(class = "fa fa-envelope"), " Email"
+        ),
+        value = "email_link"
       )
     )
+  ),
+
+  # Add CSS to move Contact menu to the right
+  tags$head(
+    tags$script(HTML('
+      $(document).ready(function() {
+        $("li:has(a:contains(Contact))").addClass("navbar-right");
+      });
+    '))
   ),
 
   # Attribution footer
