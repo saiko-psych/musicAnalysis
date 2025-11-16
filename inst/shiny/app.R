@@ -117,14 +117,22 @@ ui <- tagList(
         line-height: 18px !important;
       }
 
-      /* Better spacing between sections - vintage sepia backgrounds */
-      /* DO NOT force background on wellPanels - let them be transparent when specified */
-      .well:not(.force-bg), .panel:not(.force-bg), .info-card {
+      /* CRITICAL FIX: Remove ALL default wellPanel backgrounds first */
+      .well {
+        background-color: transparent !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        border: 1px solid rgba(139, 115, 85, 0.3);
         margin-bottom: 25px !important;
       }
 
-      /* Only apply vintage background to wellPanels with force-bg class */
-      .well.force-bg, .panel.force-bg {
+      /* THEN apply vintage background ONLY to wellPanels that DON'T have explicit transparent style */
+      .well:not([style*="transparent"]) {
+        background-color: rgba(250, 245, 235, 0.95) !important;
+      }
+
+      .panel, .info-card {
+        margin-bottom: 25px !important;
         background-color: rgba(250, 245, 235, 0.95) !important;
         border: 1px solid rgba(139, 115, 85, 0.3) !important;
       }
@@ -214,14 +222,25 @@ ui <- tagList(
         background-color: rgba(139, 115, 85, 0.1) !important;
       }
 
-      /* Details/summary elements clickable */
+      /* Details/summary elements - MAKE THEM OBVIOUSLY CLICKABLE */
       summary {
-        cursor: pointer;
-        text-decoration: underline;
+        cursor: pointer !important;
+        text-decoration: underline !important;
         color: #8B7355 !important;
+        font-weight: bold !important;
       }
 
       summary:hover {
+        color: #6B5D52 !important;
+        text-decoration: underline !important;
+      }
+
+      /* Ensure summary strong elements also get the color */
+      summary strong {
+        color: #8B7355 !important;
+      }
+
+      summary:hover strong {
         color: #6B5D52 !important;
       }
 
