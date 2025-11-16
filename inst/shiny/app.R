@@ -126,13 +126,15 @@ ui <- tagList(
       }
 
       /* Apply vintage background to wellPanels that DO NOT have explicit transparent style */
-      .well:not([style*="transparent"]) {
+      .well:not([style*="transparent"]):not([style*="background-color: transparent"]) {
         background-color: rgba(250, 245, 235, 0.95) !important;
       }
 
-      /* Ensure transparent wellPanels stay transparent */
-      .well[style*="transparent"] {
+      /* CRITICAL: Ensure transparent wellPanels stay transparent - override Bootstrap defaults */
+      .well[style*="transparent"],
+      .well[style*="background-color: transparent"] {
         background-color: transparent !important;
+        background-image: none !important;
       }
 
       .panel, .info-card {
