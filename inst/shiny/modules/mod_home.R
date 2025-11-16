@@ -73,24 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9057 (2025-11-16)"),
+        h4("What's New in v0.0.0.9058 (2025-11-16)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("COMPLETED: "),
-            "Removed ALL emojis throughout entire app - replaced with Font Awesome icons"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "Button sizing - removed excessive btn-lg and btn-block classes"
+            tags$strong("IMPROVED: "),
+            "ASCII art now displays with transparent background - music sheet visible"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Modal dialog titles now use proper icon() + tagList() pattern"
+            "All links now underlined for better visibility"
           ),
           tags$li(
-            tags$strong("VERIFIED: "),
-            "All Show R Code buttons work without folder/file selection (show template)"
+            tags$strong("FIXED: "),
+            "Color consistency - replaced turquoise with vintage brown theme colors"
+          ),
+          tags$li(
+            tags$strong("POLISHED: "),
+            "Version info and build date now match vintage brown theme"
           )
         )
       ),
@@ -105,6 +105,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9057
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9057 (2025-11-16)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("COMPLETED:"), " ALL emojis removed from entire app"),
+                tags$li(tags$strong("FIXED:"), " Button sizing - removed btn-lg and btn-block"),
+                tags$li(tags$strong("IMPROVED:"), " Modal titles use proper Font Awesome icons")
+              )
+            ),
 
             # v0.0.0.9056
             tags$div(

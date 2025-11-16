@@ -3,7 +3,16 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9057 (2025-11-16)
+## Current Version: v0.0.0.9058 (2025-11-16)
+
+### v0.0.0.9058 (2025-11-16)
+- **IMPROVED: ASCII art display** - now in wellPanel with transparent background (music sheet visible through it)
+- **IMPROVED: Link visibility** - all links now underlined for better clickability (except navbar and buttons)
+- **FIXED: Color consistency** - replaced turquoise colors (#3498db, #27ae60) with vintage brown theme (#8B7355, #6B5D52)
+- **POLISHED: Version info styling** - version and build date now use brown colors matching vintage theme
+- **FIXED: CSS parsing error** - changed "they're" to "they are" in CSS comment to avoid R parse error
+- **VERIFIED: Contact menu** - already correctly positioned in navbar on right side (not at bottom)
+- Attribution footer at bottom is just music sheet license information (stays as intended)
 
 ### v0.0.0.9057 (2025-11-16)
 - **COMPLETED: Emoji removal** - ALL emojis removed from entire app (48 total across all modules)
