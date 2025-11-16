@@ -48,7 +48,7 @@ mod_pppt_ui <- function(id) {
               ns("root_dir"),
               "Browse for folder",
               "Select the folder containing PPPT .rsl.csv files",
-              class = "btn-primary btn-lg"
+              class = "btn-primary"
             ),
             tags$div(
               style = "margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;",
@@ -81,7 +81,8 @@ mod_pppt_ui <- function(id) {
         actionButton(
           ns("analyze"),
           "Analyze Folder Structure",
-          class = "btn-info btn-block"
+          icon = icon("search"),
+          class = "btn-info"
         )
       )
     ),
@@ -173,9 +174,8 @@ mod_pppt_ui <- function(id) {
         actionButton(
           ns("scan"),
           "Scan PPPT Files",
-      icon = icon("folder"),
-          class = "btn-success btn-lg btn-block",
-          icon = icon("search")
+          icon = icon("search"),
+          class = "btn-success"
         )
       ),
       column(
@@ -183,8 +183,8 @@ mod_pppt_ui <- function(id) {
         actionButton(
           ns("show_r_code_scan"),
           "Show R Code",
-      icon = icon("file-code"),
-          class = "btn-info btn-lg btn-block"
+          icon = icon("file-code"),
+          class = "btn-info"
         )
       )
     ),
@@ -608,8 +608,8 @@ mod_pppt_server <- function(id) {
             downloadButton(
               ns("download_csv"),
               "Download CSV",
-      icon = icon("download"),
-              class = "btn-primary btn-lg btn-block"
+              icon = icon("download"),
+              class = "btn-primary"
             )
           ),
           column(
@@ -617,8 +617,8 @@ mod_pppt_server <- function(id) {
             actionButton(
               ns("show_code"),
               "Show R Code",
-      icon = icon("code"),
-              class = "btn-info btn-lg btn-block"
+              icon = icon("file-code"),
+              class = "btn-info"
             )
           ),
           column(
@@ -626,7 +626,8 @@ mod_pppt_server <- function(id) {
             actionButton(
               ns("show_validation"),
               "Validation Details",
-              class = "btn-warning btn-lg btn-block"
+              icon = icon("exclamation-triangle"),
+              class = "btn-warning"
             )
           )
         ),

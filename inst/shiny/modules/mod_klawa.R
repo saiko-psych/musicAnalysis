@@ -30,7 +30,7 @@ mod_klawa_ui <- function(id) {
               ns("root_dir"),
               "Browse for folder",
               "Select the KLAWA root directory",
-              class = "btn-primary btn-lg"
+              class = "btn-primary"
             ),
             tags$div(
               style = "margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;",
@@ -63,8 +63,8 @@ mod_klawa_ui <- function(id) {
         actionButton(
           ns("analyze"),
           "Analyze Folder Structure",
-          class = "btn-info btn-block",
-          icon = icon("search")
+          icon = icon("search"),
+          class = "btn-info"
         )
       )
     ),
@@ -197,7 +197,7 @@ mod_klawa_ui <- function(id) {
       ns("scan"),
       "Scan All PDFs",
       icon = icon("search"),
-      class = "btn-success btn-lg"
+      class = "btn-success"
     ),
     actionButton(
       ns("show_r_code"),

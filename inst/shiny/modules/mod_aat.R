@@ -51,7 +51,7 @@ mod_aat_ui <- function(id) {
               ns("root_dir"),
               "Browse for folder",
               "Select the folder containing AAT CSV files",
-              class = "btn-primary btn-lg"
+              class = "btn-primary"
             ),
             tags$div(
               style = "margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;",
@@ -84,7 +84,8 @@ mod_aat_ui <- function(id) {
         actionButton(
           ns("analyze"),
           "Analyze Folder Structure",
-          class = "btn-info btn-block"
+          icon = icon("search"),
+          class = "btn-info"
         )
       )
     ),
@@ -166,8 +167,9 @@ mod_aat_ui <- function(id) {
         width = 8,
         actionButton(
           ns("scan"),
-          "icon("play") Scan AAT Files",
-          class = "btn-success btn-lg btn-block"
+          "Scan AAT Files",
+          icon = icon("play"),
+          class = "btn-success"
         )
       ),
       column(
@@ -175,9 +177,8 @@ mod_aat_ui <- function(id) {
         actionButton(
           ns("show_r_code"),
           "Show R Code",
-      icon = icon("file-code"),
-          class = "btn-info btn-block",
-          style = "margin-top: 0;"
+          icon = icon("file-code"),
+          class = "btn-info"
         )
       )
     ),

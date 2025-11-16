@@ -41,12 +41,11 @@ mod_mexp_ui <- function(id) {
     fluidRow(
       column(
         width = 6,
-        actionButton(ns("parse"), "Parse CSV", class = "btn-primary btn-block")
+        actionButton(ns("parse"), "Parse CSV", icon = icon("play"), class = "btn-primary")
       ),
       column(
         width = 6,
-        actionButton(ns("show_r_code"), "Show R Code",
-      icon = icon("file-code"), class = "btn-info btn-block")
+        actionButton(ns("show_r_code"), "Show R Code", icon = icon("file-code"), class = "btn-info")
       )
     ),
     br(), br(),
