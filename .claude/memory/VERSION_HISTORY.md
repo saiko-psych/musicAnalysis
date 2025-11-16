@@ -3,7 +3,25 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9055 (2025-11-15)
+## Current Version: v0.0.0.9057 (2025-11-16)
+
+### v0.0.0.9057 (2025-11-16)
+- **COMPLETED: Emoji removal** - ALL emojis removed from entire app (48 total across all modules)
+- **REPLACED: Modal titles** - now use `tagList(icon("file-code"), " R Code for...")` pattern
+- **REMOVED: Emojis from headers** - section headers, tips, status messages now plain text
+- **REMOVED: Emojis from notifications** - checkmarks and warnings replaced with plain text
+- **FIXED: Button sizing** - removed all btn-lg classes (buttons were too large)
+- **FIXED: Button width** - removed btn-block from multi-column layouts (shouldn't fill width)
+- **KEPT: Sidebar buttons** - btn-block preserved in narrow wellPanel sidebars (correct usage)
+- **FIXED: Duplicate icons** - corrected PPPT buttons with duplicate icon parameters
+- **ADDED: Missing icons** - search, play, exclamation-triangle icons to buttons
+- **VERIFIED: All Show R Code buttons work** - template shown when no folder/file selected
+- App now 100% emoji-free with properly sized buttons that don't force full-width
+
+### v0.0.0.9056 (2025-11-15)
+- **COMPLETED: All emojis replaced** - Python script replaced button emojis with icon parameters
+- **FIXED: KLAWA Show R Code** - now works without folder selection (shows template)
+- Modal titles converted to tagList with icons
 
 ### v0.0.0.9055 (2025-11-15)
 - **FIXED: Button sizes** - removed !important flags that made all buttons way too big

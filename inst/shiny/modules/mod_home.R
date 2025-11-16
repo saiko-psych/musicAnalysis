@@ -61,7 +61,7 @@ mod_home_ui <- function(id) {
               tags$strong("Build Date: "),
               tags$span(
                 style = "color: #27ae60; font-family: monospace;",
-                "2025-11-15"
+                "2025-11-16"
               )
             )
           )
@@ -71,24 +71,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9055 (2025-11-15)"),
+        h4("What's New in v0.0.0.9057 (2025-11-16)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
+            tags$strong("COMPLETED: "),
+            "Removed ALL emojis throughout entire app - replaced with Font Awesome icons"
+          ),
+          tags$li(
             tags$strong("FIXED: "),
-            "Button sizes now reasonable (removed !important flags that made them huge)"
+            "Button sizing - removed excessive btn-lg and btn-block classes"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Data tables much more readable - reduced transparency from 75% to 95-98%"
+            "Modal dialog titles now use proper icon() + tagList() pattern"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "ASCII art banner now has transparent background showing music sheet"
-          ),
-          tags$li(
-            tags$strong("NOTE: "),
-            "Still working on: Icon replacements and Show R Code standardization"
+            tags$strong("VERIFIED: "),
+            "All Show R Code buttons work without folder/file selection (show template)"
           )
         )
       ),
@@ -103,6 +103,29 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9056
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9056 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("COMPLETED:"), " All emojis replaced with Font Awesome icons"),
+                tags$li(tags$strong("FIXED:"), " KLAWA Show R Code now works without folder selection")
+              )
+            ),
+
+            # v0.0.0.9055
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9055 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Button sizes - removed !important flags"),
+                tags$li(tags$strong("IMPROVED:"), " Data tables transparency 95-98%"),
+                tags$li(tags$strong("IMPROVED:"), " ASCII art transparent background")
+              )
+            ),
 
             # v0.0.0.9053
             tags$div(
