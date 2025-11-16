@@ -8,11 +8,11 @@ mod_klawa_ui <- function(id) {
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
-      h4("📁 How KLAWA Scanning Works"),
+      h4(icon("folder-open"), " How KLAWA Scanning Works"),
       p("This tool extracts voice/singing performance metrics from KLAWA PDF files. It can auto-detect your folder structure or work with any organization."),
       p(
         style = "margin-top: 10px; padding: 8px; background-color: #e8f5e9; border-left: 3px solid #4caf50;",
-        tags$strong("💡 Tip:"), " Auto-detection analyzes your folders and identifies groups, measurements, and PCs automatically!",
+        icon("lightbulb"), tags$strong(" Tip:"), " Auto-detection analyzes your folders and identifies groups, measurements, and PCs automatically!",
         " No need for pre-defined structure."
       )
     ),
@@ -30,7 +30,7 @@ mod_klawa_ui <- function(id) {
               ns("root_dir"),
               "Browse for folder",
               "Select the KLAWA root directory",
-              class = "btn-primary btn-lg"
+              class = "btn-primary"
             ),
             tags$div(
               style = "margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;",
@@ -62,8 +62,9 @@ mod_klawa_ui <- function(id) {
         br(), br(),
         actionButton(
           ns("analyze"),
-          "🔍 Analyze Folder Structure",
-          class = "btn-info btn-block"
+          "Analyze Folder Structure",
+          icon = icon("search"),
+          class = "btn-info"
         )
       )
     ),
@@ -75,11 +76,11 @@ mod_klawa_ui <- function(id) {
       condition = sprintf("output['%s'] != ''", ns("structure_summary")),
       wellPanel(
         style = "background-color: #e7ffe7;",
-        h5("📊 Detected Folder Structure"),
+        h5("Detected Folder Structure"),
         htmlOutput(ns("structure_summary")),
         hr(),
         tags$details(
-          tags$summary(tags$strong("📁 Folder Tree (click to expand)")),
+          tags$summary(tags$strong("Folder Tree (click to expand)")),
           tags$pre(
             style = "background-color: #f8f9fa; padding: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;",
             verbatimTextOutput(ns("structure_tree"))
@@ -93,7 +94,7 @@ mod_klawa_ui <- function(id) {
     wellPanel(
       style = "background-color: #f0f0f0;",
       tags$details(
-        tags$summary(tags$strong("⚙ Advanced Settings (click to expand)")),
+        tags$summary(tags$strong("Advanced Settings (click to expand)")),
         br(),
         fluidRow(
           column(
@@ -194,8 +195,16 @@ mod_klawa_ui <- function(id) {
     h4("4. Scan PDFs"),
     actionButton(
       ns("scan"),
-      "🔍 Scan All PDFs",
-      class = "btn-success btn-lg"
+      "Scan All PDFs",
+      icon = icon("search"),
+      class = "btn-success"
+    ),
+    actionButton(
+      ns("show_r_code"),
+      "Show R Code",
+      icon = icon("file-code"),
+      class = "btn-info",
+      style = "margin-left: 10px;"
     ),
     tags$span(
       style = "margin-left: 15px; color: #6c757d;",
@@ -204,11 +213,14 @@ mod_klawa_ui <- function(id) {
 
     br(), br(),
 
+    # R Code Modal (hidden initially)
+    uiOutput(ns("r_code_output")),
+
     # Results Table
     h4("5. Scanned Data"),
     tags$p(
       style = "color: #666; margin-bottom: 10px;",
-      tags$strong("💡 Tip:"), " Double-click any cell to edit its value. Edits are saved automatically and included in the CSV download."
+      tags$strong("Tip:"), " Double-click any cell to edit its value. Edits are saved automatically and included in the CSV download."
     ),
     DT::DTOutput(ns("tbl")),
 
@@ -225,7 +237,7 @@ mod_klawa_ui <- function(id) {
     br(), br(),
 
     # Folder Structure Guide
-    h4("📁 KLAWA Folder Structure & Data Preparation Guide"),
+    h4("KLAWA Folder Structure & Data Preparation Guide"),
     wellPanel(
       style = "background-color: #f8f9fa; border-left: 4px solid #17a2b8;",
 
@@ -373,7 +385,7 @@ mod_klawa_server <- function(id) {
 
           # Build summary HTML
           summary_html <- sprintf(
-            "<p><strong>📄 Total PDFs found:</strong> %d</p>",
+            "<p><strong>Total PDFs found:</strong> %d</p>",
             structure$n_pdfs
           )
 
@@ -416,7 +428,7 @@ mod_klawa_server <- function(id) {
           })
 
           showNotification(
-            "✓ Folder structure analyzed successfully!",
+            "Folder structure analyzed successfully!",
             type = "message",
             duration = 3
           )
@@ -518,13 +530,111 @@ mod_klawa_server <- function(id) {
           }
 
           showNotification(
-            sprintf("✓ Scan completed. %d files processed.", nrow(out)),
+            sprintf("Scan completed. %d files processed.", nrow(out)),
             type = "message",
             duration = 4
           )
         }
       })
     }, ignoreInit = TRUE)
+
+    # --- Show R Code ----------------------------------------------------------
+    observeEvent(input$show_r_code, {
+      root_path <- input$root
+
+      # Show template code if no path selected, or actual code if path exists
+      if (is.null(root_path) || root_path == "") {
+        r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan KLAWA PDFs
+klawa_data <- klawa_scan(
+  root = "path/to/your/KLAWA/folder"
+)
+
+# View the data
+View(klawa_data)
+
+# Save to CSV
+write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)'
+      } else {
+        # Escape backslashes for R code
+        escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+        r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan KLAWA PDFs
+klawa_data <- klawa_scan(
+  root = "%s"
+)
+
+# View the data
+View(klawa_data)
+
+# Save to CSV
+write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
+      }
+
+      showModal(modalDialog(
+        title = tagList(icon("file-code"), " R Code for KLAWA Scanning"),
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(ns("copy_code"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
+          modalButton("Close")
+        ),
+        tags$div(
+          tags$p("Use this R code to reproduce the KLAWA scan outside of the Shiny app:"),
+          tags$pre(
+            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
+            tags$code(r_code)
+          ),
+          tags$div(
+            id = ns("copy_notification"),
+            style = "display: none; color: #28a745; margin-top: 10px;",
+            "Code copied to clipboard!"
+          )
+        ),
+        tags$script(HTML(sprintf('
+          $("#%s").click(function() {
+            var code = $(this).closest(".modal-content").find("code").text();
+            navigator.clipboard.writeText(code).then(function() {
+              $("#%s").show().delay(2000).fadeOut();
+            });
+          });
+        ', ns("copy_code"), ns("copy_notification"))))
+      ))
+    })
+
+    output$download_r_code <- downloadHandler(
+      filename = function() {
+        paste0("klawa_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+      },
+      content = function(file) {
+        root_path <- input$root
+        escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+        r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan KLAWA PDFs
+klawa_data <- klawa_scan(
+  root = "%s"
+)
+
+# View the data
+View(klawa_data)
+
+# Save to CSV
+write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
+
+        writeLines(r_code, file)
+      }
+    )
 
     # --- Table + download -----------------------------------------------------
     # Reactive value to store edited data
@@ -583,7 +693,7 @@ mod_klawa_server <- function(id) {
       if (!is.null(problems_detailed_rv()) && !inherits(problems_detailed_rv(), "try-error")) {
         wellPanel(
           style = "background-color: #f5f5f5; margin-top: 20px; padding: 20px;",
-          h4(style = "margin-top: 0; color: #333;", "📊 Data Quality Analysis"),
+          h4(style = "margin-top: 0; color: #333;", "Data Quality Analysis"),
           p(
             style = "color: #666; margin-bottom: 15px;",
             "Detailed breakdown of all detected issues. Click tabs to explore specific problem types."

@@ -10,7 +10,7 @@ mod_aat_ui <- function(id) {
       style = "background-color: #fff3cd; border-left: 4px solid #ffc107;",
       tags$h4(
         style = "color: #856404; margin-top: 0;",
-        "⚠️ Work in Progress - Not Yet Ready for Production Use"
+        "Work in Progress - Not Yet Ready for Production Use"
       ),
       tags$p(
         style = "color: #856404; margin-bottom: 0;",
@@ -24,7 +24,7 @@ mod_aat_ui <- function(id) {
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
-      h4("📊 How AAT Scanning Works"),
+      h4("How AAT Scanning Works"),
       p("This tool extracts AAT (Auditory Ambiguity Test) metrics from CSV response files (*.itl.csv or *.csv)."),
       tags$ul(
         tags$li(tags$strong("Ambiguous (%):"), " Percentage of f0-responses (fundamental) in ambiguous items"),
@@ -33,7 +33,7 @@ mod_aat_ui <- function(id) {
       ),
       p(
         style = "margin-top: 10px; padding: 8px; background-color: #e8f5e9; border-left: 3px solid #4caf50;",
-        tags$strong("💡 Tip:"), " Place all AAT CSV files in one folder or organize them into subfolders by group/condition.",
+        tags$strong("Tip:"), " Place all AAT CSV files in one folder or organize them into subfolders by group/condition.",
         " The scanner will find all CSV files recursively!"
       )
     ),
@@ -51,7 +51,7 @@ mod_aat_ui <- function(id) {
               ns("root_dir"),
               "Browse for folder",
               "Select the folder containing AAT CSV files",
-              class = "btn-primary btn-lg"
+              class = "btn-primary"
             ),
             tags$div(
               style = "margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;",
@@ -83,8 +83,9 @@ mod_aat_ui <- function(id) {
         br(), br(),
         actionButton(
           ns("analyze"),
-          "🔍 Analyze Folder Structure",
-          class = "btn-info btn-block"
+          "Analyze Folder Structure",
+          icon = icon("search"),
+          class = "btn-info"
         )
       )
     ),
@@ -96,11 +97,11 @@ mod_aat_ui <- function(id) {
       condition = sprintf("output['%s'] != ''", ns("structure_summary")),
       wellPanel(
         style = "background-color: #e7ffe7;",
-        h5("📊 Detected Folder Structure"),
+        h5("Detected Folder Structure"),
         htmlOutput(ns("structure_summary")),
         hr(),
         tags$details(
-          tags$summary(tags$strong("📁 Sample File Paths (click to expand)")),
+          tags$summary(tags$strong("Sample File Paths (click to expand)")),
           tags$pre(
             style = "background-color: #f8f9fa; padding: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;",
             verbatimTextOutput(ns("sample_paths"))
@@ -114,7 +115,7 @@ mod_aat_ui <- function(id) {
     wellPanel(
       style = "background-color: #f0f0f0;",
       tags$details(
-        tags$summary(tags$strong("⚙ Advanced Settings (click to expand)")),
+        tags$summary(tags$strong("Advanced Settings (click to expand)")),
         br(),
         fluidRow(
           column(
@@ -161,10 +162,25 @@ mod_aat_ui <- function(id) {
 
     # Scan Button
     h4("3. Start Scanning"),
-    actionButton(
-      ns("scan"),
-      "▶ Scan AAT Files",
-      class = "btn-success btn-lg btn-block"
+    fluidRow(
+      column(
+        width = 8,
+        actionButton(
+          ns("scan"),
+          "Scan AAT Files",
+          icon = icon("play"),
+          class = "btn-success"
+        )
+      ),
+      column(
+        width = 4,
+        actionButton(
+          ns("show_r_code"),
+          "Show R Code",
+          icon = icon("file-code"),
+          class = "btn-info"
+        )
+      )
     ),
 
     br(), br(),
@@ -174,7 +190,7 @@ mod_aat_ui <- function(id) {
       condition = sprintf("output['%s']", ns("show_results")),
       wellPanel(
         style = "background-color: #f5f5f5;",
-        h4("📊 Scan Results"),
+        h4("Scan Results"),
 
         # Summary Statistics
         htmlOutput(ns("summary_stats")),
@@ -189,14 +205,15 @@ mod_aat_ui <- function(id) {
         br(),
 
         # Download Button
-        downloadButton(ns("download_csv"), "💾 Download Results as CSV", class = "btn-primary"),
+        downloadButton(ns("download_csv"), "Download Results as CSV",
+      icon = icon("download"), class = "btn-primary"),
 
         br(), br(),
 
         # Quality Report
         h5("Quality Report"),
         tags$details(
-          tags$summary(tags$strong("🔍 Participants with Quality Issues (click to expand)")),
+          tags$summary(tags$strong("Participants with Quality Issues (click to expand)")),
           br(),
           DT::DTOutput(ns("quality_issues_table"))
         )
@@ -207,7 +224,7 @@ mod_aat_ui <- function(id) {
     hr(),
     wellPanel(
       style = "background-color: #fffbea; border-left: 4px solid #ffb74d;",
-      h5("📄 Expected File Format"),
+      h5("Expected File Format"),
       p(tags$strong("Filename:"), " AAT_response_<CODE>_<DATE>.itl.csv (or any CSV file with participant code)"),
       p(tags$strong("Required Column:"), " 'Pitch Classification' with codes:"),
       tags$ul(
@@ -346,6 +363,129 @@ mod_aat_server <- function(id) {
         })
       })
     })
+
+    # --- Show R Code ----------------------------------------------------------
+    observeEvent(input$show_r_code, {
+      root_path <- rv$root_path
+
+      # Show template code if no folder selected, otherwise show actual path
+      if (is.null(root_path) || root_path == "") {
+        r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan AAT CSV files
+aat_data <- aat_scan(
+  root = "path/to/your/AAT/folder",
+  code_pattern = "(\\\\d{4}[A-Za-z]{4})",  # 4 digits + 4 letters
+  date_format = "DDMMYY"  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+)
+
+# View the data
+View(aat_data)
+
+# Save to CSV
+write.csv(aat_data, "aat_results.csv", row.names = FALSE)'
+      } else {
+        # Escape backslashes for R code
+        escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+        r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan AAT CSV files
+aat_data <- aat_scan(
+  root = "%s",
+  code_pattern = "(\\\\d{4}[A-Za-z]{4})",  # 4 digits + 4 letters
+  date_format = "DDMMYY"  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+)
+
+# View the data
+View(aat_data)
+
+# Save to CSV
+write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
+      }
+
+      showModal(modalDialog(
+        title = tagList(icon("file-code"), " R Code for AAT Scanning"),
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(ns("copy_code"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
+          modalButton("Close")
+        ),
+        tags$div(
+          tags$p("Use this R code to reproduce the AAT scan outside of the Shiny app:"),
+          tags$pre(
+            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
+            tags$code(r_code)
+          ),
+          tags$div(
+            id = ns("copy_notification"),
+            style = "display: none; color: #28a745; margin-top: 10px;",
+            "Code copied to clipboard!"
+          )
+        ),
+        tags$script(HTML(sprintf('
+          $("#%s").click(function() {
+            var code = $(this).closest(".modal-content").find("code").text();
+            navigator.clipboard.writeText(code).then(function() {
+              $("#%s").show().delay(2000).fadeOut();
+            });
+          });
+        ', ns("copy_code"), ns("copy_notification"))))
+      ))
+    })
+
+    output$download_r_code <- downloadHandler(
+      filename = function() {
+        paste0("aat_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+      },
+      content = function(file) {
+        root_path <- rv$root_path
+
+        if (is.null(root_path) || root_path == "") {
+          r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan AAT CSV files
+aat_data <- aat_scan(
+  root = "path/to/your/AAT/folder",
+  code_pattern = "(\\\\d{4}[A-Za-z]{4})",  # 4 digits + 4 letters
+  date_format = "DDMMYY"  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+)
+
+# View the data
+View(aat_data)
+
+# Save to CSV
+write.csv(aat_data, "aat_results.csv", row.names = FALSE)'
+        } else {
+          escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
+
+          r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan AAT CSV files
+aat_data <- aat_scan(
+  root = "%s",
+  code_pattern = "(\\\\d{4}[A-Za-z]{4})",  # 4 digits + 4 letters
+  date_format = "DDMMYY"  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+)
+
+# View the data
+View(aat_data)
+
+# Save to CSV
+write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
+        }
+
+        writeLines(r_code, file)
+      }
+    )
 
     # Show results panel
     output$show_results <- reactive({

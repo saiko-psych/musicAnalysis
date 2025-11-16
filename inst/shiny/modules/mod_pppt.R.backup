@@ -19,7 +19,7 @@ mod_pppt_ui <- function(id) {
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
-      h4("How PPPT Scanning Works"),
+      h4("🎵 How PPPT Scanning Works"),
       p("This tool extracts PPPT (Pitch Perception Proficiency Test) metrics from .rsl.csv files."),
       tags$ul(
         tags$li(tags$strong("PPP Index:"), " Pitch Perception Proficiency index for each UCF frequency"),
@@ -30,7 +30,7 @@ mod_pppt_ui <- function(id) {
       ),
       p(
         style = "margin-top: 10px; padding: 8px; background-color: #e8f5e9; border-left: 3px solid #4caf50;",
-        tags$strong("Tip:"), " The scanner automatically detects PPPT files by their content (UCF column),",
+        tags$strong("💡 Tip:"), " The scanner automatically detects PPPT files by their content (UCF column),",
         " even if the filename doesn't contain 'PPPT'!"
       )
     ),
@@ -48,7 +48,7 @@ mod_pppt_ui <- function(id) {
               ns("root_dir"),
               "Browse for folder",
               "Select the folder containing PPPT .rsl.csv files",
-              class = "btn-primary"
+              class = "btn-primary btn-lg"
             ),
             tags$div(
               style = "margin-top: 10px; padding: 10px; background-color: #e9ecef; border-radius: 4px;",
@@ -80,9 +80,8 @@ mod_pppt_ui <- function(id) {
         br(), br(),
         actionButton(
           ns("analyze"),
-          "Analyze Folder Structure",
-          icon = icon("search"),
-          class = "btn-info"
+          "🔍 Analyze Folder Structure",
+          class = "btn-info btn-block"
         )
       )
     ),
@@ -168,25 +167,11 @@ mod_pppt_ui <- function(id) {
 
     # Scan Button
     h4("3. Scan Files"),
-    fluidRow(
-      column(
-        width = 8,
-        actionButton(
-          ns("scan"),
-          "Scan PPPT Files",
-          icon = icon("search"),
-          class = "btn-success"
-        )
-      ),
-      column(
-        width = 4,
-        actionButton(
-          ns("show_r_code_scan"),
-          "Show R Code",
-          icon = icon("file-code"),
-          class = "btn-info"
-        )
-      )
+    actionButton(
+      ns("scan"),
+      "📁 Scan PPPT Files",
+      class = "btn-success btn-lg btn-block",
+      icon = icon("search")
     ),
 
     br(), br(),
@@ -213,7 +198,7 @@ mod_pppt_ui <- function(id) {
 
         wellPanel(
           style = "background-color: #f0f8ff;",
-          h4("PPPT Profile Visualization"),
+          h4("📊 PPPT Profile Visualization"),
           p("Visualize PPP indices across frequency bands. The frequencies are shown as connected lines, while the Overall index appears as a separate diamond marker."),
           tags$ul(
             tags$li("X-axis: PPP Index (-1 to 1)"),
@@ -226,7 +211,7 @@ mod_pppt_ui <- function(id) {
         # Data Source Selection
         wellPanel(
           style = "background-color: #fff9e6;",
-          h5("Data Source"),
+          h5("📁 Data Source"),
           radioButtons(
             ns("data_source"),
             "Choose data source:",
@@ -255,135 +240,114 @@ mod_pppt_ui <- function(id) {
           uiOutput(ns("data_status"))
         ),
 
-        # Plot controls and output (always visible)
-        fluidRow(
-          column(
-            width = 3,
-            wellPanel(
-              h4("Plot Controls"),
+        # Require data first
+        conditionalPanel(
+          condition = sprintf("output['%s']", ns("has_data")),
+          ns = ns,
 
-              selectInput(
-                ns("plot_type"),
-                "Plot Type:",
-                choices = c(
-                  "All participants - Mean profile" = "all_combined",
-                  "All participants - Overlaid lines" = "all_overlaid",
-                  "Individual plots per participant" = "individual",
-                  "Plots by group (overlaid)" = "by_group",
-                  "Group summary (overlaid)" = "group_summary",
-                  "Group summary (separate plots)" = "group_summary_separate"
-                ),
-                selected = "all_combined"
-              ),
-              
-              # Group variable selector (conditional)
-              conditionalPanel(
-                condition = "input.plot_type == 'by_group' || input.plot_type == 'group_summary' || input.plot_type == 'group_summary_separate'",
-                ns = ns,
-                uiOutput(ns("group_var_selector"))
-              ),
-
-              conditionalPanel(
-                condition = "input.plot_type == 'all_overlaid' || input.plot_type == 'by_group' || input.plot_type == 'group_summary'",
-                ns = ns,
-                selectInput(
-                  ns("color_by"),
-                  "Color lines by:",
-                  choices = c(
-                    "Participant" = "participant",
-                    "Group" = "group",
-                    "Custom color" = "custom"
-                  ),
-                  selected = "participant"
-                )
-              ),
-
-              conditionalPanel(
-                condition = "input.color_by == 'custom' || input.plot_type == 'all_combined' || input.plot_type == 'individual' || input.plot_type == 'group_summary_separate'",
-                ns = ns,
-                textInput(
-                  ns("line_color"),
-                  "Line color:",
-                  value = "steelblue",
-                  placeholder = "e.g., blue, #FF5733"
-                )
-              ),
-
-              checkboxInput(
-                ns("show_legend"),
-                "Show legend",
-                value = TRUE
-              ),
-
-              # Error bar selector (conditional - only for mean plots)
-              conditionalPanel(
-                condition = "input.plot_type == 'all_combined' || input.plot_type == 'group_summary' || input.plot_type == 'group_summary_separate'",
-                ns = ns,
-                selectInput(
-                  ns("error_type"),
-                  "Error bars:",
-                  choices = c(
-                    "Standard Error (SE)" = "se",
-                    "Standard Deviation (SD)" = "sd",
-                    "95% Confidence Interval" = "ci95",
-                    "None" = "none"
-                  ),
-                  selected = "se"
-                ),
-                tags$div(
-                  style = "padding: 5px 10px; background-color: #f0f8ff; border-radius: 4px; margin-bottom: 10px; font-size: 12px;",
-                  tags$small(
-                    tags$strong("SE:"), " Standard Error of the Mean (SD/√n)", tags$br(),
-                    tags$strong("SD:"), " Standard Deviation (spread of data)", tags$br(),
-                    tags$strong("95% CI:"), " 95% Confidence Interval for the mean"
-                  )
-                )
-              ),
-
-              br(),
-              actionButton(
-                ns("update_plot"),
-                "Generate Plot",
-                class = "btn-primary btn-block"
-              ),
-
-              br(),
-              downloadButton(
-                ns("download_plot"),
-                "Download Plot (HTML)",
-                class = "btn-success btn-block"
-              ),
-
-              br(),
-              actionButton(
-                ns("show_plot_code"),
-                "Show R Code",
-                class = "btn-info btn-block"
-              )
-            )
-          ),
-
-          column(
-            width = 9,
-            # Plot output area
-            uiOutput(ns("plot_output")),
-
-            br(),
-            # R Code display
-            conditionalPanel(
-              condition = "input.show_plot_code > 0",
-              ns = ns,
+          fluidRow(
+            column(
+              width = 3,
               wellPanel(
-                style = "background-color: #f8f9fa;",
-                h4("R Code to Reproduce This Plot"),
-                p("Copy and paste this code into your R console to recreate the plot:"),
-                verbatimTextOutput(ns("plot_r_code")),
-                downloadButton(ns("download_plot_code"), "Download Code (.R)")
+                h4("Plot Controls"),
+
+                selectInput(
+                  ns("plot_type"),
+                  "Plot Type:",
+                  choices = c(
+                    "All participants - Mean profile" = "all_combined",
+                    "All participants - Overlaid lines" = "all_overlaid",
+                    "Individual plots per participant" = "individual",
+                    "Plots by group" = "by_group"
+                  ),
+                  selected = "all_combined"
+                ),
+
+                conditionalPanel(
+                  condition = "input.plot_type == 'all_overlaid' || input.plot_type == 'by_group'",
+                  ns = ns,
+                  selectInput(
+                    ns("color_by"),
+                    "Color lines by:",
+                    choices = c(
+                      "Participant" = "participant",
+                      "Group" = "group",
+                      "Custom color" = "custom"
+                    ),
+                    selected = "participant"
+                  )
+                ),
+
+                conditionalPanel(
+                  condition = "input.color_by == 'custom' || input.plot_type == 'all_combined' || input.plot_type == 'individual'",
+                  ns = ns,
+                  textInput(
+                    ns("line_color"),
+                    "Line color:",
+                    value = "steelblue",
+                    placeholder = "e.g., blue, #FF5733"
+                  )
+                ),
+
+                checkboxInput(
+                  ns("show_legend"),
+                  "Show legend",
+                  value = TRUE
+                ),
+
+                br(),
+                actionButton(
+                  ns("update_plot"),
+                  "Update Plot",
+                  class = "btn-primary btn-block"
+                ),
+
+                br(),
+                downloadButton(
+                  ns("download_plot"),
+                  "Download Plot (HTML)",
+                  class = "btn-success btn-block"
+                ),
+
+                br(),
+                actionButton(
+                  ns("show_plot_code"),
+                  "📝 Show R Code",
+                  class = "btn-info btn-block"
+                )
+              )
+            ),
+
+            column(
+              width = 9,
+              uiOutput(ns("plot_output")),
+
+              br(),
+              conditionalPanel(
+                condition = "input.show_plot_code > 0",
+                ns = ns,
+                wellPanel(
+                  style = "background-color: #f8f9fa;",
+                  h4("R Code to Reproduce This Plot"),
+                  p("Copy and paste this code into your R console to recreate the plot:"),
+                  verbatimTextOutput(ns("plot_r_code")),
+                  downloadButton(ns("download_plot_code"), "Download Code (.R)")
+                )
               )
             )
           )
-        )
+        ),
 
+        # Message when no data
+        conditionalPanel(
+          condition = sprintf("!output['%s']", ns("has_data")),
+          ns = ns,
+          wellPanel(
+            style = "background-color: #fff3cd; border-left: 4px solid #ffc107;",
+            h5("⚠️ No Data Available"),
+            p("Please scan PPPT files in the 'Data Scanning' tab first before creating visualizations.")
+          )
+        )
       ) # End Visualization tab
     ) # End tabsetPanel
   )
@@ -401,17 +365,6 @@ mod_pppt_server <- function(id) {
       edited_data = NULL,
       validation_results = NULL
     )
-
-    # Helper function to escape strings for R code
-    # Converts backslashes to double backslashes for proper R syntax
-    escape_for_r <- function(str) {
-      if (is.null(str) || is.na(str)) return("")
-      # Escape backslashes first (\ becomes \\)
-      str <- gsub("\\\\", "\\\\\\\\", str)
-      # Escape double quotes (" becomes \")
-      str <- gsub('"', '\\\\"', str)
-      return(str)
-    }
 
     # Folder browser (if shinyFiles available)
     if (requireNamespace("shinyFiles", quietly = TRUE)) {
@@ -464,7 +417,7 @@ mod_pppt_server <- function(id) {
 
       wellPanel(
         style = "background-color: #e7ffe7;",
-        h5("Detected Folder Structure"),
+        h5("📊 Detected Folder Structure"),
         tags$div(
           style = "padding: 10px;",
           tags$p(
@@ -527,7 +480,7 @@ mod_pppt_server <- function(id) {
         )
 
         output$scan_status <- renderText({
-          sprintf("Successfully scanned %d PPPT file(s)\n\nValidation: %s",
+          sprintf("✓ Successfully scanned %d PPPT file(s)\n\nValidation: %s",
                   nrow(result),
                   rv$validation_results$validation_summary)
         })
@@ -540,7 +493,7 @@ mod_pppt_server <- function(id) {
 
       }, error = function(e) {
         output$scan_status <- renderText({
-          paste("Error:", e$message)
+          paste("✗ Error:", e$message)
         })
         showNotification(
           paste("Error scanning files:", e$message),
@@ -561,13 +514,13 @@ mod_pppt_server <- function(id) {
         # Validation Results
         wellPanel(
           style = "background-color: #fff3e0;",
-          h5("Validation Results"),
+          h5("✅ Validation Results"),
           verbatimTextOutput(ns("validation_summary")),
           conditionalPanel(
             condition = sprintf("output['%s'] != null && output['%s'].length > 0",
                                 ns("validation_details"), ns("validation_details")),
             hr(),
-            h6("Problematic Files:"),
+            h6("⚠️ Problematic Files:"),
             verbatimTextOutput(ns("validation_details"))
           )
         ),
@@ -575,16 +528,16 @@ mod_pppt_server <- function(id) {
         # Summary statistics
         wellPanel(
           style = "background-color: #e3f2fd;",
-          h5("Summary Statistics"),
+          h5("📊 Summary Statistics"),
           htmlOutput(ns("summary_stats"))
         ),
 
         # Data table
         wellPanel(
-          h5("PPPT Data"),
+          h5("📄 PPPT Data"),
           p(
             style = "color: #666; font-size: 0.9em;",
-            tags$strong("Tip:"), " Double-click any cell to edit its value.",
+            tags$strong("💡 Tip:"), " Double-click any cell to edit its value.",
             " Your changes will be reflected in the downloaded CSV."
           ),
           fluidRow(
@@ -607,27 +560,24 @@ mod_pppt_server <- function(id) {
             width = 3,
             downloadButton(
               ns("download_csv"),
-              "Download CSV",
-              icon = icon("download"),
-              class = "btn-primary"
+              "💾 Download CSV",
+              class = "btn-primary btn-lg btn-block"
             )
           ),
           column(
             width = 3,
             actionButton(
               ns("show_code"),
-              "Show R Code",
-              icon = icon("file-code"),
-              class = "btn-info"
+              "📝 Show R Code",
+              class = "btn-info btn-lg btn-block"
             )
           ),
           column(
             width = 3,
             actionButton(
               ns("show_validation"),
-              "Validation Details",
-              icon = icon("exclamation-triangle"),
-              class = "btn-warning"
+              "🔍 Validation Details",
+              class = "btn-warning btn-lg btn-block"
             )
           )
         ),
@@ -788,209 +738,18 @@ mod_pppt_server <- function(id) {
       rv$edited_data[info$row, info$col + 1] <- info$value
     })
 
-    # Show R Code modal (from scan button)
-    observeEvent(input$show_r_code_scan, {
-      root_path <- rv$root_path
-
-      # Show template if no folder selected, otherwise use actual path
-      if (is.null(root_path) || root_path == "") {
-        r_code <- '# Load the musicAnalysis package
-library(musicAnalysis)
-
-# Scan PPPT files
-pppt_data <- pppt_scan(
-  root = "path/to/your/PPPT/folder",
-  code_pattern = "\\\\d{4}[A-Za-z]{4}",  # 4 digits + 4 letters
-  date_format = "DDMMYY",  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
-  extract_groups = FALSE,  # Set to TRUE to extract group information
-  remove_duplicates = TRUE
-)
-
-# View results
-View(pppt_data)
-
-# Save to CSV
-write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)'
-      } else {
-        group_code <- if (input$extract_groups) {
-          sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
-                  paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
-        } else {
-          ""
-        }
-
-        escaped_root <- escape_for_r(root_path)
-        escaped_pattern <- escape_for_r(input$code_pattern)
-        escaped_date <- escape_for_r(input$date_format)
-
-        r_code <- sprintf('# Load the musicAnalysis package
-library(musicAnalysis)
-
-# Scan PPPT files
-pppt_data <- pppt_scan(
-  root = "%s",
-  code_pattern = "%s",
-  date_format = "%s",
-%s  remove_duplicates = %s
-)
-
-# View results
-View(pppt_data)
-
-# Save to CSV
-write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
-          escaped_root,
-          escaped_pattern,
-          escaped_date,
-          group_code,
-          input$remove_duplicates
-        )
-      }
-
-      showModal(modalDialog(
-        title = tagList(icon("file-code"), " R Code for PPPT Scanning"),
-        size = "l",
-        easyClose = TRUE,
-        footer = tagList(
-          actionButton(ns("copy_code_scan"), "Copy to Clipboard",
-      icon = icon("copy"), class = "btn-primary"),
-          downloadButton(ns("download_r_code_scan"), "Download .R File",
-      icon = icon("download"), class = "btn-success"),
-          modalButton("Close")
-        ),
-        tags$div(
-          tags$p("Use this R code to reproduce the PPPT scan outside of the Shiny app:"),
-          tags$pre(
-            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
-            tags$code(r_code)
-          ),
-          tags$div(
-            id = ns("copy_notification_scan"),
-            style = "display: none; color: #28a745; margin-top: 10px;",
-            "Code copied to clipboard!"
-          )
-        ),
-        tags$script(HTML(sprintf('
-          $("#%s").click(function() {
-            var code = $(this).closest(".modal-content").find("code").text();
-            navigator.clipboard.writeText(code).then(function() {
-              $("#%s").show().delay(2000).fadeOut();
-            });
-          });
-        ', ns("copy_code_scan"), ns("copy_notification_scan"))))
-      ))
-    })
-
-    # Download R code from modal
-    output$download_r_code_scan <- downloadHandler(
-      filename = function() {
-        paste0("pppt_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
-      },
-      content = function(file) {
-        root_path <- rv$root_path
-
-        if (is.null(root_path) || root_path == "") {
-          r_code <- '# Load the musicAnalysis package
-library(musicAnalysis)
-
-# Scan PPPT files
-pppt_data <- pppt_scan(
-  root = "path/to/your/PPPT/folder",
-  code_pattern = "\\\\d{4}[A-Za-z]{4}",  # 4 digits + 4 letters
-  date_format = "DDMMYY",  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
-  extract_groups = FALSE,  # Set to TRUE to extract group information
-  remove_duplicates = TRUE
-)
-
-# View results
-View(pppt_data)
-
-# Save to CSV
-write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)'
-        } else {
-          group_code <- if (input$extract_groups) {
-            sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
-                    paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
-          } else {
-            ""
-          }
-
-          escaped_root <- escape_for_r(root_path)
-          escaped_pattern <- escape_for_r(input$code_pattern)
-          escaped_date <- escape_for_r(input$date_format)
-
-          r_code <- sprintf('# Load the musicAnalysis package
-library(musicAnalysis)
-
-# Scan PPPT files
-pppt_data <- pppt_scan(
-  root = "%s",
-  code_pattern = "%s",
-  date_format = "%s",
-%s  remove_duplicates = %s
-)
-
-# View results
-View(pppt_data)
-
-# Save to CSV
-write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
-            escaped_root,
-            escaped_pattern,
-            escaped_date,
-            group_code,
-            input$remove_duplicates
-          )
-        }
-
-        writeLines(r_code, file)
-      }
-    )
-
     # R Code output
     output$r_code <- renderText({
-      root_path <- rv$root_path
+      req(rv$root_path)
 
-      if (is.null(root_path) || root_path == "") {
-        code <- 'library(musicAnalysis)
-
-# Scan PPPT files
-pppt_data <- pppt_scan(
-  root = "path/to/your/PPPT/folder",
-  code_pattern = "\\\\d{4}[A-Za-z]{4}",
-  date_format = "DDMMYY",
-  extract_groups = FALSE,
-  remove_duplicates = TRUE
-)
-
-# View results
-View(pppt_data)
-
-# Validate results
-validation <- pppt_validate(
-  root = "path/to/your/PPPT/folder",
-  scanned_data = pppt_data,
-  code_pattern = "\\\\d{4}[A-Za-z]{4}"
-)
-print(validation$validation_summary)
-
-# Save to CSV
-write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
-'
+      group_code <- if (input$extract_groups) {
+        sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
       } else {
-        group_code <- if (input$extract_groups) {
-          sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
-                  paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
-        } else {
-          ""
-        }
+        ""
+      }
 
-        # Escape paths and patterns for R code
-        escaped_root <- escape_for_r(root_path)
-        escaped_pattern <- escape_for_r(input$code_pattern)
-        escaped_date <- escape_for_r(input$date_format)
-
-        code <- sprintf('library(musicAnalysis)
+      code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
 pppt_data <- pppt_scan(
@@ -1014,15 +773,14 @@ print(validation$validation_summary)
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
-          escaped_root,
-          escaped_pattern,
-          escaped_date,
-          group_code,
-          input$remove_duplicates,
-          escaped_root,
-          escaped_pattern
-        )
-      }
+        rv$root_path,
+        input$code_pattern,
+        input$date_format,
+        group_code,
+        input$remove_duplicates,
+        rv$root_path,
+        input$code_pattern
+      )
 
       code
     })
@@ -1050,11 +808,6 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
           ""
         }
 
-        # Escape paths and patterns for R code
-        escaped_root <- escape_for_r(rv$root_path)
-        escaped_pattern <- escape_for_r(input$code_pattern)
-        escaped_date <- escape_for_r(input$date_format)
-
         code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
@@ -1079,13 +832,13 @@ print(validation$validation_summary)
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
-          escaped_root,
-          escaped_pattern,
-          escaped_date,
+          rv$root_path,
+          input$code_pattern,
+          input$date_format,
           group_code,
           input$remove_duplicates,
-          escaped_root,
-          escaped_pattern
+          rv$root_path,
+          input$code_pattern
         )
         writeLines(code, file)
       }
@@ -1166,14 +919,14 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
         if (source == "scanned") {
           tags$div(
             style = "padding: 10px; background-color: #fff3cd; border-radius: 4px; margin-top: 10px;",
-            tags$strong("No data available"),
+            tags$strong("⚠️ No data available"),
             tags$br(),
             "Please scan PPPT files in the 'Data Scanning' tab first."
           )
         } else {
           tags$div(
             style = "padding: 10px; background-color: #fff3cd; border-radius: 4px; margin-top: 10px;",
-            tags$strong("No file uploaded"),
+            tags$strong("⚠️ No file uploaded"),
             tags$br(),
             "Please upload a CSV file above."
           )
@@ -1181,7 +934,7 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
       } else {
         tags$div(
           style = "padding: 10px; background-color: #d4edda; border-radius: 4px; margin-top: 10px;",
-          tags$strong("Data ready for visualization"),
+          tags$strong("✓ Data ready for visualization"),
           tags$br(),
           sprintf("%d participants, %d variables", nrow(data), ncol(data))
         )
@@ -1195,30 +948,6 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
     })
     outputOptions(output, "has_data", suspendWhenHidden = FALSE)
 
-    # Group variable selector
-    output$group_var_selector <- renderUI({
-      data <- current_viz_data()
-      req(data)
-      
-      # Get all column names except PPP indices and code
-      exclude_cols <- c("code", "file", "date", grep("^ppp_index_", names(data), value = TRUE))
-      available_vars <- setdiff(names(data), exclude_cols)
-      
-      if (length(available_vars) == 0) {
-        return(tags$div(
-          style = "padding: 10px; background-color: #fff3cd; border-radius: 4px;",
-          tags$small("No grouping variables available in data")
-        ))
-      }
-      
-      selectInput(
-        ns("group_var"),
-        "Grouping variable:",
-        choices = available_vars,
-        selected = if ("group" %in% available_vars) "group" else available_vars[1]
-      )
-    })
-
     # Reactive for current plot
     current_plot <- reactiveVal(NULL)
 
@@ -1230,24 +959,10 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
         data <- current_viz_data()
 
         # Determine color_by parameter
-        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group", "group_summary")) {
+        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
           input$color_by
         } else {
           "custom"  # For all_combined and individual
-        }
-        
-        # Get group variable if needed
-        group_var_param <- if (input$plot_type %in% c("by_group", "group_summary", "group_summary_separate") && !is.null(input$group_var)) {
-          input$group_var
-        } else {
-          "group"  # Default
-        }
-
-        # Get error type if applicable
-        error_type_param <- if (input$plot_type %in% c("all_combined", "group_summary", "group_summary_separate") && !is.null(input$error_type)) {
-          input$error_type
-        } else {
-          "se"  # Default
         }
 
         # Generate plot(s)
@@ -1255,11 +970,9 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
           data = data,
           plot_type = input$plot_type,
           color_by = color_by_param,
-          group_var = group_var_param,
           line_color = input$line_color,
           show_legend = input$show_legend,
-          title = NULL,  # Let function generate default titles
-          error_type = error_type_param
+          title = NULL  # Let function generate default titles
         )
 
         # Store for download and code generation
@@ -1282,35 +995,12 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 
     # Render plot output
     output$plot_output <- renderUI({
-      # Check if data is available
-      data <- current_viz_data()
-      
-      if (is.null(data) || nrow(data) == 0) {
-        return(wellPanel(
-          style = "background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 20px;",
-          h5("No Data Available"),
-          p("Please load data using one of the following methods:"),
-          tags$ul(
-            tags$li("Scan PPPT files in the 'Data Scanning' tab, OR"),
-            tags$li("Upload a CSV file using the 'Upload CSV file' option above")
-          )
-        ))
-      }
-      
-      # Check if plot has been generated
-      if (is.null(current_plot())) {
-        return(wellPanel(
-          style = "background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 20px;",
-          h5("Ready to Visualize"),
-          p(sprintf("Data loaded: %d participants", nrow(data))),
-          p("Click the 'Generate Plot' button to create a visualization.")
-        ))
-      }
+      req(current_plot())
 
       plot_result <- current_plot()
 
       # Handle different return types
-      if (input$plot_type %in% c("all_combined", "all_overlaid", "group_summary")) {
+      if (input$plot_type %in% c("all_combined", "all_overlaid")) {
         # Single plot
         tagList(
           h4("PPPT Frequency Profile"),
@@ -1338,24 +1028,13 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
             )
           })
         )
-      } else if (input$plot_type == "group_summary_separate") {
-        # Separate group summary plots
-        tagList(
-          h4("PPPT Group Summary Profiles"),
-          lapply(seq_along(plot_result), function(i) {
-            tagList(
-              plotly::plotlyOutput(ns(paste0("group_summary_plot_", i)), height = "500px"),
-              br()
-            )
-          })
-        )
       }
     })
 
-    # Render main plot (for all_combined, all_overlaid, and group_summary)
+    # Render main plot (for all_combined and all_overlaid)
     output$main_plot <- plotly::renderPlotly({
       req(current_plot())
-      req(input$plot_type %in% c("all_combined", "all_overlaid", "group_summary"))
+      req(input$plot_type %in% c("all_combined", "all_overlaid"))
       current_plot()
     })
 
@@ -1389,21 +1068,6 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
       })
     })
 
-    # Render group summary separate plots dynamically
-    observe({
-      req(current_plot())
-      req(input$plot_type == "group_summary_separate")
-
-      plot_list <- current_plot()
-
-      lapply(seq_along(plot_list), function(i) {
-        output_name <- paste0("group_summary_plot_", i)
-        output[[output_name]] <- plotly::renderPlotly({
-          plot_list[[i]]
-        })
-      })
-    })
-
     # Generate R code for plot
     output$plot_r_code <- renderText({
       req(current_viz_data())
@@ -1412,22 +1076,8 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
       source <- if (!is.null(input$data_source)) input$data_source else "scanned"
 
       # Determine color_by parameter
-      color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group", "group_summary")) {
+      color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
         sprintf('  color_by = "%s",\n', input$color_by)
-      } else {
-        ""
-      }
-
-      # Determine group_var parameter
-      group_var_param <- if (input$plot_type %in% c("by_group", "group_summary") && !is.null(input$group_var)) {
-        sprintf('  group_var = "%s",\n', input$group_var)
-      } else {
-        ""
-      }
-
-      # Determine error_type parameter
-      error_type_param <- if (input$plot_type %in% c("all_combined", "group_summary") && !is.null(input$error_type)) {
-        sprintf('  error_type = "%s",\n', input$error_type)
       } else {
         ""
       }
@@ -1444,7 +1094,7 @@ library(plotly)
 plot <- pppt_plot_profile(
   data = pppt_data,
   plot_type = "%s",
-%s%s%s  line_color = "%s",
+%s  line_color = "%s",
   show_legend = %s,
   title = NULL
 )
@@ -1457,8 +1107,6 @@ htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
 ',
           input$plot_type,
           color_by_param,
-          group_var_param,
-          error_type_param,
           input$line_color,
           input$show_legend
         )
@@ -1477,7 +1125,7 @@ pppt_data <- read.csv("path/to/your/pppt_data.csv")
 plot <- pppt_plot_profile(
   data = pppt_data,
   plot_type = "%s",
-%s%s%s  line_color = "%s",
+%s  line_color = "%s",
   show_legend = %s,
   title = NULL
 )
@@ -1490,8 +1138,6 @@ htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
 ',
           input$plot_type,
           color_by_param,
-          group_var_param,
-          error_type_param,
           input$line_color,
           input$show_legend
         )
@@ -1509,22 +1155,8 @@ htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
         source <- if (!is.null(input$data_source)) input$data_source else "scanned"
 
         # Determine color_by parameter
-        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group", "group_summary")) {
+        color_by_param <- if (input$plot_type %in% c("all_overlaid", "by_group")) {
           sprintf('  color_by = "%s",\n', input$color_by)
-        } else {
-          ""
-        }
-
-        # Determine group_var parameter
-        group_var_param <- if (input$plot_type %in% c("by_group", "group_summary") && !is.null(input$group_var)) {
-          sprintf('  group_var = "%s",\n', input$group_var)
-        } else {
-          ""
-        }
-
-        # Determine error_type parameter
-        error_type_param <- if (input$plot_type %in% c("all_combined", "group_summary") && !is.null(input$error_type)) {
-          sprintf('  error_type = "%s",\n', input$error_type)
         } else {
           ""
         }
@@ -1541,7 +1173,7 @@ library(plotly)
 plot <- pppt_plot_profile(
   data = pppt_data,
   plot_type = "%s",
-%s%s%s  line_color = "%s",
+%s  line_color = "%s",
   show_legend = %s,
   title = NULL
 )
@@ -1554,8 +1186,6 @@ htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
 ',
             input$plot_type,
             color_by_param,
-            group_var_param,
-            error_type_param,
             input$line_color,
             input$show_legend
           )
@@ -1586,8 +1216,6 @@ htmlwidgets::saveWidget(plot, "pppt_profile_plot.html")
 ',
             input$plot_type,
             color_by_param,
-            group_var_param,
-            error_type_param,
             input$line_color,
             input$show_legend
           )

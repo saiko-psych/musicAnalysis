@@ -4,46 +4,54 @@ mod_home_ui <- function(id) {
   ns <- NS(id)
   tagList(
     fluidPage(
-      # ASCII Art Banner
+      # Center content with visible background on sides
+      fluidRow(
+        column(
+          width = 10,
+          offset = 1,
+
+
+
+      # ASCII Art Banner with transparent background
       wellPanel(
-        style = "background-color: #2c3e50; color: #ecf0f1; font-family: monospace; padding: 20px;",
+        style = "background-color: transparent; color: #2c1810; font-family: monospace; padding: 20px; margin-bottom: 30px; border: 2px solid #8B7355; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);",
         tags$pre(
           style = "margin: 0; font-size: 14px; line-height: 1.2;",
 "
-                            ╔═══════════════════════════════════════════════════════════════════════╗
-                            ║                                                                       ║
-                            ║   ███╗   ███╗██╗   ██╗███████╗██╗ ██████╗                             ║
-                            ║   ████╗ ████║██║   ██║██╔════╝██║██╔════╝                             ║
-                            ║   ██╔████╔██║██║   ██║███████╗██║██║                                  ║
-                            ║   ██║╚██╔╝██║██║   ██║╚════██║██║██║                                  ║
-                            ║   ██║ ╚═╝ ██║╚██████╔╝███████║██║╚██████╗                             ║
-                            ║   ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝                             ║
-                            ║                                                                       ║
-                            ║            █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗ ║
-                            ║           ██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝ ║
-                            ║           ███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗ ║
-                            ║           ██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║ ║
-                            ║           ██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║ ║
-                            ║           ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝ ║
-                            ║                                                                       ║
-                            ║        Music Psychology Data Preparation for University of Graz       ║
-                            ║                                                                       ║
-                            ╚═══════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║   ███╗   ███╗██╗   ██╗███████╗██╗ ██████╗                             ║
+║   ████╗ ████║██║   ██║██╔════╝██║██╔════╝                             ║
+║   ██╔████╔██║██║   ██║███████╗██║██║                                  ║
+║   ██║╚██╔╝██║██║   ██║╚════██║██║██║                                  ║
+║   ██║ ╚═╝ ██║╚██████╔╝███████║██║╚██████╗                             ║
+║   ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝                             ║
+║                                                                       ║
+║            █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗ ║
+║           ██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝ ║
+║           ███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗ ║
+║           ██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║ ║
+║           ██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║ ║
+║           ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝ ║
+║                                                                       ║
+║        Music Psychology Data Preparation for University of Graz       ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
 "
         )
       ),
 
       # Version Information
       wellPanel(
-        style = "background-color: #f8f9fa; border-left: 4px solid #3498db;",
+        style = "background-color: #f8f9fa; border-left: 4px solid #8B7355; margin-bottom: 30px;",
         fluidRow(
           column(
             width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("📦 Package Version: "),
+              tags$strong("Package Version: "),
               tags$span(
-                style = "color: #3498db; font-family: monospace;",
+                style = "color: #6B5D52; font-family: monospace; font-weight: bold;",
                 as.character(utils::packageVersion("musicAnalysis"))
               )
             )
@@ -52,10 +60,10 @@ mod_home_ui <- function(id) {
             width = 6,
             tags$div(
               style = "font-size: 16px;",
-              tags$strong("🕐 Build Date: "),
+              tags$strong("Build Date: "),
               tags$span(
-                style = "color: #27ae60; font-family: monospace;",
-                "2025-11-14"
+                style = "color: #8B7355; font-family: monospace; font-weight: bold;",
+                "2025-11-16"
               )
             )
           )
@@ -64,43 +72,316 @@ mod_home_ui <- function(id) {
 
       # What's New Section
       wellPanel(
-        style = "background-color: #e8f5e9; border-left: 4px solid #4caf50;",
-        h4("✨ What's New in v0.0.0.9034 (2025-11-14)"),
+        style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
+        h4("What's New in v0.0.0.9061 (2025-11-16)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "PPPT Shiny module now properly displays data table after scanning"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "'Show R Code' button in PPPT module to display reproducible scan code"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "Download button for R code (.R file) in PPPT module"
+            tags$strong("FIXED: "),
+            "ASCII art background now properly transparent - music sheet fully visible"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Enhanced PPPT data table with better editing and display capabilities"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "Better UI layout with properly organized action buttons"
+            "CSS specificity fixed to ensure transparent backgrounds work correctly"
           )
         )
       ),
 
       # Version History - Collapsible
       wellPanel(
-        style = "background-color: #f5f5f5; border-left: 4px solid #9e9e9e;",
+        style = "background-color: #f5f5f5; border-left: 4px solid #9e9e9e; margin-bottom: 30px;",
         tags$details(
           tags$summary(
             style = "cursor: pointer; padding: 10px; font-size: 18px; font-weight: bold; color: #424242; user-select: none;",
-            "📜 Version History (Click to expand/collapse)"
+            "Version History (Click to expand/collapse)"
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9060
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9060 (2025-11-16)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " ASCII art transparent background attempt"),
+                tags$li(tags$strong("IMPROVED:"), " All links underlined for better visibility"),
+                tags$li(tags$strong("FIXED:"), " Turquoise colors replaced with vintage brown theme"),
+                tags$li(tags$strong("POLISHED:"), " Version info styling matches brown theme")
+              )
+            ),
+
+            # v0.0.0.9057
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9057 (2025-11-16)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("COMPLETED:"), " ALL emojis removed from entire app"),
+                tags$li(tags$strong("FIXED:"), " Button sizing - removed btn-lg and btn-block"),
+                tags$li(tags$strong("IMPROVED:"), " Modal titles use proper Font Awesome icons")
+              )
+            ),
+
+            # v0.0.0.9056
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9056 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("COMPLETED:"), " All emojis replaced with Font Awesome icons"),
+                tags$li(tags$strong("FIXED:"), " KLAWA Show R Code now works without folder selection")
+              )
+            ),
+
+            # v0.0.0.9055
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9055 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Button sizes - removed !important flags"),
+                tags$li(tags$strong("IMPROVED:"), " Data tables transparency 95-98%"),
+                tags$li(tags$strong("IMPROVED:"), " ASCII art transparent background")
+              )
+            ),
+
+            # v0.0.0.9053
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9053 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Navbar actually compact - found real root cause")
+              )
+            ),
+
+            # v0.0.0.9052
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9052 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPTED:"), " Better CSS targeting (still too big - wrong root cause)")
+              )
+            ),
+
+            # v0.0.0.9051
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9051 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPTED:"), " Bootstrap 3 with 35px navbar (still too big)")
+              )
+            ),
+
+            # v0.0.0.9050
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9050 (2025-11-15)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPTED:"), " Bootstrap 5 navbar CSS (didn't work)")
+              )
+            ),
+
+            # v0.0.0.9049
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9049 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " Show R Code buttons for KLAWA, AAT, Musical Experience"),
+                tags$li(tags$strong("NEW:"), " R code modals with copy/download"),
+                tags$li(tags$strong("ISSUE:"), " Navbar CSS didn't work (Bootstrap 3 vs 5 mismatch)")
+              )
+            ),
+
+            # v0.0.0.9048
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9048 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " Compact navbar, centered home layout"),
+                tags$li(tags$strong("IMPROVED:"), " Visible background on home page sides")
+              )
+            ),
+
+            # v0.0.0.9047
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9047 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " Background image more visible, vintage panel colors"),
+                tags$li(tags$strong("IMPROVED:"), " Removed navbar icons (kept only GitHub/Email)"),
+                tags$li(tags$strong("FIXED:"), " CSS parsing error in app.R")
+              )
+            ),
+
+            # v0.0.0.9046
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9046 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " Vintage sheet music background with CC BY 2.0 attribution"),
+                tags$li(tags$strong("IMPROVED:"), " Navbar colors in vintage sepia tones"),
+                tags$li(tags$strong("IMPROVED:"), " Contact menu in navbar (no address-book icon)")
+              )
+            ),
+
+            # v0.0.0.9045
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9045 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " Font Awesome icons in navbar (real icons, not emojis)"),
+                tags$li(tags$strong("NEW:"), " Contact menu in navbar with GitHub and Email"),
+                tags$li(tags$strong("IMPROVED:"), " Better spacing between all sections"),
+                tags$li(tags$strong("REVERTED:"), " ASCII art banner (kept as requested)")
+              )
+            ),
+
+            # v0.0.0.9044
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9044 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPT:"), " Modern UI redesign (reverted per user request)"),
+                tags$li(tags$strong("CREATED:"), " GitHub Issue #16 for R code generation")
+              )
+            ),
+
+            # v0.0.0.9043
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9043 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " R code generation with proper path escaping"),
+                tags$li(tags$strong("IMPROVED:"), " Windows paths use double backslashes"),
+                tags$li(tags$strong("IMPROVED:"), " Generated code is directly executable")
+              )
+            ),
+
+            # v0.0.0.9042
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9042 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " 95% CI vectorization bug"),
+                tags$li(tags$strong("IMPROVED:"), " All error bar types work correctly"),
+                tags$li(tags$strong("IMPROVED:"), " Overall markers match line colors")
+              )
+            ),
+
+            # v0.0.0.9041
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9041 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Error bars calculate correctly (no more ±0)"),
+                tags$li(tags$strong("NEW:"), " Error bar type selector (SE, SD, CI95, None)"),
+                tags$li(tags$strong("IMPROVED:"), " Hover tooltips show error type")
+              )
+            ),
+
+            # v0.0.0.9040
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9040 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Group summary plot rendering"),
+                tags$li(tags$strong("FIXED:"), " Error bars display on plots"),
+                tags$li(tags$strong("IMPROVED:"), " Overall index error bars")
+              )
+            ),
+
+            # v0.0.0.9039
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9039 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ENHANCED:"), " Flexible grouping variable selection"),
+                tags$li(tags$strong("NEW:"), " Group summary plot type with error bars"),
+                tags$li(tags$strong("IMPROVED:"), " Bigger overall symbol size")
+              )
+            ),
+
+            # v0.0.0.9038
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9038 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " PPPT Visualization UI - buttons now visible"),
+                tags$li(tags$strong("IMPROVED:"), " Better user guidance messages"),
+                tags$li(tags$strong("IMPROVED:"), " UI style consistency")
+              )
+            ),
+
+            # v0.0.0.9037
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9037 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " PPPT Visualization data recognition"),
+                tags$li(tags$strong("ADDED:"), " CSV upload option with validation"),
+                tags$li(tags$strong("ADDED:"), " Data source selector")
+              )
+            ),
+
+            # v0.0.0.9036
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9036 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("NEW:"), " PPPT Frequency Profile Visualization"),
+                tags$li(tags$strong("ADDED:"), " Visualization tab with 4 plot types"),
+                tags$li(tags$strong("ADDED:"), " Interactive plots with frequency lines and overall marker"),
+                tags$li(tags$strong("ADDED:"), " Show R Code and download buttons for plots")
+              )
+            ),
+
+            # v0.0.0.9035
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9035 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " PPPT scanner with comprehensive enhancements"),
+                tags$li(tags$strong("ADDED:"), " Row display selector (10, 25, 50, 100, All)"),
+                tags$li(tags$strong("ADDED:"), " Enhanced folder structure analysis with 4 file type counts"),
+                tags$li(tags$strong("ADDED:"), " Duplicate detection and removal with reporting"),
+                tags$li(tags$strong("ADDED:"), " Improved code extraction with fallback strategies"),
+                tags$li(tags$strong("ADDED:"), " Optional group extraction from folder paths"),
+                tags$li(tags$strong("ADDED:"), " pppt_validate() function for data quality checks")
+              )
+            ),
+
+            # v0.0.0.9034
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #fff3e0; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #e65100;", "v0.0.0.9034 (2025-11-14)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " PPPT Shiny module UI enhancements"),
+                tags$li(tags$strong("FIXED:"), " Data table display now shows properly after scanning"),
+                tags$li(tags$strong("ADDED:"), " 'Show R Code' button for reproducible scan code"),
+                tags$li(tags$strong("ADDED:"), " Download button for R code (.R file)")
+              )
+            ),
 
             # v0.0.0.9033
             tags$div(
@@ -280,7 +561,7 @@ mod_home_ui <- function(id) {
               tags$details(
                 tags$summary(
                   style = "cursor: pointer; color: #757575; font-weight: bold;",
-                  "📋 Earlier Versions (v0.0.0.9005-9011)"
+                  "Earlier Versions (v0.0.0.9005-9011)"
                 ),
                 tags$ul(
                   style = "margin-top: 10px; line-height: 1.6; color: #666;",
@@ -319,7 +600,7 @@ mod_home_ui <- function(id) {
           style = "padding: 10px;",
           tags$h5(
             style = "margin-top: 0; color: #2e7d32;",
-            "🎵 KLAWA - Voice/Singing Performance Scanner ",
+            "KLAWA - Voice/Singing Performance Scanner ",
             tags$span(
               style = "font-size: 12px; color: #666; font-weight: normal;",
               "(Click to open)"
@@ -441,7 +722,7 @@ mod_home_ui <- function(id) {
           style = "padding: 10px;",
           tags$h5(
             style = "margin-top: 0; color: #3f51b5;",
-            "🎵 PPPT - Pitch Perception Proficiency Test ",
+            "PPPT - Pitch Perception Proficiency Test ",
             tags$span(
               style = "font-size: 12px; color: #666; font-weight: normal;",
               "(Click to open)"
@@ -519,7 +800,7 @@ mod_home_ui <- function(id) {
         style = "background-color: #fff9c4; border-left: 4px solid #fbc02d;",
         tags$h5(
           style = "margin-top: 0;",
-          "💡 Quick Tips"
+          "Quick Tips"
         ),
         tags$ul(
           tags$li(
@@ -556,8 +837,10 @@ mod_home_ui <- function(id) {
           "Package: musicAnalysis | License: MIT"
         )
       )
-    )
-  )
+        )  # Close column
+      )  # Close fluidRow
+    )  # Close fluidPage
+  )  # Close tagList
 }
 
 mod_home_server <- function(id, parent_session = NULL) {

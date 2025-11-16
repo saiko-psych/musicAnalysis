@@ -3,7 +3,222 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9034 (2025-11-14)
+## Current Version: v0.0.0.9058 (2025-11-16)
+
+### v0.0.0.9058 (2025-11-16)
+- **IMPROVED: ASCII art display** - now in wellPanel with transparent background (music sheet visible through it)
+- **IMPROVED: Link visibility** - all links now underlined for better clickability (except navbar and buttons)
+- **FIXED: Color consistency** - replaced turquoise colors (#3498db, #27ae60) with vintage brown theme (#8B7355, #6B5D52)
+- **POLISHED: Version info styling** - version and build date now use brown colors matching vintage theme
+- **FIXED: CSS parsing error** - changed "they're" to "they are" in CSS comment to avoid R parse error
+- **VERIFIED: Contact menu** - already correctly positioned in navbar on right side (not at bottom)
+- Attribution footer at bottom is just music sheet license information (stays as intended)
+
+### v0.0.0.9057 (2025-11-16)
+- **COMPLETED: Emoji removal** - ALL emojis removed from entire app (48 total across all modules)
+- **REPLACED: Modal titles** - now use `tagList(icon("file-code"), " R Code for...")` pattern
+- **REMOVED: Emojis from headers** - section headers, tips, status messages now plain text
+- **REMOVED: Emojis from notifications** - checkmarks and warnings replaced with plain text
+- **FIXED: Button sizing** - removed all btn-lg classes (buttons were too large)
+- **FIXED: Button width** - removed btn-block from multi-column layouts (shouldn't fill width)
+- **KEPT: Sidebar buttons** - btn-block preserved in narrow wellPanel sidebars (correct usage)
+- **FIXED: Duplicate icons** - corrected PPPT buttons with duplicate icon parameters
+- **ADDED: Missing icons** - search, play, exclamation-triangle icons to buttons
+- **VERIFIED: All Show R Code buttons work** - template shown when no folder/file selected
+- App now 100% emoji-free with properly sized buttons that don't force full-width
+
+### v0.0.0.9056 (2025-11-15)
+- **COMPLETED: All emojis replaced** - Python script replaced button emojis with icon parameters
+- **FIXED: KLAWA Show R Code** - now works without folder selection (shows template)
+- Modal titles converted to tagList with icons
+
+### v0.0.0.9055 (2025-11-15)
+- **FIXED: Button sizes** - removed !important flags that made all buttons way too big
+- **IMPROVED: Data table readability** - increased opacity from 75% to 95-98% (much easier to read)
+- **IMPROVED: ASCII art banner** - transparent background now shows music sheet through it
+- **VISUAL: Much better appearance** - buttons normal size, data readable, background visible
+- Still TODO: Replace emojis with Font Awesome icons, standardize Show R Code buttons
+
+### v0.0.0.9054 (2025-11-15)
+- **IMPROVED: Navbar text size** - brand: 16px (was 14px), links: 14px (was 13px)
+- **IMPROVED: Contact menu on right** - moved Contact dropdown to right side of navbar
+- **FIXED: PPPT Show R Code button** - added Show R Code button next to scan button (was missing)
+- **IMPROVED: Consistent button layouts** - all scan buttons use 8-4 column split (scan/code)
+- KLAWA: Scan + Show R Code side by side
+- AAT: Scan + Show R Code in 8-4 layout
+- Musical Experience: Parse + Show R Code in 6-6 layout
+- PPPT: Now has Scan + Show R Code in 8-4 layout (NEW!)
+- All Show R Code buttons open modals with copy/download functionality
+
+### v0.0.0.9053 (2025-11-15)
+- **FIXED: Navbar ACTUALLY compact now!** - Found and fixed the real root cause
+- **ROOT CAUSE IDENTIFIED**: `.container-fluid { min-height: 100vh }` was applying to navbar's container-fluid
+- **SOLUTION**: Changed CSS selector to `body > .container-fluid` to target only main content container
+- **ADDITIONAL FIX**: Added `.navbar .container-fluid { min-height: auto !important; padding: 0 !important; }`
+- Navbar now displays at proper compact height without the massive vertical space
+- User correctly identified that previous fix only made part transparent but didn't actually shrink it
+
+### v0.0.0.9052 (2025-11-15)
+- **FIXED: Navbar truly compact** - 40px height with max-height constraints
+- **FIXED: Button spacing** - controlled padding prevents overly wide buttons
+- **IMPROVED: Better CSS targeting** - added .navbar and .navbar-header rules
+- **IMPROVED: Navbar margins** - removed excessive margins from .navbar-nav
+- **TECHNICAL: Added max-height** to both .navbar-default and .navbar-header
+- All button sizes (.btn, .btn-lg, .btn-sm) now have explicit padding control
+
+### v0.0.0.9051 (2025-11-15)
+- **FIXED: Switched back to Bootstrap 3** - Bootstrap 5 navbar structure incompatible with Shiny navbarPage
+- **FIXED: Properly compact navbar** - using Bootstrap 3 classes with !important flags
+- Navbar: 35px height, 15px/13px fonts, 7px padding, explicit line-height 21px
+- All styling now works correctly with Bootstrap 3 theme
+
+### v0.0.0.9050 (2025-11-15)
+- **FIXED: Bootstrap 5 navbar CSS** - correctly targets .navbar, .nav-link classes instead of Bootstrap 3 classes
+- **FIXED: Navbar now actually compact** - previous version used BS3 classes that didn't apply to BS5
+- **CONFIRMED: All styling restored** - background image, attribution footer, spacing all working
+- Navbar uses correct Bootstrap 5 CSS custom properties (--bs-navbar-padding-y)
+- Navbar height: 35px, fonts: 0.9rem/0.8rem, padding: 0.2rem
+
+### v0.0.0.9049 (2025-11-14)
+- **NEW: Show R Code buttons** - added to KLAWA, AAT, and Musical Experience scanning
+- **NEW: R code modals** - with copy to clipboard and download .R file functionality
+- **IMPROVED: Even more compact navbar** - reduced from 40px to 35px height
+- **IMPROVED: Smaller navbar fonts** - brand: 15px (was 16px), links: 13px (was 14px)
+- **IMPROVED: Reduced navbar padding** - 7px (was 10px) for tighter appearance
+- Closes GitHub Issue #16 (R code generation for all modules)
+
+### v0.0.0.9048 (2025-11-14)
+- **IMPROVED: Compact navbar** - reduced height from default to 40px
+- **IMPROVED: Darker navbar text** - changed from light cream (#F5E6D3) to dark brown (#2c1810, #3d2817) for better readability
+- **IMPROVED: Home page layout** - centered content in 10-column width with visible background on left and right sides
+- **IMPROVED: Navbar font sizes** - brand: 16px, links: 14px, reduced padding to 10px for compact appearance
+
+### v0.0.0.9047 (2025-11-14)
+- **IMPROVED: Background image much more visible** (transparency reduced from 92% to 75%)
+- **IMPROVED: Removed icons from navbar tabs** (kept only GitHub/Email icons in Contact menu)
+- **IMPROVED: All panels now have vintage sepia theme colors** matching the sheet music
+- **IMPROVED: ASCII art banner with darker vintage brown tone** (#3d3226)
+- **IMPROVED: Consistent vintage borders** on all wellPanels (#8B7355, #6B5D52)
+- **FIXED: Navbar styling simplified** and cleaned up
+
+### v0.0.0.9046 (2025-11-14)
+- **NEW: Music sheet background image across all pages**
+- Added vintage sheet music background (music_sheet.jpg) with proper CC BY 2.0 attribution
+- Attribution footer with link to Boston Public Library source on Flickr
+- Navbar colors updated to vintage sepia tones (#8B7355, #6B5D52) matching the sheet music
+- Background is fixed attachment with semi-transparent white overlay for readability
+- Contact menu moved to right side of navbar (no address-book icon, just "Contact" text)
+- Removed extra icons from Contact dropdown (kept only GitHub and Email icons)
+
+### v0.0.0.9045 (2025-11-14)
+- **NEW: Font Awesome icons in navbar**
+- Added real icons (not emojis) for all tabs: Home, KLAWA, Musical Experience, AAT, PPPT, Merge
+- Musical notes background in navbar with gradient (purple/blue)
+- Contact menu in navbar with GitHub and Email links
+- Improved spacing between all sections throughout the app (30px margin-bottom)
+- Better spacing in forms and panels
+- Reverted ASCII art banner (kept as requested)
+- Navbar now has musical note decorations in background
+
+### v0.0.0.9044 (2025-11-14)
+- **ATTEMPT: Modern UI redesign (reverted per user request)**
+- Created GitHub issue #16 for R code generation across all modules
+- All PPPT features confirmed working (grouping variable selector already implemented)
+
+### v0.0.0.9043 (2025-11-14)
+- **FIXED: R code generation now properly escapes Windows paths**
+- Added `escape_for_r()` helper function to handle path escaping
+- Windows paths now use double backslashes (e.g., `C:\\Users\\David\\...`)
+- Regex patterns now properly escaped (e.g., `\\d{4}` instead of `\d{4}`)
+- Generated R code is now directly executable without modification
+- Cross-platform compatible: works on Windows, Mac, and Linux
+- Updated both "Show R Code" and "Download R Code" sections
+
+### v0.0.0.9042 (2025-11-14)
+- **CRITICAL FIX: 95% Confidence Interval now works correctly**
+- Fixed `.calculate_error()` function to use `ifelse()` instead of `if` for vectorization
+- The `if (n > 30)` statement was causing "condition has length > 1" error
+- CI95 now calculates correctly using t-distribution: `t_val * SD / sqrt(n)`
+- All error bar types (SE, SD, CI95) now work properly in all plot types
+- Overall PPP index markers now automatically match line colors via `legendgroup` in overlaid plots
+- Fixed vectorization to handle multiple data points simultaneously
+
+### v0.0.0.9041 (2025-11-14)
+- **FIXED: Error bars now calculate correctly (were showing ±0)**
+- Fixed error bar calculation to properly compute SE, SD, and CI95
+- Changed from hardcoded `se` column to dynamic `error` column based on user selection
+- Added UI selector for error bar type with 4 options: SE, SD, 95% CI, or None
+- Added helpful descriptions for each error bar type in UI
+- Standard Error: SE = SD/√n
+- Standard Deviation: SD (spread of data)
+- 95% Confidence Interval: uses t-distribution for accurate intervals
+- Error bars now display correctly in all mean/summary plots
+- Updated hover templates to show error type in parentheses
+- R code generation includes error_type parameter
+
+### v0.0.0.9040 (2025-11-14)
+- **FIXED: PPPT group summary plot now works correctly**
+- Fixed rendering of group_summary plot type in Shiny UI
+- Added error bars to overall PPP index markers in overlaid plots
+- Error bars now display properly for both frequency bands and overall index
+- Improved conditional panel logic for color_by selector (includes group_summary)
+- Fixed group_summary to render as single plot instead of multiple plots
+- Enhanced error bar implementation in `.create_overlaid_profile_plot()`
+- All plot types now properly display error bars when applicable
+
+### v0.0.0.9039 (2025-11-14)
+- **ENHANCED: PPPT Visualization with flexible grouping and error bars**
+- Added selectable grouping variable from data columns (not hardcoded to "group")
+- Added "Group summary" plot type showing mean line per group with error bars
+- Added error bars (±SE) to all mean/summary plots (all_combined and group_summary)
+- Increased overall PPP index symbol size from 10 to 14 for better visibility
+- Error bars shown for both frequency bands and overall index
+- Dynamic group variable selector that excludes PPP index columns
+- Updated R code generation to include group_var parameter
+- Improved plot customization and flexibility
+
+### v0.0.0.9038 (2025-11-14)
+- **FIXED: PPPT Visualization UI - buttons and plots now visible**
+- Removed outer conditional panel that was hiding plot controls
+- Changed "Update Plot" button to "Generate Plot" for clarity
+- Removed emoji from "Show R Code" button text for consistency
+- Added helpful messages in plot area when no data or plot generated
+- Improved user experience to match musical experience module style
+
+### v0.0.0.9037 (2025-11-14)
+- **FIXED: PPPT Visualization tab data recognition**
+- Fixed conditional panel to properly recognize scanned data from Data Scanning tab
+- Added CSV upload option for visualization with format validation
+- Added data source selector (scanned vs uploaded)
+- Added real-time data validation and status display
+- Updated R code generation to handle both scanned and uploaded data sources
+- Improved reactive data flow between tabs
+
+### v0.0.0.9036 (2025-11-14)
+- **NEW: PPPT Frequency Profile Visualization**
+- Added `pppt_plot_profile()` function for creating interactive PPPT profile plots
+- Frequency bands (294, 523, 932, 1661, 2960, 5274 Hz) shown as connected lines
+- Overall PPP index shown as separate diamond marker (not connected)
+- Four plot types: all_combined (mean), all_overlaid, individual, by_group
+- Color-by options: participant, group, or custom color
+- Added visualization tab in PPPT Shiny module with:
+  - Plot type selector
+  - Color and legend controls
+  - Update Plot button
+  - Download Plot (HTML) button
+  - Show R Code button for reproducibility
+  - Download Code (.R) button
+- Helper functions: `.pppt_to_long()`, `.create_single_profile_plot()`, `.create_overlaid_profile_plot()`
+
+### v0.0.0.9035 (2025-11-14)
+- **IMPROVED: PPPT Scanner with comprehensive enhancements**
+- Added row display selector (10, 25, 50, 100, All)
+- Enhanced folder structure analysis showing 4 file type counts
+- Added duplicate detection and removal with reporting
+- Improved code extraction with fallback strategies
+- Added optional group extraction from folder paths
+- Created `pppt_validate()` function for data quality checks
+- Complete Shiny UI overhaul with validation results
 
 ### v0.0.0.9034 (2025-11-14)
 - **IMPROVED: PPPT Shiny module UI enhancements**

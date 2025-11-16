@@ -38,7 +38,16 @@ mod_mexp_ui <- function(id) {
 
     fileInput(ns("csv"), "CSV file", accept = c(".csv", "text/csv")),
     checkboxInput(ns("instrument_checks"), "Enable instrument checks", value = TRUE),
-    actionButton(ns("parse"), "Parse CSV"),
+    fluidRow(
+      column(
+        width = 6,
+        actionButton(ns("parse"), "Parse CSV", icon = icon("play"), class = "btn-primary")
+      ),
+      column(
+        width = 6,
+        actionButton(ns("show_r_code"), "Show R Code", icon = icon("file-code"), class = "btn-info")
+      )
+    ),
     br(), br(),
     tabsetPanel(
       tabPanel("Wide", DTOutput(ns("wide_tbl"))),
@@ -260,6 +269,111 @@ mod_mexp_server <- function(id) {
         }
       })
     })
+
+    # --- Show R Code ----------------------------------------------------------
+    observeEvent(input$show_r_code, {
+      csv_file <- input$csv
+
+      # Show template code if no file selected, otherwise show generic template
+      # (MEXP uses uploaded files, so we always show template with placeholder path)
+      r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Parse Musical Experience CSV
+# Replace "path/to/your/file.csv" with your actual file path
+mexp_data <- musical_experience_time(
+  file = "path/to/your/file.csv",
+  check_instruments = TRUE  # Set to FALSE to disable instrument validation
+)
+
+# Access the different components:
+# - Wide format (one row per participant)
+wide_data <- mexp_data$wide
+View(wide_data)
+
+# - Long format (one row per instrument/activity)
+long_data <- mexp_data$long
+View(long_data)
+
+# - Flags (problematic entries for review)
+flags_data <- mexp_data$flags
+View(flags_data)
+
+# Save to CSV
+write.csv(wide_data, "musical_experience_wide.csv", row.names = FALSE)
+write.csv(long_data, "musical_experience_long.csv", row.names = FALSE)
+write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
+
+      showModal(modalDialog(
+        title = tagList(icon("file-code"), " R Code for Musical Experience Parsing"),
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(ns("copy_code"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
+          modalButton("Close")
+        ),
+        tags$div(
+          tags$p("Use this R code to parse Musical Experience data outside of the Shiny app:"),
+          tags$pre(
+            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
+            tags$code(r_code)
+          ),
+          tags$div(
+            id = ns("copy_notification"),
+            style = "display: none; color: #28a745; margin-top: 10px;",
+            "Code copied to clipboard!"
+          )
+        ),
+        tags$script(HTML(sprintf('
+          $("#%s").click(function() {
+            var code = $(this).closest(".modal-content").find("code").text();
+            navigator.clipboard.writeText(code).then(function() {
+              $("#%s").show().delay(2000).fadeOut();
+            });
+          });
+        ', ns("copy_code"), ns("copy_notification"))))
+      ))
+    })
+
+    output$download_r_code <- downloadHandler(
+      filename = function() {
+        paste0("musical_experience_parse_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+      },
+      content = function(file) {
+        r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Parse Musical Experience CSV
+# Replace "path/to/your/file.csv" with your actual file path
+mexp_data <- musical_experience_time(
+  file = "path/to/your/file.csv",
+  check_instruments = TRUE  # Set to FALSE to disable instrument validation
+)
+
+# Access the different components:
+# - Wide format (one row per participant)
+wide_data <- mexp_data$wide
+View(wide_data)
+
+# - Long format (one row per instrument/activity)
+long_data <- mexp_data$long
+View(long_data)
+
+# - Flags (problematic entries for review)
+flags_data <- mexp_data$flags
+View(flags_data)
+
+# Save to CSV
+write.csv(wide_data, "musical_experience_wide.csv", row.names = FALSE)
+write.csv(long_data, "musical_experience_long.csv", row.names = FALSE)
+write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
+
+        writeLines(r_code, file)
+      }
+    )
 
     # Dynamically update category IDs based on parsed data (simplified - no instrument names)
     observe({
