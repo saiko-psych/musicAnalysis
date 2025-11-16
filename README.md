@@ -6,7 +6,7 @@ An R package for automated data extraction and preparation from music psychology
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.4.0-blue.svg)](https://www.r-project.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.0.0.9061-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
+[![Version](https://img.shields.io/badge/version-0.0.0.9062-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
 
 ---
 
@@ -91,7 +91,7 @@ devtools::install_github("saiko-psych/musicAnalysis")
 ```r
 # Download the latest release tarball
 # Then install locally:
-install.packages("path/to/musicAnalysis_0.0.0.9061.tar.gz",
+install.packages("path/to/musicAnalysis_0.0.0.9062.tar.gz",
                  repos = NULL, type = "source")
 ```
 
@@ -187,25 +187,30 @@ data/KLAWA/
 
 **Time format support**: `2d`, `1.5w`, `1/2w`, `3m`, `2y` (days, weeks, months, years)
 
-### 3. AAT Data *(Work in Progress - Not Production Ready)*
-
-⚠️ **Status**: The AAT (Auditory Ambiguity Test) module is under active development. Basic functionality exists but is still being validated with real data. Use with caution and manually verify all extracted values.
+### 3. AAT (Auditory Ambiguity Test)
 
 **Expected files**:
 - `.rsl.csv` files: Computed results with ambiguous % and control %
 - `.itl.csv` files: Raw response data with pitch classifications
 
 **Extracted metrics**:
-- Ambiguous %: Percentage of f0-responses in ambiguous items
-- Control %: Percentage correct in control items
-- Quality metrics: Ambivalent responses, "don't know" responses
+- **Ambiguous %**: Percentage of f0-responses in ambiguous items
+- **Control %**: Percentage correct in control items
+- **Quality metrics**: Ambivalent responses, "don't know" responses
 
-**Known limitations**:
-- Two different .rsl formats exist (summary vs item-level); only summary format fully supported
-- .itl files require manual specification of which items are ambiguous vs control
-- File format detection is still being refined
+**Shiny module**: `inst/shiny/modules/mod_aat.R` provides GUI interface with folder scanning, data editing, and CSV export
 
-### 4. PPPT Data *(Coming Soon)*
+### 4. PPPT (Pitch Perception Proficiency Test)
+
+**Expected files**:
+- `.rsl.csv` files containing PPP indices across UCF frequency bands
+
+**Extracted metrics**:
+- **PPP indices** for UCF bands: 294 Hz, 523 Hz, 932 Hz, 1661 Hz, 2960 Hz, 5274 Hz
+- **Overall PPP index** across all frequencies
+- **Date extraction** from filenames (configurable format)
+
+**Shiny module**: `inst/shiny/modules/mod_pppt.R` provides complete GUI with plotting, editing, and export features
 
 ---
 
@@ -377,6 +382,24 @@ launch_app()
 - 📊 Context-aware participant selection (top N, bottom N)
 - 💾 Download plots as HTML
 - 📋 Data table view with summary statistics
+- 📝 Show R Code button with copy/download functionality
+
+**AAT Tab**:
+- 📁 Interactive folder browser for AAT data
+- 🔍 Automatic detection of .rsl.csv and .itl.csv files
+- ⚙️ Date format configuration
+- ✏️ Editable data table
+- 💾 CSV export with modifications
+- 📝 Show R Code for reproducible analysis
+
+**PPPT Tab**:
+- 📁 Folder scanning for PPPT .rsl.csv files
+- 📊 PPP profile plots across UCF frequency bands
+- 🎨 Individual and overlaid profile visualizations
+- ⚙️ Date format configuration
+- ✏️ Editable data table
+- 💾 CSV export
+- 📝 Show R Code button
 
 **Merge Tab**:
 - 🔗 Merge multiple datasets by participant code
@@ -402,14 +425,18 @@ musicAnalysis/
 │
 ├── inst/shiny/                # Shiny application
 │   ├── app.R
+│   ├── www/                   # Static assets (music sheet background)
 │   └── modules/
 │       ├── mod_home.R
 │       ├── mod_klawa.R
 │       ├── mod_mexp.R
+│       ├── mod_aat.R
+│       ├── mod_pppt.R
 │       └── mod_merge.R
 │
-├── tests/testthat/            # Unit tests (108 tests)
+├── tests/testthat/            # Unit tests (139 tests)
 │   ├── test-klawa.R
+│   ├── test-aat.R
 │   ├── test-merge.R
 │   └── test-utils.R
 │
@@ -426,7 +453,7 @@ musicAnalysis/
 devtools::load_all()
 
 # Run tests
-devtools::test()  # Currently 108 tests, all passing
+devtools::test()  # Currently 139 tests: 60 KLAWA, 31 AAT, 20 merge, 28 utils
 
 # Update documentation
 devtools::document()
@@ -489,50 +516,60 @@ set_ma_options(thresholds = list(
 
 ## 📋 Version History
 
-### v0.0.0.9026 (2025-11-06) - Latest
-- ✅ Fixed AAT .rsl parsing to extract from "Type of Pair" + "AAT Score [%]" columns
-- ✅ Fixed AAT .itl parsing to handle column names with suffixes
-- ✅ Added detection for two .rsl formats: summary vs item-level
-- ✅ Added AAT module description panel on home page
-- ✅ Added WIP warning to AAT module
-- ⚠️ **AAT module is not yet production-ready**
+### v0.0.0.9062 (2025-11-16) - Latest
+- ✅ **HOTFIX**: ASCII art background now properly transparent
+- ✅ Enhanced CSS specificity to override Bootstrap 3 defaults
+- ✅ Music sheet background fully visible behind ASCII art banner
+- ✅ All feature branches merged and deleted - only master branch remains
 
-### v0.0.0.9025 (2025-11-06)
-- ✅ AAT module refinements: filename filtering, file type detection
-- ✅ Metadata extraction from filenames (code and date)
-- ✅ Date format selector in AAT Shiny interface
+### v0.0.0.9061 (2025-11-16)
+- ✅ Attempted ASCII background transparency fix
+- ✅ CSS selector improvements
 
-### v0.0.0.9024 (2025-11-06)
-- ✅ NEW: AAT (Auditory Ambiguity Test) module implemented (WIP)
-- ✅ Complete AAT analysis workflow with tests
-- ✅ AAT Shiny interface with quality detection
+### v0.0.0.9060 (2025-11-16)
+- ✅ All links underlined for better visibility
+- ✅ Turquoise colors replaced with vintage brown theme (#8B7355)
+- ✅ Summary elements ("Advanced Settings") now bold, underlined, clickable
+- ✅ Version info styling matches brown theme
 
-### v0.0.0.9023 (2025-11-06)
-- ✅ Fixed category_sum plot labels and colors
-- ✅ Each participant gets unique color
-- ✅ Proper label format: "CODE - total Category"
+### v0.0.0.9058-9059 (2025-11-16)
+- ✅ UI polish: emoji removal, button sizing, navbar fixes
+- ✅ Font Awesome icons replace all emojis
+- ✅ Compact navbar (40px height)
+
+### v0.0.0.9034 (2025-11-14)
+- ✅ PPPT Shiny module enhancements
+- ✅ Show R Code buttons with download capability
+- ✅ Enhanced data table editing
 
 ### Earlier Versions
-See `inst/shiny/modules/mod_home.R` or `docs/CLAUDE.md` for complete version history.
+See `.claude/memory/VERSION_HISTORY.md` for complete version history.
 
 ---
 
 ## 🎯 Roadmap
 
 ### High Priority
-1. **Fix top_N and bottom_N participant selection** - Make context-aware based on plot type
-2. **KLAWA flexible folder structure** - Guided setup for non-standard structures
-3. **Variable organization** - Logical sorting in wide and long formats
-4. **Variable name cleaning** - Remove brackets and special characters
-5. **Variable labels** - Descriptive labels for all variables
+1. **KLAWA flexible folder structure** - Guided setup for non-standard structures
+2. **Musical Experience variable organization** - Logical sorting in wide/long formats
+3. **Variable name cleaning** - Remove brackets `[]` and special characters
+4. **Variable labels** - Descriptive labels for all variables
+5. **Plot grouping** - Allow grouping by variables in visualizations
 
 ### Medium Priority
-- **Descriptive statistics table** - Summary stats with grouping options
-- **Show R code buttons** - Display reproducible code for operations
-- **PPPT data parser** - New data source
-- **AAT data parser** - New data source
+- **Descriptive statistics table** - Summary stats for Musical Experience
+- **Version timestamps** - Show date/time for each version
+- **Fix top_N/bottom_N selection** - Context-aware based on plot_type
+- **Additional useful variables** - Expand Musical Experience metrics
 
-See `docs/CLAUDE.md` for complete roadmap.
+### Completed
+- ✅ AAT module with complete workflow
+- ✅ PPPT module with profile plots
+- ✅ Show R Code buttons across all modules
+- ✅ Transparent ASCII art background
+- ✅ Brown vintage theme throughout app
+
+See `CLAUDE.md` for detailed development guidelines.
 
 ---
 
@@ -610,5 +647,5 @@ For questions, issues, or feature requests:
 ---
 
 **Last Updated**: 2025-11-16
-**Version**: 0.0.0.9061
+**Version**: 0.0.0.9062
 **Status**: Active Development 🚧
