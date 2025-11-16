@@ -117,18 +117,22 @@ ui <- tagList(
         line-height: 18px !important;
       }
 
-      /* CRITICAL FIX: Remove ALL default wellPanel backgrounds first */
+      /* Default wellPanel styling - remove Bootstrap defaults */
       .well {
-        background-color: transparent !important;
         background-image: none !important;
         box-shadow: none !important;
         border: 1px solid rgba(139, 115, 85, 0.3);
         margin-bottom: 25px !important;
       }
 
-      /* THEN apply vintage background ONLY to wellPanels that DO NOT have explicit transparent style */
+      /* Apply vintage background to wellPanels that DO NOT have explicit transparent style */
       .well:not([style*="transparent"]) {
         background-color: rgba(250, 245, 235, 0.95) !important;
+      }
+
+      /* Ensure transparent wellPanels stay transparent */
+      .well[style*="transparent"] {
+        background-color: transparent !important;
       }
 
       .panel, .info-card {

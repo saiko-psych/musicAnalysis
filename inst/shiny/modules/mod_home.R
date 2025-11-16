@@ -73,24 +73,16 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9058 (2025-11-16)"),
+        h4("What's New in v0.0.0.9061 (2025-11-16)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "ASCII art now displays with transparent background - music sheet visible"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "All links now underlined for better visibility"
-          ),
-          tags$li(
             tags$strong("FIXED: "),
-            "Color consistency - replaced turquoise with vintage brown theme colors"
+            "ASCII art background now properly transparent - music sheet fully visible"
           ),
           tags$li(
-            tags$strong("POLISHED: "),
-            "Version info and build date now match vintage brown theme"
+            tags$strong("IMPROVED: "),
+            "CSS specificity fixed to ensure transparent backgrounds work correctly"
           )
         )
       ),
@@ -105,6 +97,19 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9060
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9060 (2025-11-16)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " ASCII art transparent background attempt"),
+                tags$li(tags$strong("IMPROVED:"), " All links underlined for better visibility"),
+                tags$li(tags$strong("FIXED:"), " Turquoise colors replaced with vintage brown theme"),
+                tags$li(tags$strong("POLISHED:"), " Version info styling matches brown theme")
+              )
+            ),
 
             # v0.0.0.9057
             tags$div(
