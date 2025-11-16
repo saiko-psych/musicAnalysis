@@ -274,8 +274,9 @@ mod_mexp_server <- function(id) {
     # --- Show R Code ----------------------------------------------------------
     observeEvent(input$show_r_code, {
       csv_file <- input$csv
-      req(csv_file)
 
+      # Show template code if no file selected, otherwise show generic template
+      # (MEXP uses uploaded files, so we always show template with placeholder path)
       r_code <- '# Load the musicAnalysis package
 library(musicAnalysis)
 
@@ -305,7 +306,7 @@ write.csv(long_data, "musical_experience_long.csv", row.names = FALSE)
 write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
 
       showModal(modalDialog(
-        title = "📜 R Code for Musical Experience Parsing",
+        title = tagList(icon("file-code"), " R Code for Musical Experience Parsing"),
         size = "l",
         easyClose = TRUE,
         footer = tagList(
@@ -324,7 +325,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
           tags$div(
             id = ns("copy_notification"),
             style = "display: none; color: #28a745; margin-top: 10px;",
-            "✓ Code copied to clipboard!"
+            "Code copied to clipboard!"
           )
         ),
         tags$script(HTML(sprintf('

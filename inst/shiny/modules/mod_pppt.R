@@ -19,7 +19,7 @@ mod_pppt_ui <- function(id) {
     # Help/Instructions Panel
     wellPanel(
       style = "background-color: #f8f9fa;",
-      h4("🎵 How PPPT Scanning Works"),
+      h4("How PPPT Scanning Works"),
       p("This tool extracts PPPT (Pitch Perception Proficiency Test) metrics from .rsl.csv files."),
       tags$ul(
         tags$li(tags$strong("PPP Index:"), " Pitch Perception Proficiency index for each UCF frequency"),
@@ -30,7 +30,7 @@ mod_pppt_ui <- function(id) {
       ),
       p(
         style = "margin-top: 10px; padding: 8px; background-color: #e8f5e9; border-left: 3px solid #4caf50;",
-        tags$strong("💡 Tip:"), " The scanner automatically detects PPPT files by their content (UCF column),",
+        tags$strong("Tip:"), " The scanner automatically detects PPPT files by their content (UCF column),",
         " even if the filename doesn't contain 'PPPT'!"
       )
     ),
@@ -80,7 +80,7 @@ mod_pppt_ui <- function(id) {
         br(), br(),
         actionButton(
           ns("analyze"),
-          "🔍 Analyze Folder Structure",
+          "Analyze Folder Structure",
           class = "btn-info btn-block"
         )
       )
@@ -213,7 +213,7 @@ mod_pppt_ui <- function(id) {
 
         wellPanel(
           style = "background-color: #f0f8ff;",
-          h4("📊 PPPT Profile Visualization"),
+          h4("PPPT Profile Visualization"),
           p("Visualize PPP indices across frequency bands. The frequencies are shown as connected lines, while the Overall index appears as a separate diamond marker."),
           tags$ul(
             tags$li("X-axis: PPP Index (-1 to 1)"),
@@ -464,7 +464,7 @@ mod_pppt_server <- function(id) {
 
       wellPanel(
         style = "background-color: #e7ffe7;",
-        h5("📊 Detected Folder Structure"),
+        h5("Detected Folder Structure"),
         tags$div(
           style = "padding: 10px;",
           tags$p(
@@ -527,7 +527,7 @@ mod_pppt_server <- function(id) {
         )
 
         output$scan_status <- renderText({
-          sprintf("✓ Successfully scanned %d PPPT file(s)\n\nValidation: %s",
+          sprintf("Successfully scanned %d PPPT file(s)\n\nValidation: %s",
                   nrow(result),
                   rv$validation_results$validation_summary)
         })
@@ -540,7 +540,7 @@ mod_pppt_server <- function(id) {
 
       }, error = function(e) {
         output$scan_status <- renderText({
-          paste("✗ Error:", e$message)
+          paste("Error:", e$message)
         })
         showNotification(
           paste("Error scanning files:", e$message),
@@ -561,13 +561,13 @@ mod_pppt_server <- function(id) {
         # Validation Results
         wellPanel(
           style = "background-color: #fff3e0;",
-          h5("✅ Validation Results"),
+          h5("Validation Results"),
           verbatimTextOutput(ns("validation_summary")),
           conditionalPanel(
             condition = sprintf("output['%s'] != null && output['%s'].length > 0",
                                 ns("validation_details"), ns("validation_details")),
             hr(),
-            h6("⚠️ Problematic Files:"),
+            h6("Problematic Files:"),
             verbatimTextOutput(ns("validation_details"))
           )
         ),
@@ -575,16 +575,16 @@ mod_pppt_server <- function(id) {
         # Summary statistics
         wellPanel(
           style = "background-color: #e3f2fd;",
-          h5("📊 Summary Statistics"),
+          h5("Summary Statistics"),
           htmlOutput(ns("summary_stats"))
         ),
 
         # Data table
         wellPanel(
-          h5("📄 PPPT Data"),
+          h5("PPPT Data"),
           p(
             style = "color: #666; font-size: 0.9em;",
-            tags$strong("💡 Tip:"), " Double-click any cell to edit its value.",
+            tags$strong("Tip:"), " Double-click any cell to edit its value.",
             " Your changes will be reflected in the downloaded CSV."
           ),
           fluidRow(
@@ -789,82 +789,28 @@ mod_pppt_server <- function(id) {
 
     # Show R Code modal (from scan button)
     observeEvent(input$show_r_code_scan, {
-      req(rv$root_path)
+      root_path <- rv$root_path
 
-      group_code <- if (input$extract_groups) {
-        sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
-                paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
-      } else {
-        ""
-      }
-
-      escaped_root <- escape_for_r(rv$root_path)
-      escaped_pattern <- escape_for_r(input$code_pattern)
-      escaped_date <- escape_for_r(input$date_format)
-
-      r_code <- sprintf('# Load the musicAnalysis package
+      # Show template if no folder selected, otherwise use actual path
+      if (is.null(root_path) || root_path == "") {
+        r_code <- '# Load the musicAnalysis package
 library(musicAnalysis)
 
 # Scan PPPT files
 pppt_data <- pppt_scan(
-  root = "%s",
-  code_pattern = "%s",
-  date_format = "%s",
-%s  remove_duplicates = %s
+  root = "path/to/your/PPPT/folder",
+  code_pattern = "\\\\d{4}[A-Za-z]{4}",  # 4 digits + 4 letters
+  date_format = "DDMMYY",  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+  extract_groups = FALSE,  # Set to TRUE to extract group information
+  remove_duplicates = TRUE
 )
 
 # View results
 View(pppt_data)
 
 # Save to CSV
-write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
-        escaped_root,
-        escaped_pattern,
-        escaped_date,
-        group_code,
-        input$remove_duplicates
-      )
-
-      showModal(modalDialog(
-        title = "📜 R Code for PPPT Scanning",
-        size = "l",
-        easyClose = TRUE,
-        footer = tagList(
-          actionButton(ns("copy_code_scan"), "Copy to Clipboard",
-      icon = icon("copy"), class = "btn-primary"),
-          downloadButton(ns("download_r_code_scan"), "Download .R File",
-      icon = icon("download"), class = "btn-success"),
-          modalButton("Close")
-        ),
-        tags$div(
-          tags$p("Use this R code to reproduce the PPPT scan outside of the Shiny app:"),
-          tags$pre(
-            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
-            tags$code(r_code)
-          ),
-          tags$div(
-            id = ns("copy_notification_scan"),
-            style = "display: none; color: #28a745; margin-top: 10px;",
-            "✓ Code copied to clipboard!"
-          )
-        ),
-        tags$script(HTML(sprintf('
-          $("#%s").click(function() {
-            var code = $(this).closest(".modal-content").find("code").text();
-            navigator.clipboard.writeText(code).then(function() {
-              $("#%s").show().delay(2000).fadeOut();
-            });
-          });
-        ', ns("copy_code_scan"), ns("copy_notification_scan"))))
-      ))
-    })
-
-    # Download R code from modal
-    output$download_r_code_scan <- downloadHandler(
-      filename = function() {
-        paste0("pppt_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
-      },
-      content = function(file) {
+write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)'
+      } else {
         group_code <- if (input$extract_groups) {
           sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
                   paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
@@ -872,7 +818,7 @@ write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
           ""
         }
 
-        escaped_root <- escape_for_r(rv$root_path)
+        escaped_root <- escape_for_r(root_path)
         escaped_pattern <- escape_for_r(input$code_pattern)
         escaped_date <- escape_for_r(input$date_format)
 
@@ -898,6 +844,103 @@ write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
           group_code,
           input$remove_duplicates
         )
+      }
+
+      showModal(modalDialog(
+        title = tagList(icon("file-code"), " R Code for PPPT Scanning"),
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton(ns("copy_code_scan"), "Copy to Clipboard",
+      icon = icon("copy"), class = "btn-primary"),
+          downloadButton(ns("download_r_code_scan"), "Download .R File",
+      icon = icon("download"), class = "btn-success"),
+          modalButton("Close")
+        ),
+        tags$div(
+          tags$p("Use this R code to reproduce the PPPT scan outside of the Shiny app:"),
+          tags$pre(
+            style = "background-color: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 400px;",
+            tags$code(r_code)
+          ),
+          tags$div(
+            id = ns("copy_notification_scan"),
+            style = "display: none; color: #28a745; margin-top: 10px;",
+            "Code copied to clipboard!"
+          )
+        ),
+        tags$script(HTML(sprintf('
+          $("#%s").click(function() {
+            var code = $(this).closest(".modal-content").find("code").text();
+            navigator.clipboard.writeText(code).then(function() {
+              $("#%s").show().delay(2000).fadeOut();
+            });
+          });
+        ', ns("copy_code_scan"), ns("copy_notification_scan"))))
+      ))
+    })
+
+    # Download R code from modal
+    output$download_r_code_scan <- downloadHandler(
+      filename = function() {
+        paste0("pppt_scan_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+      },
+      content = function(file) {
+        root_path <- rv$root_path
+
+        if (is.null(root_path) || root_path == "") {
+          r_code <- '# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "path/to/your/PPPT/folder",
+  code_pattern = "\\\\d{4}[A-Za-z]{4}",  # 4 digits + 4 letters
+  date_format = "DDMMYY",  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+  extract_groups = FALSE,  # Set to TRUE to extract group information
+  remove_duplicates = TRUE
+)
+
+# View results
+View(pppt_data)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)'
+        } else {
+          group_code <- if (input$extract_groups) {
+            sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                    paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+          } else {
+            ""
+          }
+
+          escaped_root <- escape_for_r(root_path)
+          escaped_pattern <- escape_for_r(input$code_pattern)
+          escaped_date <- escape_for_r(input$date_format)
+
+          r_code <- sprintf('# Load the musicAnalysis package
+library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "%s",
+  code_pattern = "%s",
+  date_format = "%s",
+%s  remove_duplicates = %s
+)
+
+# View results
+View(pppt_data)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
+            escaped_root,
+            escaped_pattern,
+            escaped_date,
+            group_code,
+            input$remove_duplicates
+          )
+        }
 
         writeLines(r_code, file)
       }
@@ -905,21 +948,48 @@ write.csv(pppt_data, "pppt_results.csv", row.names = FALSE)',
 
     # R Code output
     output$r_code <- renderText({
-      req(rv$root_path)
+      root_path <- rv$root_path
 
-      group_code <- if (input$extract_groups) {
-        sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
-                paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+      if (is.null(root_path) || root_path == "") {
+        code <- 'library(musicAnalysis)
+
+# Scan PPPT files
+pppt_data <- pppt_scan(
+  root = "path/to/your/PPPT/folder",
+  code_pattern = "\\\\d{4}[A-Za-z]{4}",
+  date_format = "DDMMYY",
+  extract_groups = FALSE,
+  remove_duplicates = TRUE
+)
+
+# View results
+View(pppt_data)
+
+# Validate results
+validation <- pppt_validate(
+  root = "path/to/your/PPPT/folder",
+  scanned_data = pppt_data,
+  code_pattern = "\\\\d{4}[A-Za-z]{4}"
+)
+print(validation$validation_summary)
+
+# Save to CSV
+write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
+'
       } else {
-        ""
-      }
+        group_code <- if (input$extract_groups) {
+          sprintf('  extract_groups = TRUE,\n  group_names = c(%s),\n',
+                  paste0('"', trimws(strsplit(input$group_names, ",")[[1]]), '"', collapse = ", "))
+        } else {
+          ""
+        }
 
-      # Escape paths and patterns for R code
-      escaped_root <- escape_for_r(rv$root_path)
-      escaped_pattern <- escape_for_r(input$code_pattern)
-      escaped_date <- escape_for_r(input$date_format)
+        # Escape paths and patterns for R code
+        escaped_root <- escape_for_r(root_path)
+        escaped_pattern <- escape_for_r(input$code_pattern)
+        escaped_date <- escape_for_r(input$date_format)
 
-      code <- sprintf('library(musicAnalysis)
+        code <- sprintf('library(musicAnalysis)
 
 # Scan PPPT files
 pppt_data <- pppt_scan(
@@ -943,14 +1013,15 @@ print(validation$validation_summary)
 # Save to CSV
 write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
 ',
-        escaped_root,
-        escaped_pattern,
-        escaped_date,
-        group_code,
-        input$remove_duplicates,
-        escaped_root,
-        escaped_pattern
-      )
+          escaped_root,
+          escaped_pattern,
+          escaped_date,
+          group_code,
+          input$remove_duplicates,
+          escaped_root,
+          escaped_pattern
+        )
+      }
 
       code
     })
@@ -1094,14 +1165,14 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
         if (source == "scanned") {
           tags$div(
             style = "padding: 10px; background-color: #fff3cd; border-radius: 4px; margin-top: 10px;",
-            tags$strong("⚠️ No data available"),
+            tags$strong("No data available"),
             tags$br(),
             "Please scan PPPT files in the 'Data Scanning' tab first."
           )
         } else {
           tags$div(
             style = "padding: 10px; background-color: #fff3cd; border-radius: 4px; margin-top: 10px;",
-            tags$strong("⚠️ No file uploaded"),
+            tags$strong("No file uploaded"),
             tags$br(),
             "Please upload a CSV file above."
           )
@@ -1109,7 +1180,7 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
       } else {
         tags$div(
           style = "padding: 10px; background-color: #d4edda; border-radius: 4px; margin-top: 10px;",
-          tags$strong("✓ Data ready for visualization"),
+          tags$strong("Data ready for visualization"),
           tags$br(),
           sprintf("%d participants, %d variables", nrow(data), ncol(data))
         )
@@ -1216,7 +1287,7 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
       if (is.null(data) || nrow(data) == 0) {
         return(wellPanel(
           style = "background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 20px;",
-          h5("⚠️ No Data Available"),
+          h5("No Data Available"),
           p("Please load data using one of the following methods:"),
           tags$ul(
             tags$li("Scan PPPT files in the 'Data Scanning' tab, OR"),
@@ -1229,7 +1300,7 @@ write.csv(pppt_data, "pppt_data.csv", row.names = FALSE)
       if (is.null(current_plot())) {
         return(wellPanel(
           style = "background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 20px;",
-          h5("📊 Ready to Visualize"),
+          h5("Ready to Visualize"),
           p(sprintf("Data loaded: %d participants", nrow(data))),
           p("Click the 'Generate Plot' button to create a visualization.")
         ))

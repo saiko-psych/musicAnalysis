@@ -10,11 +10,12 @@ mod_home_ui <- function(id) {
           width = 10,
           offset = 1,
 
+
+
       # ASCII Art Banner
-      wellPanel(
-        style = "background-color: transparent; color: #2c1810; font-family: monospace; padding: 20px; margin-bottom: 30px; border: 2px solid #8B7355; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);",
-        tags$pre(
-          style = "margin: 0; font-size: 14px; line-height: 1.2;",
+      p(
+        style = "font-size: 16px; line-height: 1.6;",
+
 "
                             ╔═══════════════════════════════════════════════════════════════════════╗
                             ║                                                                       ║
@@ -36,8 +37,7 @@ mod_home_ui <- function(id) {
                             ║                                                                       ║
                             ╚═══════════════════════════════════════════════════════════════════════╝
 "
-        )
-      ),
+        ),
 
       # Version Information
       wellPanel(
@@ -519,7 +519,7 @@ mod_home_ui <- function(id) {
               tags$details(
                 tags$summary(
                   style = "cursor: pointer; color: #757575; font-weight: bold;",
-                  "📋 Earlier Versions (v0.0.0.9005-9011)"
+                  "Earlier Versions (v0.0.0.9005-9011)"
                 ),
                 tags$ul(
                   style = "margin-top: 10px; line-height: 1.6; color: #666;",
@@ -558,7 +558,7 @@ mod_home_ui <- function(id) {
           style = "padding: 10px;",
           tags$h5(
             style = "margin-top: 0; color: #2e7d32;",
-            "🎵 KLAWA - Voice/Singing Performance Scanner ",
+            "KLAWA - Voice/Singing Performance Scanner ",
             tags$span(
               style = "font-size: 12px; color: #666; font-weight: normal;",
               "(Click to open)"
@@ -680,7 +680,7 @@ mod_home_ui <- function(id) {
           style = "padding: 10px;",
           tags$h5(
             style = "margin-top: 0; color: #3f51b5;",
-            "🎵 PPPT - Pitch Perception Proficiency Test ",
+            "PPPT - Pitch Perception Proficiency Test ",
             tags$span(
               style = "font-size: 12px; color: #666; font-weight: normal;",
               "(Click to open)"
@@ -758,7 +758,7 @@ mod_home_ui <- function(id) {
         style = "background-color: #fff9c4; border-left: 4px solid #fbc02d;",
         tags$h5(
           style = "margin-top: 0;",
-          "💡 Quick Tips"
+          "Quick Tips"
         ),
         tags$ul(
           tags$li(

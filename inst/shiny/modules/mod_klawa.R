@@ -76,7 +76,7 @@ mod_klawa_ui <- function(id) {
       condition = sprintf("output['%s'] != ''", ns("structure_summary")),
       wellPanel(
         style = "background-color: #e7ffe7;",
-        h5("📊 Detected Folder Structure"),
+        h5("Detected Folder Structure"),
         htmlOutput(ns("structure_summary")),
         hr(),
         tags$details(
@@ -94,7 +94,7 @@ mod_klawa_ui <- function(id) {
     wellPanel(
       style = "background-color: #f0f0f0;",
       tags$details(
-        tags$summary(tags$strong("⚙ Advanced Settings (click to expand)")),
+        tags$summary(tags$strong("Advanced Settings (click to expand)")),
         br(),
         fluidRow(
           column(
@@ -220,7 +220,7 @@ mod_klawa_ui <- function(id) {
     h4("5. Scanned Data"),
     tags$p(
       style = "color: #666; margin-bottom: 10px;",
-      tags$strong("💡 Tip:"), " Double-click any cell to edit its value. Edits are saved automatically and included in the CSV download."
+      tags$strong("Tip:"), " Double-click any cell to edit its value. Edits are saved automatically and included in the CSV download."
     ),
     DT::DTOutput(ns("tbl")),
 
@@ -385,7 +385,7 @@ mod_klawa_server <- function(id) {
 
           # Build summary HTML
           summary_html <- sprintf(
-            "<p><strong>📄 Total PDFs found:</strong> %d</p>",
+            "<p><strong>Total PDFs found:</strong> %d</p>",
             structure$n_pdfs
           )
 
@@ -428,7 +428,7 @@ mod_klawa_server <- function(id) {
           })
 
           showNotification(
-            "✓ Folder structure analyzed successfully!",
+            "Folder structure analyzed successfully!",
             type = "message",
             duration = 3
           )
@@ -530,7 +530,7 @@ mod_klawa_server <- function(id) {
           }
 
           showNotification(
-            sprintf("✓ Scan completed. %d files processed.", nrow(out)),
+            sprintf("Scan completed. %d files processed.", nrow(out)),
             type = "message",
             duration = 4
           )
@@ -596,7 +596,7 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
           tags$div(
             id = ns("copy_notification"),
             style = "display: none; color: #28a745; margin-top: 10px;",
-            "✓ Code copied to clipboard!"
+            "Code copied to clipboard!"
           )
         ),
         tags$script(HTML(sprintf('
@@ -693,7 +693,7 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
       if (!is.null(problems_detailed_rv()) && !inherits(problems_detailed_rv(), "try-error")) {
         wellPanel(
           style = "background-color: #f5f5f5; margin-top: 20px; padding: 20px;",
-          h4(style = "margin-top: 0; color: #333;", "📊 Data Quality Analysis"),
+          h4(style = "margin-top: 0; color: #333;", "Data Quality Analysis"),
           p(
             style = "color: #666; margin-bottom: 15px;",
             "Detailed breakdown of all detected issues. Click tabs to explore specific problem types."
