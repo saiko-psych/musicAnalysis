@@ -19,7 +19,8 @@
       "Bash(done)",
       "Bash(__NEW_LINE__ for file in inst/shiny/modules/mod_aat.R inst/shiny/modules/mod_mexp.R inst/shiny/modules/mod_pppt.R inst/shiny/modules/mod_home.R)",
       "Bash(git stash:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

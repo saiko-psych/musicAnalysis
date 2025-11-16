@@ -126,7 +126,7 @@ ui <- tagList(
         margin-bottom: 25px !important;
       }
 
-      /* THEN apply vintage background ONLY to wellPanels that DON'T have explicit transparent style */
+      /* THEN apply vintage background ONLY to wellPanels that DO NOT have explicit transparent style */
       .well:not([style*="transparent"]) {
         background-color: rgba(250, 245, 235, 0.95) !important;
       }
