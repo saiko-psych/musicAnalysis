@@ -169,6 +169,21 @@ ui <- tagList(
         margin-right: 6px;
       }
 
+      /* Underline all clickable links */
+      a {
+        text-decoration: underline !important;
+      }
+
+      /* Except navbar links */
+      .navbar a {
+        text-decoration: none !important;
+      }
+
+      /* And buttons styled as links */
+      .btn {
+        text-decoration: none !important;
+      }
+
       /* Attribution footer */
       .attribution {
         position: fixed;

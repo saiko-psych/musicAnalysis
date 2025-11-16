@@ -12,36 +12,38 @@ mod_home_ui <- function(id) {
 
 
 
-      # ASCII Art Banner
-      p(
-        style = "font-size: 16px; line-height: 1.6;",
-
+      # ASCII Art Banner with transparent background
+      wellPanel(
+        style = "background-color: transparent; color: #2c1810; font-family: monospace; padding: 20px; margin-bottom: 30px; border: 2px solid #8B7355; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);",
+        tags$pre(
+          style = "margin: 0; font-size: 14px; line-height: 1.2;",
 "
-                            ╔═══════════════════════════════════════════════════════════════════════╗
-                            ║                                                                       ║
-                            ║   ███╗   ███╗██╗   ██╗███████╗██╗ ██████╗                             ║
-                            ║   ████╗ ████║██║   ██║██╔════╝██║██╔════╝                             ║
-                            ║   ██╔████╔██║██║   ██║███████╗██║██║                                  ║
-                            ║   ██║╚██╔╝██║██║   ██║╚════██║██║██║                                  ║
-                            ║   ██║ ╚═╝ ██║╚██████╔╝███████║██║╚██████╗                             ║
-                            ║   ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝                             ║
-                            ║                                                                       ║
-                            ║            █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗ ║
-                            ║           ██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝ ║
-                            ║           ███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗ ║
-                            ║           ██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║ ║
-                            ║           ██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║ ║
-                            ║           ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝ ║
-                            ║                                                                       ║
-                            ║        Music Psychology Data Preparation for University of Graz       ║
-                            ║                                                                       ║
-                            ╚═══════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║   ███╗   ███╗██╗   ██╗███████╗██╗ ██████╗                             ║
+║   ████╗ ████║██║   ██║██╔════╝██║██╔════╝                             ║
+║   ██╔████╔██║██║   ██║███████╗██║██║                                  ║
+║   ██║╚██╔╝██║██║   ██║╚════██║██║██║                                  ║
+║   ██║ ╚═╝ ██║╚██████╔╝███████║██║╚██████╗                             ║
+║   ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝                             ║
+║                                                                       ║
+║            █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗ ║
+║           ██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝ ║
+║           ███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗ ║
+║           ██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║ ║
+║           ██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║ ║
+║           ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝ ║
+║                                                                       ║
+║        Music Psychology Data Preparation for University of Graz       ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
 "
-        ),
+        )
+      ),
 
       # Version Information
       wellPanel(
-        style = "background-color: #f8f9fa; border-left: 4px solid #3498db; margin-bottom: 30px;",
+        style = "background-color: #f8f9fa; border-left: 4px solid #8B7355; margin-bottom: 30px;",
         fluidRow(
           column(
             width = 6,
@@ -49,7 +51,7 @@ mod_home_ui <- function(id) {
               style = "font-size: 16px;",
               tags$strong("Package Version: "),
               tags$span(
-                style = "color: #3498db; font-family: monospace;",
+                style = "color: #6B5D52; font-family: monospace; font-weight: bold;",
                 as.character(utils::packageVersion("musicAnalysis"))
               )
             )
@@ -60,7 +62,7 @@ mod_home_ui <- function(id) {
               style = "font-size: 16px;",
               tags$strong("Build Date: "),
               tags$span(
-                style = "color: #27ae60; font-family: monospace;",
+                style = "color: #8B7355; font-family: monospace; font-weight: bold;",
                 "2025-11-16"
               )
             )
