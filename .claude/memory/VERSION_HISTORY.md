@@ -3,7 +3,63 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9058 (2025-11-16)
+## Current Version: v0.0.0.9070 (2025-11-19)
+
+### v0.0.0.9070 (2025-11-19)
+- **HOTFIX: Folder tree displays complete hierarchy** - tree rendering completely rewritten to show ALL directory levels
+- **FIXED: Tree algorithm** - now extracts all directories in hierarchy including intermediate ones (R/aat.R:623-693)
+- **FIXED: Proper indentation** - tree connectors (├──, └──, │) work correctly at all levels
+- **VERIFIED: Multi-level test** - tested with tests/testdata_AAT_PPPT showing proper 3-level hierarchy
+- Apologies for v0.0.0.9069 breaking the tree - this version actually works!
+
+### v0.0.0.9069 (2025-11-19)
+- **ADDED: Configurable quality thresholds** - Low Control Score (%) and High Ambiguous Count in Advanced Settings
+- **FIXED: Terminology** - changed "ambivalent" to "ambiguous" throughout AAT module UI
+- **ENHANCED: Dynamic quality descriptions** - tab descriptions update based on user-set threshold values
+- **IMPROVED: Consistent h5 subheadings** - Quality Report, Expected File Format, Detected Folder Structure
+- **BROKE: Folder tree** - tree rendering was completely broken (fixed in v0.0.0.9070)
+
+### v0.0.0.9068 (2025-11-19)
+- **ADDED: Remove Duplicates button** - AAT module can now filter duplicate participant codes
+- **ENHANCED: Folder tree shows file counts** - displays "(X AAT files)" per directory instead of individual filenames
+- **ADDED: Categorized quality report** - 5 tabs: Low Control Score, High Ambiguous, High Don't Know, Missing Date, Missing Code
+- **IMPROVED: Quality issue organization** - separate tabs for easier data quality assessment
+
+### v0.0.0.9067 (2025-11-19)
+- **ADDED: Folder tree** - AAT module now shows folder structure with file type counts
+- **ADDED: Row display selector** - all 13 data tables now have "Show X entries" dropdown
+- **IMPROVED: Table pagination** - consistent pageLength options across all modules (10/25/50/100/All)
+
+### v0.0.0.9066 (2025-11-19)
+- **ENHANCED: AAT file type selector** - choose which file types to scan
+- **ADDED: File type checkboxes** - real .rsl (summary), item-level .rsl, .itl files
+- **DEFAULT: Real .rsl only** - AAT now defaults to scanning only summary format files
+- **MATCHING: PPPT behavior** - AAT and PPPT now have consistent default scanning behavior
+
+### v0.0.0.9065 (2025-11-18)
+- **ADDED: Folder tree in AAT** - shows hierarchical structure of scanned directory
+- **ADDED: File type detection** - distinguishes between real .rsl, fake .rsl, and .itl files
+- **ENHANCED: Quality metrics** - better visibility of data quality issues
+
+### v0.0.0.9064 (2025-11-18)
+- **IMPROVED: PPPT quality checks** - more robust quality issue detection
+- **ENHANCED: AAT quality reporting** - clearer quality metrics display
+
+### v0.0.0.9063 (2025-11-17)
+- **ADDED: PPPT complete implementation** - Pitch Perception Proficiency Test module fully functional
+- **ADDED: PPP indices** - calculates PPP across 6 UCF frequency bands (294, 523, 932, 1661, 2960, 5274 Hz)
+- **ADDED: Overall PPP index** - aggregated metric across all frequency bands
+
+### v0.0.0.9062 (2025-11-16)
+- **HOTFIX: ASCII art background ACTUALLY transparent** - CSS specificity fixed with !important
+- **FIXED: ASCII banner z-index** - proper layering to show music sheet background through transparent areas
+- **UPDATED: README** - comprehensive improvements and broken link fixes
+
+### v0.0.0.9061 (2025-11-16)
+- **DOCS: README improvements** - fixed section links and anonymized folder structure
+
+### v0.0.0.9060 (2025-11-16)
+- **WORKFLOW: Documentation updates** - improved workflow documentation
 
 ### v0.0.0.9058 (2025-11-16)
 - **IMPROVED: ASCII art display** - now in wellPanel with transparent background (music sheet visible through it)
