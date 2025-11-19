@@ -591,7 +591,7 @@ aat_analyze_structure <- function(root) {
 
 #' Generate folder tree structure
 #'
-#' Creates a visual tree representation of AAT files in a folder structure
+#' Creates a visual tree representation showing folder hierarchy with file counts
 #'
 #' @param root Root directory
 #' @param files Vector of file paths to include in tree
@@ -614,13 +614,11 @@ aat_analyze_structure <- function(root) {
   dirs <- dirs[dirs != "."]  # Remove root indicator
 
   if (length(dirs) == 0) {
-    # All files in root
-    for (i in seq_along(rel_paths)) {
-      prefix <- if (i == length(rel_paths)) "└── " else "├── "
-      tree_lines <- c(tree_lines, paste0(prefix, basename(rel_paths[i])))
-    }
+    # All files in root - show count instead of individual files
+    n_files <- length(rel_paths)
+    tree_lines <- c(tree_lines, paste0("└── (", n_files, " AAT file", ifelse(n_files != 1, "s", ""), ")"))
   } else {
-    # Files in subdirectories
+    # Files in subdirectories - show counts per directory
     # Sort directories for consistent output
     dirs <- sort(dirs)
 
@@ -628,20 +626,14 @@ aat_analyze_structure <- function(root) {
       dir_path <- dirs[dir_idx]
       is_last_dir <- (dir_idx == length(dirs))
 
-      # Add directory
+      # Count files in this directory
+      files_in_dir <- sum(dirname(rel_paths) == dir_path)
+
+      # Add directory with file count
       dir_parts <- fs::path_split(dir_path)[[1]]
       indent <- paste(rep("│   ", length(dir_parts) - 1), collapse = "")
       prefix <- if (is_last_dir) "└── " else "├── "
-      tree_lines <- c(tree_lines, paste0(indent, prefix, basename(dir_path), "/"))
-
-      # Add files in this directory
-      files_in_dir <- rel_paths[dirname(rel_paths) == dir_path]
-      for (file_idx in seq_along(files_in_dir)) {
-        is_last_file <- (file_idx == length(files_in_dir))
-        file_indent <- paste(rep("│   ", length(dir_parts)), collapse = "")
-        file_prefix <- if (is_last_file && is_last_dir) "    └── " else "    ├── "
-        tree_lines <- c(tree_lines, paste0(file_indent, file_prefix, basename(files_in_dir[file_idx])))
-      }
+      tree_lines <- c(tree_lines, paste0(indent, prefix, basename(dir_path), "/ (", files_in_dir, " AAT file", ifelse(files_in_dir != 1, "s", ""), ")"))
     }
   }
 

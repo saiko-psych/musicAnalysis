@@ -73,24 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9067 (2025-11-19)"),
+        h4("What's New in v0.0.0.9068 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("ADDED: "),
-            "Folder tree display in AAT structure analysis shows directory hierarchy"
+            "Remove Duplicates button in AAT module to filter duplicate participant codes"
           ),
           tags$li(
             tags$strong("ENHANCED: "),
-            "AAT structure analysis now counts file types: real .rsl, item-level .rsl, .itl"
+            "Folder tree shows file counts per directory (e.g., '20 AAT files') instead of individual filenames"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Row display selector for ALL data tables (10, 25, 50, 100, All)"
+            "Categorized quality report: Low Control Score, High Ambivalent, Missing Date/Code"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "13 data tables across all modules now support customizable row display"
+            "Quality issues split into 5 tabs for easier data quality assessment"
           )
         )
       ),
@@ -105,6 +105,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9067
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9067 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ADDED:"), " Folder tree + file type counts in AAT"),
+                tags$li(tags$strong("ADDED:"), " Row display selector for all 13 data tables"),
+                tags$li(tags$strong("IMPROVED:"), " Consistent table pagination across all modules")
+              )
+            ),
 
             # v0.0.0.9066
             tags$div(

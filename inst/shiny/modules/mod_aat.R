@@ -220,12 +220,21 @@ mod_aat_ui <- function(id) {
     h4("3. Start Scanning"),
     fluidRow(
       column(
-        width = 8,
+        width = 4,
         actionButton(
           ns("scan"),
           "Scan AAT Files",
           icon = icon("play"),
           class = "btn-success"
+        )
+      ),
+      column(
+        width = 4,
+        actionButton(
+          ns("remove_duplicates"),
+          "Remove Duplicates",
+          icon = icon("filter"),
+          class = "btn-warning"
         )
       ),
       column(
@@ -284,9 +293,42 @@ mod_aat_ui <- function(id) {
         # Quality Report
         h5("Quality Report"),
         tags$details(
-          tags$summary(tags$strong("Participants with Quality Issues (click to expand)")),
+          tags$summary(tags$strong("Data Quality Issues by Category (click to expand)")),
           br(),
-          DT::DTOutput(ns("quality_issues_table"))
+          tabsetPanel(
+            id = ns("quality_tabs"),
+            type = "tabs",
+            tabPanel(
+              "Low Control Score",
+              br(),
+              p("Participants with control score < 80%"),
+              DT::DTOutput(ns("quality_low_control"))
+            ),
+            tabPanel(
+              "High Ambivalent",
+              br(),
+              p("Participants with > 5 ambivalent responses"),
+              DT::DTOutput(ns("quality_high_ambivalent"))
+            ),
+            tabPanel(
+              "High Don't Know",
+              br(),
+              p("Participants with > 3 'don't know' responses"),
+              DT::DTOutput(ns("quality_high_dontknow"))
+            ),
+            tabPanel(
+              "Missing Date",
+              br(),
+              p("Participants with missing or invalid date"),
+              DT::DTOutput(ns("quality_missing_date"))
+            ),
+            tabPanel(
+              "Missing Code",
+              br(),
+              p("Participants with missing or invalid participant code"),
+              DT::DTOutput(ns("quality_missing_code"))
+            )
+          )
         )
       )
     ),
@@ -676,30 +718,87 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
       rv$aat_data_edited[info$row, info$col] <- info$value
     })
 
-    # Quality issues table
-    output$quality_issues_table <- DT::renderDT({
-      req(rv$aat_data)
+    # Remove duplicates button
+    observeEvent(input$remove_duplicates, {
+      req(rv$aat_data_edited)
 
-      quality_issues <- rv$aat_data %>%
-        dplyr::filter(n_ambivalent > 5 | n_dont_know > 3) %>%
-        dplyr::select(code, ambiguous_pct, control_pct, n_ambivalent, n_dont_know, file)
+      n_before <- nrow(rv$aat_data_edited)
+      rv$aat_data_edited <- rv$aat_data_edited[!duplicated(rv$aat_data_edited$code), ]
+      n_after <- nrow(rv$aat_data_edited)
+      n_removed <- n_before - n_after
 
-      if (nrow(quality_issues) == 0) {
+      if (n_removed > 0) {
+        showNotification(
+          paste("Removed", n_removed, "duplicate participant code(s). Kept first occurrence."),
+          type = "message",
+          duration = 5
+        )
+      } else {
+        showNotification(
+          "No duplicate participant codes found!",
+          type = "message",
+          duration = 3
+        )
+      }
+    })
+
+    # Quality issues tables
+    .render_quality_table <- function(data, message = "No issues detected!") {
+      if (nrow(data) == 0) {
         return(DT::datatable(
-          data.frame(Message = "No quality issues detected!"),
+          data.frame(Message = message),
           rownames = FALSE,
           options = list(dom = 't')
         ))
       }
-
       DT::datatable(
-        quality_issues,
+        data,
         rownames = FALSE,
         options = list(
           pageLength = 10,
           scrollX = TRUE
         )
       )
+    }
+
+    output$quality_low_control <- DT::renderDT({
+      req(rv$aat_data)
+      issues <- rv$aat_data %>%
+        dplyr::filter(!is.na(control_pct) & control_pct < 80) %>%
+        dplyr::select(code, date, control_pct, ambiguous_pct, file)
+      .render_quality_table(issues, "No participants with low control score!")
+    })
+
+    output$quality_high_ambivalent <- DT::renderDT({
+      req(rv$aat_data)
+      issues <- rv$aat_data %>%
+        dplyr::filter(!is.na(n_ambivalent) & n_ambivalent > 5) %>%
+        dplyr::select(code, date, n_ambivalent, n_evaluable, n_total, file)
+      .render_quality_table(issues, "No participants with high ambivalent responses!")
+    })
+
+    output$quality_high_dontknow <- DT::renderDT({
+      req(rv$aat_data)
+      issues <- rv$aat_data %>%
+        dplyr::filter(!is.na(n_dont_know) & n_dont_know > 3) %>%
+        dplyr::select(code, date, n_dont_know, n_evaluable, n_total, file)
+      .render_quality_table(issues, "No participants with high 'don't know' responses!")
+    })
+
+    output$quality_missing_date <- DT::renderDT({
+      req(rv$aat_data)
+      issues <- rv$aat_data %>%
+        dplyr::filter(is.na(date) | date == "" | date == "NA") %>%
+        dplyr::select(code, date, ambiguous_pct, control_pct, file)
+      .render_quality_table(issues, "No participants with missing date!")
+    })
+
+    output$quality_missing_code <- DT::renderDT({
+      req(rv$aat_data)
+      issues <- rv$aat_data %>%
+        dplyr::filter(is.na(code) | code == "" | code == "NA") %>%
+        dplyr::select(code, date, ambiguous_pct, control_pct, file)
+      .render_quality_table(issues, "No participants with missing code!")
     })
 
     # Download CSV
