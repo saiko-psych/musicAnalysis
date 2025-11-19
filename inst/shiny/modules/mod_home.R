@@ -63,7 +63,7 @@ mod_home_ui <- function(id) {
               tags$strong("Build Date: "),
               tags$span(
                 style = "color: #8B7355; font-family: monospace; font-weight: bold;",
-                "2025-11-16"
+                "2025-11-19"
               )
             )
           )
@@ -73,16 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9064 (2025-11-19)"),
+        h4("What's New in v0.0.0.9065 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Citation link colors now have better contrast (dark brown, underlined, bold)"
+            tags$strong("FIXED: "),
+            "Citation links now WHITE with high contrast - truly visible!"
           ),
           tags$li(
             tags$strong("FIXED: "),
-            "Attribution footer links more readable on brown background"
+            "Developer footer section now has high-contrast styling"
+          ),
+          tags$li(
+            tags$strong("ADDED: "),
+            "Hover states: citation links turn GOLD, email link turns GOLD"
+          ),
+          tags$li(
+            tags$strong("IMPROVED: "),
+            "Dark backgrounds behind all important links for readability"
           )
         )
       ),
@@ -97,6 +105,16 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9064
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9064 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ATTEMPTED:"), " Better citation contrast (still not visible enough)")
+              )
+            ),
 
             # v0.0.0.9063
             tags$div(
@@ -858,15 +876,46 @@ mod_home_ui <- function(id) {
 
       # Footer
       tags$div(
-        style = "text-align: center; color: #7f8c8d; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1;",
+        style = "text-align: center; color: #2c1810; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 2px solid #8B7355;",
         tags$p(
-          "Developed by David Matischek | ",
-          tags$a(href = "mailto:david.matischek@uni-graz.at", "david.matischek@uni-graz.at"),
-          " | University of Graz"
+          style = "font-weight: 600;",
+          "Developed by ",
+          tags$span(
+            style = "color: #FFFFFF; background-color: rgba(139, 115, 85, 0.9); padding: 2px 6px; border-radius: 3px; font-weight: 700;",
+            "David Matischek"
+          ),
+          " | ",
+          tags$a(
+            href = "mailto:david.matischek@uni-graz.at",
+            style = "color: #FFFFFF !important; background-color: rgba(139, 115, 85, 0.9); padding: 2px 6px; border-radius: 3px; text-decoration: underline !important; font-weight: 700;",
+            onmouseover = "this.style.backgroundColor='rgba(139, 115, 85, 1)'; this.style.color='#FFD700';",
+            onmouseout = "this.style.backgroundColor='rgba(139, 115, 85, 0.9)'; this.style.color='#FFFFFF';",
+            "david.matischek@uni-graz.at"
+          ),
+          " | ",
+          tags$span(
+            style = "color: #FFFFFF; background-color: rgba(139, 115, 85, 0.9); padding: 2px 6px; border-radius: 3px; font-weight: 700;",
+            "University of Graz"
+          )
         ),
         tags$p(
-          style = "font-family: monospace; font-size: 12px;",
-          "Package: musicAnalysis | License: MIT"
+          style = "font-family: monospace; font-size: 12px; margin-top: 10px;",
+          tags$span(
+            style = "color: #2c1810; font-weight: 600;",
+            "Package: "
+          ),
+          tags$span(
+            style = "color: #FFFFFF; background-color: rgba(107, 93, 82, 0.9); padding: 2px 5px; border-radius: 3px; font-weight: 700;",
+            "musicAnalysis"
+          ),
+          tags$span(
+            style = "color: #2c1810; font-weight: 600;",
+            " | License: "
+          ),
+          tags$span(
+            style = "color: #FFFFFF; background-color: rgba(107, 93, 82, 0.9); padding: 2px 5px; border-radius: 3px; font-weight: 700;",
+            "MIT"
+          )
         )
       )
         )  # Close column

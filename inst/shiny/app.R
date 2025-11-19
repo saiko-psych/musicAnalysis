@@ -266,13 +266,21 @@ ui <- tagList(
         z-index: 1000;
       }
       .attribution a {
-        color: #2c1810;
-        text-decoration: underline;
-        font-weight: 600;
+        color: #FFFFFF !important;
+        text-decoration: underline !important;
+        font-weight: 700 !important;
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 2px 4px;
+        border-radius: 2px;
       }
       .attribution a:hover {
-        color: #1a0e09;
-        text-decoration: underline;
+        color: #FFD700 !important;
+        background-color: rgba(0, 0, 0, 0.4);
+        text-decoration: underline !important;
+      }
+      .attribution a:active {
+        color: #FFA500 !important;
+        background-color: rgba(0, 0, 0, 0.6);
       }
       .attribution img {
         height: 1em;
