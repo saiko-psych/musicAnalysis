@@ -110,10 +110,58 @@ mod_aat_ui <- function(id) {
       )
     ),
 
-    # Advanced Settings
-    h4("2. Advanced Settings (Optional)"),
+    # File Type Selection and Advanced Settings
+    h4("2. Configure Settings"),
     wellPanel(
-      style = "background-color: #f0f0f0;",
+      fluidRow(
+        column(
+          width = 12,
+          h5("File Types to Scan"),
+          tags$p(
+            style = "color: #666; font-size: 14px;",
+            "Select which AAT file types to include in the scan:"
+          )
+        )
+      ),
+      fluidRow(
+        column(
+          width = 4,
+          checkboxInput(
+            ns("scan_rsl_summary"),
+            "Real .rsl files (summary format)",
+            value = TRUE
+          ),
+          tags$small(
+            class = "text-muted",
+            "Files with 'Type of Pair' column - standard AAT output"
+          )
+        ),
+        column(
+          width = 4,
+          checkboxInput(
+            ns("scan_rsl_itemlevel"),
+            ".rsl files (item-level format)",
+            value = FALSE
+          ),
+          tags$small(
+            class = "text-muted",
+            "Files with '% F0' column - detailed per-item results"
+          )
+        ),
+        column(
+          width = 4,
+          checkboxInput(
+            ns("scan_itl"),
+            ".itl files (raw responses)",
+            value = FALSE
+          ),
+          tags$small(
+            class = "text-muted",
+            "Raw response files with 'Pitch Classification' column"
+          )
+        )
+      ),
+      hr(),
       tags$details(
         tags$summary(tags$strong("Advanced Settings (click to expand)")),
         br(),
@@ -339,11 +387,34 @@ mod_aat_server <- function(id) {
             date_format <- "DDMMYY"
           }
 
+          # Build file_types vector from checkboxes
+          file_types <- character(0)
+          if (isTRUE(input$scan_rsl_summary)) {
+            file_types <- c(file_types, "rsl_summary")
+          }
+          if (isTRUE(input$scan_rsl_itemlevel)) {
+            file_types <- c(file_types, "rsl_itemlevel")
+          }
+          if (isTRUE(input$scan_itl)) {
+            file_types <- c(file_types, "itl")
+          }
+
+          # Validation: at least one file type must be selected
+          if (length(file_types) == 0) {
+            showNotification(
+              "Please select at least one file type to scan!",
+              type = "warning",
+              duration = 5
+            )
+            return(NULL)
+          }
+
           # Scan files
           rv$aat_data <- aat_scan(
             root = rv$root_path,
             code_pattern = code_pattern,
-            date_format = date_format
+            date_format = date_format,
+            file_types = file_types
           )
 
           # Initialize edited data
@@ -368,23 +439,42 @@ mod_aat_server <- function(id) {
     observeEvent(input$show_r_code, {
       root_path <- rv$root_path
 
+      # Build file_types vector for R code
+      file_types_selected <- character(0)
+      if (isTRUE(input$scan_rsl_summary)) {
+        file_types_selected <- c(file_types_selected, '"rsl_summary"')
+      }
+      if (isTRUE(input$scan_rsl_itemlevel)) {
+        file_types_selected <- c(file_types_selected, '"rsl_itemlevel"')
+      }
+      if (isTRUE(input$scan_itl)) {
+        file_types_selected <- c(file_types_selected, '"itl"')
+      }
+
+      file_types_r_code <- if (length(file_types_selected) > 0) {
+        paste0("  file_types = c(", paste(file_types_selected, collapse = ", "), "),")
+      } else {
+        '  file_types = c("rsl_summary"),  # Default: only real .rsl summary files'
+      }
+
       # Show template code if no folder selected, otherwise show actual path
       if (is.null(root_path) || root_path == "") {
-        r_code <- '# Load the musicAnalysis package
+        r_code <- sprintf('# Load the musicAnalysis package
 library(musicAnalysis)
 
 # Scan AAT CSV files
 aat_data <- aat_scan(
   root = "path/to/your/AAT/folder",
   code_pattern = "(\\\\d{4}[A-Za-z]{4})",  # 4 digits + 4 letters
-  date_format = "DDMMYY"  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+  date_format = "DDMMYY",  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+%s
 )
 
 # View the data
 View(aat_data)
 
 # Save to CSV
-write.csv(aat_data, "aat_results.csv", row.names = FALSE)'
+write.csv(aat_data, "aat_results.csv", row.names = FALSE)', file_types_r_code)
       } else {
         # Escape backslashes for R code
         escaped_path <- gsub("\\\\", "\\\\\\\\", root_path)
@@ -396,14 +486,15 @@ library(musicAnalysis)
 aat_data <- aat_scan(
   root = "%s",
   code_pattern = "(\\\\d{4}[A-Za-z]{4})",  # 4 digits + 4 letters
-  date_format = "DDMMYY"  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+  date_format = "DDMMYY",  # Options: "DDMMYY", "DDMMYYYY", "YYMMDD", "YYYYMMDD"
+%s
 )
 
 # View the data
 View(aat_data)
 
 # Save to CSV
-write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
+write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path, file_types_r_code)
       }
 
       showModal(modalDialog(

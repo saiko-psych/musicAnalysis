@@ -73,24 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9065 (2025-11-19)"),
+        h4("What's New in v0.0.0.9066 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "Citation links now WHITE with high contrast - truly visible!"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "Developer footer section now has high-contrast styling"
+            tags$strong("ENHANCED: "),
+            "AAT module now supports selective file type scanning"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Hover states: citation links turn GOLD, email link turns GOLD"
+            "File type selector: choose real .rsl (summary), .rsl (item-level), or .itl files"
+          ),
+          tags$li(
+            tags$strong("DEFAULT: "),
+            "AAT now only scans real .rsl summary files by default (like PPPT)"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Dark backgrounds behind all important links for readability"
+            "R code generation includes selected file types for reproducibility"
           )
         )
       ),
@@ -105,6 +105,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9065
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9065 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("FIXED:"), " Citation links now WHITE with high contrast"),
+                tags$li(tags$strong("FIXED:"), " Developer footer with high-contrast styling"),
+                tags$li(tags$strong("ADDED:"), " Hover states turn GOLD for better visibility")
+              )
+            ),
 
             # v0.0.0.9064
             tags$div(

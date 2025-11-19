@@ -19,6 +19,11 @@
 #'   If NULL, will attempt to detect from data or assume all non-control items.
 #' @param control_items Optional numeric vector of item indices that are control items (for .itl files).
 #'   If NULL, will attempt to detect from data.
+#' @param file_types Character vector specifying which file types to scan. Options:
+#'   - "rsl_summary": Real .rsl files with summary format (Type of Pair column)
+#'   - "rsl_itemlevel": .rsl files with item-level format (% F0 column)
+#'   - "itl": Raw response .itl.csv files
+#'   Default: c("rsl_summary") - only scan real .rsl summary files
 #'
 #' @return A tibble with columns:
 #'   - `code`: Participant code (from filename)
@@ -64,7 +69,8 @@ aat_scan <- function(root,
                      code_pattern = "(\\d{4}[A-Za-z]{4})",
                      date_format = "DDMMYY",
                      ambiguous_items = NULL,
-                     control_items = NULL) {
+                     control_items = NULL,
+                     file_types = c("rsl_summary")) {
 
   # Validate root directory
   if (!fs::dir_exists(root)) {
@@ -105,13 +111,14 @@ aat_scan <- function(root,
     rel_path <- fs::path_rel(f, root)
     tryCatch(cli::cli_progress_update(id = progress_id), error = function(e) NULL)
     tryCatch({
-      aat_parse_one(f, rel_path, code_pattern, date_format, ambiguous_items, control_items)
+      aat_parse_one(f, rel_path, code_pattern, date_format, ambiguous_items, control_items, file_types)
     }, error = function(e) {
       cli::cli_warn("Failed to parse {rel_path}: {e$message}")
       tibble::tibble(
         code = NA_character_,
         date = NA_character_,
         file_type = NA_character_,
+        file_subtype = NA_character_,
         ambiguous_pct = NA_real_,
         control_pct = NA_real_,
         a_tone_pairs = NA_integer_,
@@ -144,10 +151,11 @@ aat_scan <- function(root,
 #' @param date_format Date format in filename
 #' @param ambiguous_items Numeric vector of ambiguous item indices (for .itl files)
 #' @param control_items Numeric vector of control item indices (for .itl files)
+#' @param file_types Character vector of allowed file types
 #'
-#' @return Single-row tibble with AAT metrics
+#' @return Single-row tibble with AAT metrics, or NULL if file type not in file_types
 #' @keywords internal
-aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambiguous_items, control_items) {
+aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambiguous_items, control_items, file_types) {
 
   filename <- basename(file_path)
 
@@ -167,10 +175,24 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     file_type <- "unknown"
   }
 
-  # Parse based on file type
+  # Parse based on file type and check if it should be included
   if (file_type == "rsl") {
-    return(.aat_parse_rsl(file_path, rel_path, code, date))
+    result <- .aat_parse_rsl(file_path, rel_path, code, date)
+
+    # Check if this rsl subtype is in the requested file_types
+    if (result$file_subtype == "rsl_summary" && !"rsl_summary" %in% file_types) {
+      return(NULL)
+    }
+    if (result$file_subtype == "rsl_itemlevel" && !"rsl_itemlevel" %in% file_types) {
+      return(NULL)
+    }
+
+    return(result)
   } else {
+    # .itl files
+    if (!"itl" %in% file_types) {
+      return(NULL)
+    }
     return(.aat_parse_itl(file_path, rel_path, code, date, ambiguous_items, control_items))
   }
 }
@@ -203,9 +225,11 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
   c_tone_pairs <- NA_integer_
   a_avg_items_per_pair <- NA_real_
   c_avg_items_per_pair <- NA_real_
+  file_subtype <- NA_character_
 
-  # Check for Format 1 (summary format)
+  # Check for Format 1 (summary format) - "real" .rsl files
   if ("Type of Pair" %in% names(data) && "AAT Score [%]" %in% names(data)) {
+    file_subtype <- "rsl_summary"
     # Find row where Type of Pair is "Ambiguous"
     ambig_row <- which(stringr::str_detect(data$`Type of Pair`, "(?i)ambiguous"))
     if (length(ambig_row) > 0) {
@@ -234,8 +258,9 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
       }
     }
   }
-  # Check for Format 2 (item-level format)
+  # Check for Format 2 (item-level format) - "fake" .rsl files
   else if ("% F0" %in% names(data) && "Nmin [-]" %in% names(data)) {
+    file_subtype <- "rsl_itemlevel"
     # This format has per-tone-pair statistics
     # We MUST use Nmin column to separate ambiguous from control:
     # - Control items: Nmin has SAME harmonic numbers (e.g., "3 3", "4 4", "5 5")
@@ -293,6 +318,7 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     code = code,
     date = date,
     file_type = "rsl",
+    file_subtype = file_subtype,
     ambiguous_pct = ambiguous_pct,
     control_pct = control_pct,
     a_tone_pairs = a_tone_pairs,
@@ -433,6 +459,7 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     code = code,
     date = date,
     file_type = "itl",
+    file_subtype = "itl",
     ambiguous_pct = ambiguous_pct,
     control_pct = control_pct,
     a_tone_pairs = a_tone_pairs,
