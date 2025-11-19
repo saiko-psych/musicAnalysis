@@ -101,6 +101,14 @@ mod_aat_ui <- function(id) {
         htmlOutput(ns("structure_summary")),
         hr(),
         tags$details(
+          tags$summary(tags$strong("Folder Tree (click to expand)")),
+          tags$pre(
+            style = "background-color: #f8f9fa; padding: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;",
+            verbatimTextOutput(ns("folder_tree"))
+          )
+        ),
+        hr(),
+        tags$details(
           tags$summary(tags$strong("Sample File Paths (click to expand)")),
           tags$pre(
             style = "background-color: #f8f9fa; padding: 10px; max-height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;",
@@ -247,7 +255,22 @@ mod_aat_ui <- function(id) {
 
         # Data Table
         h5("Participant-Level Results"),
-        p("Double-click any cell to edit. Download includes all edits."),
+        fluidRow(
+          column(
+            width = 6,
+            p("Double-click any cell to edit. Download includes all edits.")
+          ),
+          column(
+            width = 6,
+            selectInput(
+              ns("rows_to_display"),
+              "Rows to display:",
+              choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+              selected = 25,
+              width = "150px"
+            )
+          )
+        ),
         DT::DTOutput(ns("aat_table")),
 
         br(),
@@ -360,8 +383,18 @@ mod_aat_server <- function(id) {
       HTML(paste0(
         "<p><strong>Structure Type:</strong> ", info$structure, "</p>",
         "<p><strong>Total CSV files found:</strong> ", info$n_files, "</p>",
+        "<p><strong>AAT files (with 'AAT' in filename):</strong> ", info$n_aat_files, "</p>",
+        "<p style='margin-left: 20px;'><strong>Real .rsl files (summary format):</strong> ", info$n_rsl_summary, "</p>",
+        "<p style='margin-left: 20px;'><strong>.rsl files (item-level format):</strong> ", info$n_rsl_itemlevel, "</p>",
+        "<p style='margin-left: 20px;'><strong>.itl files (raw responses):</strong> ", info$n_itl, "</p>",
         "<p><strong>Subfolders with files:</strong> ", nrow(info$subfolder_summary), "</p>"
       ))
+    })
+
+    # Display folder tree
+    output$folder_tree <- renderText({
+      req(rv$structure_info)
+      paste(rv$structure_info$tree, collapse = "\n")
     })
 
     # Display sample file paths
@@ -619,12 +652,16 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
           dplyr::filter(n_ambivalent > 5 | n_dont_know > 3)
       }
 
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         data_display,
         editable = list(target = "cell", disable = list(columns = c(ncol(data_display) - 1))),  # Disable file column
         rownames = FALSE,
         options = list(
-          pageLength = 25,
+          pageLength = rows_display,
           scrollX = TRUE,
           dom = 'Bfrtip',
           buttons = c('copy', 'csv', 'excel')

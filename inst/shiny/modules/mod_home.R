@@ -73,24 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9066 (2025-11-19)"),
+        h4("What's New in v0.0.0.9067 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
+            tags$strong("ADDED: "),
+            "Folder tree display in AAT structure analysis shows directory hierarchy"
+          ),
+          tags$li(
             tags$strong("ENHANCED: "),
-            "AAT module now supports selective file type scanning"
+            "AAT structure analysis now counts file types: real .rsl, item-level .rsl, .itl"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "File type selector: choose real .rsl (summary), .rsl (item-level), or .itl files"
-          ),
-          tags$li(
-            tags$strong("DEFAULT: "),
-            "AAT now only scans real .rsl summary files by default (like PPPT)"
+            "Row display selector for ALL data tables (10, 25, 50, 100, All)"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "R code generation includes selected file types for reproducibility"
+            "13 data tables across all modules now support customizable row display"
           )
         )
       ),
@@ -105,6 +105,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9066
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9066 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ENHANCED:"), " AAT module file type selector"),
+                tags$li(tags$strong("ADDED:"), " Choose real .rsl, item-level .rsl, or .itl files"),
+                tags$li(tags$strong("DEFAULT:"), " AAT now only scans real .rsl summary files")
+              )
+            ),
 
             # v0.0.0.9065
             tags$div(

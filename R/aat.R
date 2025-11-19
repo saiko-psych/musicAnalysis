@@ -484,6 +484,11 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
 #' @return List with components:
 #'   - `structure`: Detected folder hierarchy (flat, one-level, multi-level)
 #'   - `n_files`: Total number of CSV files found
+#'   - `n_aat_files`: Number of files containing "AAT" in filename
+#'   - `n_rsl_summary`: Number of real .rsl files (summary format)
+#'   - `n_rsl_itemlevel`: Number of .rsl files (item-level format)
+#'   - `n_itl`: Number of .itl files
+#'   - `tree`: Character vector representing folder tree structure
 #'   - `subfolder_summary`: Tibble showing file counts per subfolder
 #'   - `sample_paths`: Character vector of example file paths
 #'
@@ -491,6 +496,7 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
 #' \dontrun{
 #' structure_info <- aat_analyze_structure("data/AAT")
 #' print(structure_info$structure)
+#' cat(structure_info$tree, sep = "\n")
 #' View(structure_info$subfolder_summary)
 #' }
 #' @export
@@ -507,9 +513,41 @@ aat_analyze_structure <- function(root) {
     return(list(
       structure = "empty",
       n_files = 0,
+      n_aat_files = 0,
+      n_rsl_summary = 0,
+      n_rsl_itemlevel = 0,
+      n_itl = 0,
+      tree = character(0),
       subfolder_summary = tibble::tibble(subfolder = character(), n_files = integer()),
       sample_paths = character()
     ))
+  }
+
+  # Filter for AAT files only
+  aat_files <- csv_files[stringr::str_detect(basename(csv_files), "AAT")]
+  n_aat_files <- length(aat_files)
+
+  # Detect file types by checking file content
+  n_rsl_summary <- 0
+  n_rsl_itemlevel <- 0
+  n_itl <- 0
+
+  for (file in aat_files) {
+    tryCatch({
+      # Read first few lines to check format
+      data <- readr::read_csv(file, n_max = 2, show_col_types = FALSE, col_types = readr::cols())
+      col_names <- names(data)
+
+      if (stringr::str_detect(basename(file), "\\.itl\\.csv$")) {
+        n_itl <- n_itl + 1
+      } else if ("Type of Pair" %in% col_names) {
+        n_rsl_summary <- n_rsl_summary + 1
+      } else if ("% F0" %in% col_names) {
+        n_rsl_itemlevel <- n_rsl_itemlevel + 1
+      }
+    }, error = function(e) {
+      # If can't read file, skip it
+    })
   }
 
   # Analyze folder depth
@@ -535,10 +573,77 @@ aat_analyze_structure <- function(root) {
   # Sample paths for display
   sample_paths <- head(rel_paths, min(10, length(rel_paths)))
 
+  # Generate tree structure
+  tree <- .generate_tree(root, aat_files)
+
   list(
     structure = structure_type,
     n_files = n_files,
+    n_aat_files = n_aat_files,
+    n_rsl_summary = n_rsl_summary,
+    n_rsl_itemlevel = n_rsl_itemlevel,
+    n_itl = n_itl,
+    tree = tree,
     subfolder_summary = subfolder_counts,
     sample_paths = sample_paths
   )
+}
+
+#' Generate folder tree structure
+#'
+#' Creates a visual tree representation of AAT files in a folder structure
+#'
+#' @param root Root directory
+#' @param files Vector of file paths to include in tree
+#' @return Character vector with tree lines
+#' @keywords internal
+.generate_tree <- function(root, files) {
+  if (length(files) == 0) {
+    return(character(0))
+  }
+
+  # Get relative paths
+  rel_paths <- fs::path_rel(files, root)
+
+  # Build tree structure
+  tree_lines <- character()
+  tree_lines <- c(tree_lines, basename(root))
+
+  # Group files by directory
+  dirs <- unique(dirname(rel_paths))
+  dirs <- dirs[dirs != "."]  # Remove root indicator
+
+  if (length(dirs) == 0) {
+    # All files in root
+    for (i in seq_along(rel_paths)) {
+      prefix <- if (i == length(rel_paths)) "└── " else "├── "
+      tree_lines <- c(tree_lines, paste0(prefix, basename(rel_paths[i])))
+    }
+  } else {
+    # Files in subdirectories
+    # Sort directories for consistent output
+    dirs <- sort(dirs)
+
+    for (dir_idx in seq_along(dirs)) {
+      dir_path <- dirs[dir_idx]
+      is_last_dir <- (dir_idx == length(dirs))
+
+      # Add directory
+      dir_parts <- fs::path_split(dir_path)[[1]]
+      indent <- paste(rep("│   ", length(dir_parts) - 1), collapse = "")
+      prefix <- if (is_last_dir) "└── " else "├── "
+      tree_lines <- c(tree_lines, paste0(indent, prefix, basename(dir_path), "/"))
+
+      # Add files in this directory
+      files_in_dir <- rel_paths[dirname(rel_paths) == dir_path]
+      for (file_idx in seq_along(files_in_dir)) {
+        is_last_file <- (file_idx == length(files_in_dir))
+        file_indent <- paste(rep("│   ", length(dir_parts)), collapse = "")
+        file_prefix <- if (is_last_file && is_last_dir) "    └── " else "    ├── "
+        tree_lines <- c(tree_lines, paste0(file_indent, file_prefix, basename(files_in_dir[file_idx])))
+      }
+    }
+  }
+
+  return(tree_lines)
 }

@@ -50,9 +50,69 @@ mod_mexp_ui <- function(id) {
     ),
     br(), br(),
     tabsetPanel(
-      tabPanel("Wide", DTOutput(ns("wide_tbl"))),
-      tabPanel("Long", DTOutput(ns("long_tbl"))),
-      tabPanel("Flags", DTOutput(ns("flags_tbl"))),
+      tabPanel(
+        "Wide",
+        br(),
+        fluidRow(
+          column(
+            width = 6,
+            p("Wide format: one row per participant with aggregated variables")
+          ),
+          column(
+            width = 6,
+            selectInput(
+              ns("rows_to_display_wide"),
+              "Rows to display:",
+              choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+              selected = 25,
+              width = "150px"
+            )
+          )
+        ),
+        DTOutput(ns("wide_tbl"))
+      ),
+      tabPanel(
+        "Long",
+        br(),
+        fluidRow(
+          column(
+            width = 6,
+            p("Long format: one row per instrument/activity")
+          ),
+          column(
+            width = 6,
+            selectInput(
+              ns("rows_to_display_long"),
+              "Rows to display:",
+              choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+              selected = 25,
+              width = "150px"
+            )
+          )
+        ),
+        DTOutput(ns("long_tbl"))
+      ),
+      tabPanel(
+        "Flags",
+        br(),
+        fluidRow(
+          column(
+            width = 6,
+            p("Problematic entries for manual review")
+          ),
+          column(
+            width = 6,
+            selectInput(
+              ns("rows_to_display_flags"),
+              "Rows to display:",
+              choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+              selected = 25,
+              width = "150px"
+            )
+          )
+        ),
+        DTOutput(ns("flags_tbl"))
+      ),
       tabPanel(
         "Practice Growth Curves",
         fluidRow(
@@ -231,6 +291,22 @@ mod_mexp_ui <- function(id) {
           ),
           column(
             width = 9,
+            fluidRow(
+              column(
+                width = 6,
+                p("Practice hours within specified time windows")
+              ),
+              column(
+                width = 6,
+                selectInput(
+                  ns("rows_to_display_history"),
+                  "Rows to display:",
+                  choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+                  selected = 25,
+                  width = "150px"
+                )
+              )
+            ),
             DTOutput(ns("history_tbl"))
           )
         )
@@ -709,24 +785,44 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
 
     output$history_tbl <- DT::renderDT({
       req(history_rv())
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_history)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         history_rv(),
-        options = list(scrollX = TRUE, pageLength = 15),
+        options = list(scrollX = TRUE, pageLength = rows_display),
         filter = "top"
       )
     })
 
     output$wide_tbl  <- DT::renderDT({
       req(res_rv())
-      DT::datatable(res_rv()$wide, options = list(scrollX = TRUE, pageLength = 15), filter = "top")
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_wide)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
+      DT::datatable(res_rv()$wide, options = list(scrollX = TRUE, pageLength = rows_display), filter = "top")
     })
     output$long_tbl  <- DT::renderDT({
       req(res_rv())
-      DT::datatable(res_rv()$long, options = list(scrollX = TRUE, pageLength = 15), filter = "top")
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_long)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
+      DT::datatable(res_rv()$long, options = list(scrollX = TRUE, pageLength = rows_display), filter = "top")
     })
     output$flags_tbl <- DT::renderDT({
       req(res_rv())
-      DT::datatable(res_rv()$flags, options = list(scrollX = TRUE, pageLength = 15), filter = "top")
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_flags)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
+      DT::datatable(res_rv()$flags, options = list(scrollX = TRUE, pageLength = rows_display), filter = "top")
     })
 
     output$dl_wide  <- downloadHandler(

@@ -218,9 +218,24 @@ mod_klawa_ui <- function(id) {
 
     # Results Table
     h4("5. Scanned Data"),
-    tags$p(
-      style = "color: #666; margin-bottom: 10px;",
-      tags$strong("Tip:"), " Double-click any cell to edit its value. Edits are saved automatically and included in the CSV download."
+    fluidRow(
+      column(
+        width = 6,
+        p(
+          style = "color: #666;",
+          tags$strong("Tip:"), " Double-click any cell to edit its value. Edits are saved automatically and included in the CSV download."
+        )
+      ),
+      column(
+        width = 6,
+        selectInput(
+          ns("rows_to_display"),
+          "Rows to display:",
+          choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+          selected = 25,
+          width = "150px"
+        )
+      )
     ),
     DT::DTOutput(ns("tbl")),
 
@@ -646,11 +661,15 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
       # Use edited data if available, otherwise use original
       display_data <- if (!is.null(edited_data())) edited_data() else klawa_rv()
 
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         display_data,
         options = list(
           scrollX = TRUE,
-          pageLength = 25,
+          pageLength = rows_display,
           order = list(list(0, 'asc'))
         ),
         filter = "top",
@@ -710,16 +729,33 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
       req(problems_detailed_rv())
       detailed <- problems_detailed_rv()
 
-      tabs <- list(
-        tabPanel("Summary", DT::DTOutput(ns("prob_summary"))),
-        tabPanel("Code Mismatches", DT::DTOutput(ns("prob_code_mismatches"))),
-        tabPanel("Code Conflicts", DT::DTOutput(ns("prob_conflicts"))),
-        tabPanel("Missing Codes", DT::DTOutput(ns("prob_missing_codes"))),
-        tabPanel("Missing Metadata", DT::DTOutput(ns("prob_missing_meta"))),
-        tabPanel("Missing Values", DT::DTOutput(ns("prob_missing_vals")))
+      tagList(
+        fluidRow(
+          column(
+            width = 6,
+            p("Review data quality issues detected during scanning")
+          ),
+          column(
+            width = 6,
+            selectInput(
+              ns("rows_to_display_problems"),
+              "Rows to display:",
+              choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+              selected = 25,
+              width = "150px"
+            )
+          )
+        ),
+        tabsetPanel(
+          id = ns("problem_tabs"),
+          tabPanel("Summary", DT::DTOutput(ns("prob_summary"))),
+          tabPanel("Code Mismatches", DT::DTOutput(ns("prob_code_mismatches"))),
+          tabPanel("Code Conflicts", DT::DTOutput(ns("prob_conflicts"))),
+          tabPanel("Missing Codes", DT::DTOutput(ns("prob_missing_codes"))),
+          tabPanel("Missing Metadata", DT::DTOutput(ns("prob_missing_meta"))),
+          tabPanel("Missing Values", DT::DTOutput(ns("prob_missing_vals")))
+        )
       )
-
-      do.call(tabsetPanel, c(list(id = ns("problem_tabs")), tabs))
     })
 
     output$prob_summary <- DT::renderDT({
@@ -733,45 +769,70 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
 
     output$prob_code_mismatches <- DT::renderDT({
       req(problems_detailed_rv())
+
+      # Get rows to display from input (using shared input for all problem tables)
+      rows_display <- as.integer(input$rows_to_display_problems)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         problems_detailed_rv()$code_mismatches,
-        options = list(scrollX = TRUE, pageLength = 25),
+        options = list(scrollX = TRUE, pageLength = rows_display),
         filter = "top"
       )
     })
 
     output$prob_conflicts <- DT::renderDT({
       req(problems_detailed_rv())
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_problems)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         problems_detailed_rv()$code_conflicts,
-        options = list(scrollX = TRUE, pageLength = 25),
+        options = list(scrollX = TRUE, pageLength = rows_display),
         filter = "top"
       )
     })
 
     output$prob_missing_codes <- DT::renderDT({
       req(problems_detailed_rv())
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_problems)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         problems_detailed_rv()$missing_codes,
-        options = list(scrollX = TRUE, pageLength = 25),
+        options = list(scrollX = TRUE, pageLength = rows_display),
         filter = "top"
       )
     })
 
     output$prob_missing_meta <- DT::renderDT({
       req(problems_detailed_rv())
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_problems)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         problems_detailed_rv()$missing_metadata,
-        options = list(scrollX = TRUE, pageLength = 25),
+        options = list(scrollX = TRUE, pageLength = rows_display),
         filter = "top"
       )
     })
 
     output$prob_missing_vals <- DT::renderDT({
       req(problems_detailed_rv())
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display_problems)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
       DT::datatable(
         problems_detailed_rv()$missing_values,
-        options = list(scrollX = TRUE, pageLength = 25),
+        options = list(scrollX = TRUE, pageLength = rows_display),
         filter = "top"
       )
     })

@@ -13,6 +13,22 @@ mod_merge_ui <- function(id) {
     textInput(ns("suffix_y"), "Suffix for Y", value = ".y"),
     actionButton(ns("do_merge"), "Merge"),
     br(), br(),
+    fluidRow(
+      column(
+        width = 6,
+        p("Merged dataset by participant code")
+      ),
+      column(
+        width = 6,
+        selectInput(
+          ns("rows_to_display"),
+          "Rows to display:",
+          choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+          selected = 25,
+          width = "150px"
+        )
+      )
+    ),
     DTOutput(ns("merged_tbl")),
     br(),
     downloadButton(ns("dl_merged"), "Download merged CSV")
@@ -44,7 +60,12 @@ mod_merge_server <- function(id) {
 
     output$merged_tbl <- renderDT({
       req(merged_rv())
-      datatable(merged_rv(), options = list(scrollX = TRUE, pageLength = 15))
+
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display)
+      if (is.na(rows_display)) rows_display <- 25  # default
+
+      datatable(merged_rv(), options = list(scrollX = TRUE, pageLength = rows_display))
     })
 
     output$dl_merged <- downloadHandler(

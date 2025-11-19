@@ -582,19 +582,23 @@ mod_pppt_server <- function(id) {
         # Data table
         wellPanel(
           h5("PPPT Data"),
-          p(
-            style = "color: #666; font-size: 0.9em;",
-            tags$strong("Tip:"), " Double-click any cell to edit its value.",
-            " Your changes will be reflected in the downloaded CSV."
-          ),
           fluidRow(
             column(
-              width = 3,
+              width = 6,
+              p(
+                style = "color: #666; font-size: 0.9em;",
+                tags$strong("Tip:"), " Double-click any cell to edit its value.",
+                " Your changes will be reflected in the downloaded CSV."
+              )
+            ),
+            column(
+              width = 6,
               selectInput(
-                ns("page_length"),
-                "Rows per page:",
+                ns("rows_to_display"),
+                "Rows to display:",
                 choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
-                selected = 25
+                selected = 25,
+                width = "150px"
               )
             )
           ),
@@ -767,13 +771,15 @@ mod_pppt_server <- function(id) {
     output$data_table <- DT::renderDataTable({
       req(rv$pppt_data)
 
-      page_len <- as.numeric(input$page_length)
+      # Get rows to display from input
+      rows_display <- as.integer(input$rows_to_display)
+      if (is.na(rows_display)) rows_display <- 25  # default
 
       DT::datatable(
         rv$edited_data,
         editable = list(target = "cell", disable = list(columns = c(0))), # Protect first column
         options = list(
-          pageLength = ifelse(page_len == -1, nrow(rv$edited_data), page_len),
+          pageLength = rows_display,
           scrollX = TRUE,
           dom = 'Bfrtip',
           buttons = c('copy', 'csv', 'excel')
