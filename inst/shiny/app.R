@@ -266,10 +266,12 @@ ui <- tagList(
         z-index: 1000;
       }
       .attribution a {
-        color: #FFE4B5;
-        text-decoration: none;
+        color: #2c1810;
+        text-decoration: underline;
+        font-weight: 600;
       }
       .attribution a:hover {
+        color: #1a0e09;
         text-decoration: underline;
       }
       .attribution img {

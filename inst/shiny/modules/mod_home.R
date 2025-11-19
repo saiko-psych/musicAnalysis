@@ -73,16 +73,16 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9063 (2025-11-19)"),
+        h4("What's New in v0.0.0.9064 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("ADDED: "),
-            "Music note favicon (browser tab icon) in vintage brown"
+            tags$strong("IMPROVED: "),
+            "Citation link colors now have better contrast (dark brown, underlined, bold)"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "App now has distinctive icon for easy tab identification"
+            tags$strong("FIXED: "),
+            "Attribution footer links more readable on brown background"
           )
         )
       ),
@@ -97,6 +97,16 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9063
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9063 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ADDED:"), " Music note favicon in browser tab (vintage brown)")
+              )
+            ),
 
             # v0.0.0.9062
             tags$div(
