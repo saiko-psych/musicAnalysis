@@ -73,24 +73,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9068 (2025-11-19)"),
+        h4("What's New in v0.0.0.9069 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
+            tags$strong("FIXED: "),
+            "Complete hierarchical folder tree structure now displays properly (all levels shown)"
+          ),
+          tags$li(
+            tags$strong("FIXED: "),
+            "Quality control terminology changed from 'ambivalent' to 'ambiguous' throughout UI"
+          ),
+          tags$li(
             tags$strong("ADDED: "),
-            "Remove Duplicates button in AAT module to filter duplicate participant codes"
+            "Configurable quality thresholds: Low Control Score and High Ambiguous Count"
           ),
           tags$li(
             tags$strong("ENHANCED: "),
-            "Folder tree shows file counts per directory (e.g., '20 AAT files') instead of individual filenames"
-          ),
-          tags$li(
-            tags$strong("ADDED: "),
-            "Categorized quality report: Low Control Score, High Ambivalent, Missing Date/Code"
+            "Quality report tab descriptions now dynamically reflect user-set threshold values"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Quality issues split into 5 tabs for easier data quality assessment"
+            "All subheadings (Quality Report, Expected File Format, Detected Folder Structure) use h5 for consistency"
           )
         )
       ),
@@ -105,6 +109,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9068
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9068 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ADDED:"), " Remove Duplicates button in AAT module"),
+                tags$li(tags$strong("ENHANCED:"), " Folder tree shows file counts per directory"),
+                tags$li(tags$strong("ADDED:"), " Categorized quality report with 5 tabs")
+              )
+            ),
 
             # v0.0.0.9067
             tags$div(

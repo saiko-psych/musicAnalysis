@@ -208,7 +208,35 @@ mod_aat_ui <- function(id) {
               "Show only participants with quality issues",
               value = FALSE
             ),
-            tags$small(class = "text-muted", "Filter for high ambivalent/don't-know counts")
+            tags$small(class = "text-muted", "Filter for high ambiguous/don't-know counts")
+          )
+        ),
+        br(),
+        h5("Quality Control Thresholds"),
+        fluidRow(
+          column(
+            width = 6,
+            numericInput(
+              ns("threshold_control"),
+              "Low Control Score Threshold (%):",
+              value = 80,
+              min = 0,
+              max = 100,
+              step = 5
+            ),
+            tags$small(class = "text-muted", "Participants with control_pct below this value will be flagged")
+          ),
+          column(
+            width = 6,
+            numericInput(
+              ns("threshold_ambiguous"),
+              "High Ambiguous Count Threshold:",
+              value = 5,
+              min = 0,
+              max = 50,
+              step = 1
+            ),
+            tags$small(class = "text-muted", "Participants with n_ambiguous above this value will be flagged")
           )
         )
       )
@@ -301,14 +329,14 @@ mod_aat_ui <- function(id) {
             tabPanel(
               "Low Control Score",
               br(),
-              p("Participants with control score < 80%"),
+              htmlOutput(ns("quality_low_control_text")),
               DT::DTOutput(ns("quality_low_control"))
             ),
             tabPanel(
-              "High Ambivalent",
+              "High Ambiguous",
               br(),
-              p("Participants with > 5 ambivalent responses"),
-              DT::DTOutput(ns("quality_high_ambivalent"))
+              htmlOutput(ns("quality_high_ambiguous_text")),
+              DT::DTOutput(ns("quality_high_ambiguous"))
             ),
             tabPanel(
               "High Don't Know",
@@ -761,20 +789,37 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
       )
     }
 
+    # Dynamic text for quality thresholds
+    output$quality_low_control_text <- renderUI({
+      threshold <- input$threshold_control
+      if (is.null(threshold)) threshold <- 80
+      p(paste0("Participants with control score < ", threshold, "%"))
+    })
+
+    output$quality_high_ambiguous_text <- renderUI({
+      threshold <- input$threshold_ambiguous
+      if (is.null(threshold)) threshold <- 5
+      p(paste0("Participants with > ", threshold, " ambiguous responses (n_ambivalent)"))
+    })
+
     output$quality_low_control <- DT::renderDT({
       req(rv$aat_data)
+      threshold <- input$threshold_control
+      if (is.null(threshold)) threshold <- 80
       issues <- rv$aat_data %>%
-        dplyr::filter(!is.na(control_pct) & control_pct < 80) %>%
+        dplyr::filter(!is.na(control_pct) & control_pct < threshold) %>%
         dplyr::select(code, date, control_pct, ambiguous_pct, file)
       .render_quality_table(issues, "No participants with low control score!")
     })
 
-    output$quality_high_ambivalent <- DT::renderDT({
+    output$quality_high_ambiguous <- DT::renderDT({
       req(rv$aat_data)
+      threshold <- input$threshold_ambiguous
+      if (is.null(threshold)) threshold <- 5
       issues <- rv$aat_data %>%
-        dplyr::filter(!is.na(n_ambivalent) & n_ambivalent > 5) %>%
+        dplyr::filter(!is.na(n_ambivalent) & n_ambivalent > threshold) %>%
         dplyr::select(code, date, n_ambivalent, n_evaluable, n_total, file)
-      .render_quality_table(issues, "No participants with high ambivalent responses!")
+      .render_quality_table(issues, "No participants with high ambiguous responses!")
     })
 
     output$quality_high_dontknow <- DT::renderDT({
