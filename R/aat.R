@@ -609,9 +609,6 @@ aat_analyze_structure <- function(root) {
   tree_lines <- character()
   tree_lines <- c(tree_lines, basename(root))
 
-  # Build complete hierarchical tree structure
-  # Strategy: Create a nested list structure, then render it
-
   # If all files are in root
   if (all(dirname(rel_paths) == ".")) {
     n_files <- length(rel_paths)
@@ -619,66 +616,78 @@ aat_analyze_structure <- function(root) {
     return(tree_lines)
   }
 
-  # Get all unique directory paths and build hierarchy
-  all_dirs <- unique(dirname(rel_paths))
-  all_dirs <- all_dirs[all_dirs != "."]
+  # Get all directories that contain files
+  dirs_with_files <- dirname(rel_paths)
+  dirs_with_files <- dirs_with_files[dirs_with_files != "."]
 
-  # Split paths into components and build tree structure
-  dir_tree <- list()
+  # Extract ALL directories in the hierarchy (including intermediate ones)
+  all_dirs_set <- character()
+  for (d in unique(dirs_with_files)) {
+    parts <- strsplit(d, "/")[[1]]
+    for (i in seq_along(parts)) {
+      partial_path <- paste(parts[1:i], collapse = "/")
+      all_dirs_set <- c(all_dirs_set, partial_path)
+    }
+  }
+  all_dirs <- unique(all_dirs_set)
+
+  # Count files directly in each directory (not in subdirs)
+  dir_file_counts <- sapply(all_dirs, function(d) {
+    sum(dirname(rel_paths) == d)
+  })
+
+  # Sort directories alphabetically for tree rendering
+  all_dirs <- sort(all_dirs)
+
+  # Render each directory
   for (dir_path in all_dirs) {
-    parts <- fs::path_split(dir_path)[[1]]
-    current <- dir_tree
-    for (part in parts) {
-      if (!part %in% names(current)) {
-        current[[part]] <- list(.files = 0, .subdirs = list())
-      }
-      current <- current[[part]]$.subdirs
-    }
-  }
+    parts <- strsplit(dir_path, "/")[[1]]
+    depth <- length(parts)
+    dir_name <- parts[depth]
 
-  # Count files in each directory
-  for (i in seq_along(rel_paths)) {
-    dir_path <- dirname(rel_paths[i])
-    if (dir_path == ".") next
-    parts <- fs::path_split(dir_path)[[1]]
-    current <- dir_tree
-    for (j in seq_along(parts)) {
-      part <- parts[j]
-      if (j == length(parts)) {
-        # Leaf directory - increment file count
-        current[[part]]$.files <- current[[part]]$.files + 1
-      }
-      current <- current[[part]]$.subdirs
-    }
-  }
+    # Find parent directory
+    parent <- if (depth > 1) paste(parts[1:(depth-1)], collapse = "/") else ""
 
-  # Render tree recursively
-  .render_tree <- function(tree, prefix = "", is_last = TRUE) {
-    lines <- character()
-    names_list <- names(tree)
-    for (i in seq_along(names_list)) {
-      name <- names_list[i]
-      if (name == ".files" || name == ".subdirs") next
+    # Find siblings (directories at same depth with same parent)
+    siblings <- all_dirs[sapply(all_dirs, function(x) {
+      x_parts <- strsplit(x, "/")[[1]]
+      if (length(x_parts) != depth) return(FALSE)
+      if (depth == 1) return(TRUE)
+      x_parent <- paste(x_parts[1:(depth-1)], collapse = "/")
+      return(x_parent == parent)
+    })]
 
-      is_last_item <- (i == length(names_list))
-      connector <- if (is_last_item) "└── " else "├── "
+    is_last_sibling <- (dir_path == siblings[length(siblings)])
 
-      n_files <- tree[[name]]$.files
-      file_label <- paste0("/ (", n_files, " AAT file", ifelse(n_files != 1, "s", ""), ")")
+    # Build prefix by checking ancestors
+    prefix <- ""
+    if (depth > 1) {
+      for (d in 1:(depth - 1)) {
+        ancestor_path <- paste(parts[1:d], collapse = "/")
+        ancestor_parts <- strsplit(ancestor_path, "/")[[1]]
+        ancestor_parent <- if (d > 1) paste(ancestor_parts[1:(d-1)], collapse = "/") else ""
 
-      lines <- c(lines, paste0(prefix, connector, name, file_label))
+        ancestor_siblings <- all_dirs[sapply(all_dirs, function(x) {
+          x_parts <- strsplit(x, "/")[[1]]
+          if (length(x_parts) != d) return(FALSE)
+          if (d == 1) return(TRUE)
+          x_parent <- paste(x_parts[1:(d-1)], collapse = "/")
+          return(x_parent == ancestor_parent)
+        })]
 
-      # Recurse into subdirectories
-      if (length(tree[[name]]$.subdirs) > 0) {
-        new_prefix <- paste0(prefix, if (is_last_item) "    " else "│   ")
-        sub_lines <- .render_tree(tree[[name]]$.subdirs, new_prefix, is_last_item)
-        lines <- c(lines, sub_lines)
+        ancestor_is_last <- (ancestor_path == ancestor_siblings[length(ancestor_siblings)])
+        prefix <- paste0(prefix, if (ancestor_is_last) "    " else "│   ")
       }
     }
-    return(lines)
-  }
 
-  tree_lines <- c(tree_lines, .render_tree(dir_tree, prefix = "", is_last = TRUE))
+    connector <- if (is_last_sibling) "└── " else "├── "
+
+    # File count for this directory
+    n_files <- dir_file_counts[dir_path]
+    file_label <- paste0("/ (", n_files, " AAT file", ifelse(n_files != 1, "s", ""), ")")
+
+    tree_lines <- c(tree_lines, paste0(prefix, connector, dir_name, file_label))
+  }
 
   return(tree_lines)
 }

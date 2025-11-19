@@ -73,28 +73,20 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9069 (2025-11-19)"),
+        h4("What's New in v0.0.0.9070 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "Complete hierarchical folder tree structure now displays properly (all levels shown)"
+            tags$strong("HOTFIX: "),
+            "Folder tree now correctly displays COMPLETE hierarchical structure with all directory levels"
           ),
           tags$li(
             tags$strong("FIXED: "),
-            "Quality control terminology changed from 'ambivalent' to 'ambiguous' throughout UI"
+            "Tree rendering algorithm rewritten to show intermediate directories and proper indentation"
           ),
           tags$li(
-            tags$strong("ADDED: "),
-            "Configurable quality thresholds: Low Control Score and High Ambiguous Count"
-          ),
-          tags$li(
-            tags$strong("ENHANCED: "),
-            "Quality report tab descriptions now dynamically reflect user-set threshold values"
-          ),
-          tags$li(
-            tags$strong("IMPROVED: "),
-            "All subheadings (Quality Report, Expected File Format, Detected Folder Structure) use h5 for consistency"
+            tags$strong("VERIFIED: "),
+            "Tested tree output with multi-level test data - all levels now visible with correct file counts"
           )
         )
       ),
@@ -109,6 +101,18 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9069
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9069 (2025-11-19)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("ADDED:"), " Configurable quality thresholds in AAT"),
+                tags$li(tags$strong("FIXED:"), " Terminology: 'ambivalent' → 'ambiguous'"),
+                tags$li(tags$strong("ENHANCED:"), " Dynamic quality report descriptions")
+              )
+            ),
 
             # v0.0.0.9068
             tags$div(
