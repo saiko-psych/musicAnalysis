@@ -14,7 +14,7 @@ mod_home_ui <- function(id) {
 
       # ASCII Art Banner with transparent background
       wellPanel(
-        style = "background-color: transparent; color: #2c1810; font-family: monospace; padding: 20px; margin-bottom: 30px; border: 2px solid #8B7355; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);",
+        style = "background-color: transparent; color: #3f2217; font-family: monospace; padding: 20px; margin-bottom: 30px; border: 2px solid #8B7355; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);",
         tags$pre(
           style = "margin: 0; font-size: 14px; line-height: 1.2;",
 "
@@ -73,16 +73,16 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9061 (2025-11-16)"),
+        h4("What's New in v0.0.0.9063 (2025-11-19)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "ASCII art background now properly transparent - music sheet fully visible"
+            tags$strong("ADDED: "),
+            "Music note favicon (browser tab icon) in vintage brown"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "CSS specificity fixed to ensure transparent backgrounds work correctly"
+            "App now has distinctive icon for easy tab identification"
           )
         )
       ),
@@ -97,6 +97,28 @@ mod_home_ui <- function(id) {
           ),
           tags$div(
             style = "padding: 15px 10px;",
+
+            # v0.0.0.9062
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9062 (2025-11-16)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("HOTFIX:"), " ASCII art background ACTUALLY transparent now"),
+                tags$li(tags$strong("FIXED:"), " CSS specificity enhanced to override Bootstrap defaults"),
+                tags$li(tags$strong("DOCS:"), " Workflow improvements and project cleanup")
+              )
+            ),
+
+            # v0.0.0.9061
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9061 (2025-11-16)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("IMPROVED:"), " CSS selector improvements for transparency")
+              )
+            ),
 
             # v0.0.0.9060
             tags$div(

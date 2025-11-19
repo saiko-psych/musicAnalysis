@@ -21,6 +21,8 @@ source(file.path(mod_path, "mod_merge.R"), local = TRUE)
 ui <- tagList(
   # Custom CSS for navbar, background, and spacing
   tags$head(
+    # Favicon - music note icon
+    tags$link(rel = "icon", type = "image/svg+xml", href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 384 512'%3E%3Cpath fill='%238B7355' d='M381.9 388.2c-6.4 27.4-27.2 42.8-55.1 48-24.5 4.5-44.9 5.6-64.5-10.2-23.9-20.1-24.2-53.4-2.7-74.4 17-16.2 40.9-19.5 76.9-25.8 6.6-1.2 16.7-2.9 22.3-5.1 0-107.7.1-166.9.1-267.1 0-8-1.9-11.6-9.8-13.6-2.5-.6-5-1.3-7.5-1.8-40.6-9.5-81.3-18.9-122-28.3C203 3.3 187.5-.1 171 0c-9.9 0-14.2 4.7-14.2 14.8v364.8c0 6.6-.4 13.2-2.3 19.6-6.6 22.6-23.3 37.4-44.8 42.4-25.3 5.9-49.2 4.4-69.8-9.8-24.6-17-30.3-46.8-14.3-74.4 16.1-27.7 42.4-35.3 74.2-38.6 11.8-1.2 23.4-1.8 35.1-2.7 7.4-.6 11.9-4.4 11.9-11.8V81.6c0-7.1 4.6-12.2 11.7-14.1 2.5-.7 5.1-1.2 7.6-1.7 40.2-9.3 80.4-18.6 120.6-27.9 16.5-3.8 32.9-7.6 49.4-11.4 7.9-1.8 10.6.8 10.6 8.8v276.2c0 6.1-.4 12.2-2.3 18.2z'/%3E%3C/svg%3E"),
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"),
     tags$style(HTML('
       /* Music sheet background for all pages */
