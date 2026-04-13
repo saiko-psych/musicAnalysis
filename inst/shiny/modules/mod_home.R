@@ -63,7 +63,7 @@ mod_home_ui <- function(id) {
               tags$strong("Build Date: "),
               tags$span(
                 style = "color: #8B7355; font-family: monospace; font-weight: bold;",
-                "2025-11-19"
+                "2026-04-13"
               )
             )
           )
@@ -73,20 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9070 (2025-11-19)"),
+        h4("What's New in v0.0.0.9072 (2026-04-13)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("HOTFIX: "),
-            "Folder tree now correctly displays COMPLETE hierarchical structure with all directory levels"
-          ),
-          tags$li(
             tags$strong("FIXED: "),
-            "Tree rendering algorithm rewritten to show intermediate directories and proper indentation"
+            "AAT terminology corrected - 'ambivalent' now used consistently for response type (code=2) across all UI labels"
           ),
           tags$li(
-            tags$strong("VERIFIED: "),
-            "Tested tree output with multi-level test data - all levels now visible with correct file counts"
+            tags$strong("REFACTORED: "),
+            "Quality report tables use shared reactive expressions for cleaner, more efficient code"
+          ),
+          tags$li(
+            tags$strong("ADDED: "),
+            "Automated shinytest2 regression test for AAT module"
+          ),
+          tags$li(
+            tags$strong("CLEANUP: "),
+            "Heading hierarchy, spacing, and dead code removal across AAT module"
           )
         )
       ),
@@ -102,6 +106,19 @@ mod_home_ui <- function(id) {
           tags$div(
             style = "padding: 15px 10px;",
 
+            # v0.0.0.9070-9072
+            tags$div(
+              style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
+              tags$h5(style = "margin-top: 0; color: #1976d2;", "v0.0.0.9070-9072 (2025-11-19 to 2026-04-13)"),
+              tags$ul(
+                style = "margin-bottom: 0;",
+                tags$li(tags$strong("HOTFIX:"), " Folder tree displays complete hierarchy (v9070)"),
+                tags$li(tags$strong("FIXED:"), " AAT terminology 'ambiguous' → 'ambivalent' for response type (v9071)"),
+                tags$li(tags$strong("REFACTORED:"), " Quality tables use shared reactives, dead code removed (v9072)"),
+                tags$li(tags$strong("ADDED:"), " shinytest2 regression test for AAT module (v9072)")
+              )
+            ),
+
             # v0.0.0.9069
             tags$div(
               style = "margin-bottom: 20px; padding: 10px; background-color: #e3f2fd; border-radius: 4px;",
@@ -109,7 +126,6 @@ mod_home_ui <- function(id) {
               tags$ul(
                 style = "margin-bottom: 0;",
                 tags$li(tags$strong("ADDED:"), " Configurable quality thresholds in AAT"),
-                tags$li(tags$strong("FIXED:"), " Terminology: 'ambivalent' → 'ambiguous'"),
                 tags$li(tags$strong("ENHANCED:"), " Dynamic quality report descriptions")
               )
             ),

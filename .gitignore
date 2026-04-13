@@ -61,6 +61,13 @@ Results/
 output/
 Output/
 
+# Playwright/browser testing artifacts
+.playwright-mcp/
+test_screenshots/
+
+# shinytest2 snapshots (platform-specific, regenerated on demand)
+tests/testthat/_snaps/
+
 # Documentation builds
 docs/*.html
 man/*.html

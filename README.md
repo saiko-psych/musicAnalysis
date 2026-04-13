@@ -6,7 +6,7 @@ An R package for automated data extraction and preparation from music psychology
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.4.0-blue.svg)](https://www.r-project.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.0.0.9062-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
+[![Version](https://img.shields.io/badge/version-0.0.0.9072-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
 
 ---
 
@@ -92,7 +92,7 @@ devtools::install_github("saiko-psych/musicAnalysis")
 ```r
 # Download the latest release tarball
 # Then install locally:
-install.packages("path/to/musicAnalysis_0.0.0.9062.tar.gz",
+install.packages("path/to/musicAnalysis_0.0.0.9072.tar.gz",
                  repos = NULL, type = "source")
 ```
 
@@ -518,11 +518,21 @@ set_ma_options(thresholds = list(
 
 ## 📋 Version History
 
-### v0.0.0.9062 (2025-11-16) - Latest
+### v0.0.0.9072 (2026-04-13) - Latest
+- ✅ **FIXED**: AAT terminology corrected ("ambivalent" for response type)
+- ✅ **REFACTORED**: Quality tables use shared reactive expressions
+- ✅ **ADDED**: shinytest2 regression test for AAT module
+- ✅ Heading hierarchy, spacing, and dead code cleanup
+
+### v0.0.0.9063-9070 (2025-11-17 to 2025-11-19)
+- ✅ PPPT module fully implemented with PPP indices across 6 UCF bands
+- ✅ AAT folder tree, file type selection, quality categorization
+- ✅ Configurable quality thresholds and dynamic descriptions
+- ✅ Row display selectors for all data tables
+
+### v0.0.0.9062 (2025-11-16)
 - ✅ **HOTFIX**: ASCII art background now properly transparent
 - ✅ Enhanced CSS specificity to override Bootstrap 3 defaults
-- ✅ Music sheet background fully visible behind ASCII art banner
-- ✅ All feature branches merged and deleted - only master branch remains
 
 ### v0.0.0.9061 (2025-11-16)
 - ✅ Attempted ASCII background transparency fix
@@ -648,6 +658,6 @@ For questions, issues, or feature requests:
 
 ---
 
-**Last Updated**: 2025-11-16
-**Version**: 0.0.0.9062
+**Last Updated**: 2026-04-13
+**Version**: 0.0.0.9072
 **Status**: Active Development 🚧

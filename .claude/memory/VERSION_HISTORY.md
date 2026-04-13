@@ -3,7 +3,19 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9070 (2025-11-19)
+## Current Version: v0.0.0.9072 (2026-04-13)
+
+### v0.0.0.9072 (2026-04-13)
+- **REFACTOR: Quality tables use shared reactives** - deduplicated filtering logic across quality report tabs
+- **REMOVED: Dead code** - unnecessary `is.null(threshold)` guards in quality table outputs
+- **ADDED: shinytest2 test for AAT module** - automated regression test covering tab navigation, threshold labels, input validation
+- **CLEANUP: Heading hierarchy** - `h3("Scan Results")` → `h4()` for consistency with sibling modules
+- **CLEANUP: Spacing** - removed excessive `br()` elements for consistent layout
+
+### v0.0.0.9071 (2026-04-13)
+- **FIXED: AAT terminology** - "ambiguous" → "ambivalent" in threshold labels, help texts, and quality tab names (response type, not item type)
+- **FIXED: Consistent UI language** - "High Ambivalent Count Threshold", "Filter for high ambivalent/don't-know counts", "n_ambivalent" in all UI strings
+- **NOTE: Reverses v0.0.0.9069 decision** - v9069 changed "ambivalent" to "ambiguous" but "ambivalent" is correct for the response type (code=2)
 
 ### v0.0.0.9070 (2025-11-19)
 - **HOTFIX: Folder tree displays complete hierarchy** - tree rendering completely rewritten to show ALL directory levels

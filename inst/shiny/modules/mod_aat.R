@@ -208,7 +208,7 @@ mod_aat_ui <- function(id) {
               "Show only participants with quality issues",
               value = FALSE
             ),
-            tags$small(class = "text-muted", "Filter for high ambiguous/don't-know counts")
+            tags$small(class = "text-muted", "Filter for high ambivalent/don't-know counts")
           )
         ),
         br(),
@@ -230,13 +230,13 @@ mod_aat_ui <- function(id) {
             width = 6,
             numericInput(
               ns("threshold_ambiguous"),
-              "High Ambiguous Count Threshold:",
+              "High Ambivalent Count Threshold:",
               value = 5,
               min = 0,
               max = 50,
               step = 1
             ),
-            tags$small(class = "text-muted", "Participants with n_ambiguous above this value will be flagged")
+            tags$small(class = "text-muted", "Participants with n_ambivalent above this value will be flagged")
           )
         )
       )
@@ -284,14 +284,16 @@ mod_aat_ui <- function(id) {
       wellPanel(
         style = "background-color: #f5f5f5;",
         h4("Scan Results"),
+        br(),
 
         # Summary Statistics
+        h4("Summary Statistics"),
         htmlOutput(ns("summary_stats")),
 
-        hr(),
+        br(), br(),
 
         # Data Table
-        h5("Participant-Level Results"),
+        h4("Participant-Level Results"),
         fluidRow(
           column(
             width = 6,
@@ -319,7 +321,7 @@ mod_aat_ui <- function(id) {
         br(), br(),
 
         # Quality Report
-        h5("Quality Report"),
+        h4("Quality Report"),
         tags$details(
           tags$summary(tags$strong("Data Quality Issues by Category (click to expand)")),
           br(),
@@ -333,7 +335,7 @@ mod_aat_ui <- function(id) {
               DT::DTOutput(ns("quality_low_control"))
             ),
             tabPanel(
-              "High Ambiguous",
+              "High Ambivalent",
               br(),
               htmlOutput(ns("quality_high_ambiguous_text")),
               DT::DTOutput(ns("quality_high_ambiguous"))
@@ -789,61 +791,70 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
       )
     }
 
-    # Dynamic text for quality thresholds
+    # Shared reactive expressions for quality-filtered data
+    quality_low_control_issues <- reactive({
+      req(rv$aat_data)
+      rv$aat_data %>%
+        dplyr::filter(!is.na(control_pct) & control_pct < input$threshold_control) %>%
+        dplyr::select(code, date, control_pct, ambiguous_pct, file)
+    })
+
+    quality_high_ambivalent_issues <- reactive({
+      req(rv$aat_data)
+      rv$aat_data %>%
+        dplyr::filter(!is.na(n_ambivalent) & n_ambivalent > input$threshold_ambiguous) %>%
+        dplyr::select(code, date, n_ambivalent, n_evaluable, n_total, file)
+    })
+
+    quality_high_dontknow_issues <- reactive({
+      req(rv$aat_data)
+      rv$aat_data %>%
+        dplyr::filter(!is.na(n_dont_know) & n_dont_know > 3) %>%
+        dplyr::select(code, date, n_dont_know, n_evaluable, n_total, file)
+    })
+
+    quality_missing_date_issues <- reactive({
+      req(rv$aat_data)
+      rv$aat_data %>%
+        dplyr::filter(is.na(date) | date == "" | date == "NA") %>%
+        dplyr::select(code, date, ambiguous_pct, control_pct, file)
+    })
+
+    quality_missing_code_issues <- reactive({
+      req(rv$aat_data)
+      rv$aat_data %>%
+        dplyr::filter(is.na(code) | code == "" | code == "NA") %>%
+        dplyr::select(code, date, ambiguous_pct, control_pct, file)
+    })
+
+    # Quality threshold text outputs
     output$quality_low_control_text <- renderUI({
-      threshold <- input$threshold_control
-      if (is.null(threshold)) threshold <- 80
-      p(paste0("Participants with control score < ", threshold, "%"))
+      p(paste0("Participants with control score < ", input$threshold_control, "%"))
     })
 
     output$quality_high_ambiguous_text <- renderUI({
-      threshold <- input$threshold_ambiguous
-      if (is.null(threshold)) threshold <- 5
-      p(paste0("Participants with > ", threshold, " ambiguous responses (n_ambivalent)"))
+      p(paste0("Participants with > ", input$threshold_ambiguous, " ambivalent responses (n_ambivalent)"))
     })
 
+    # Quality table outputs
     output$quality_low_control <- DT::renderDT({
-      req(rv$aat_data)
-      threshold <- input$threshold_control
-      if (is.null(threshold)) threshold <- 80
-      issues <- rv$aat_data %>%
-        dplyr::filter(!is.na(control_pct) & control_pct < threshold) %>%
-        dplyr::select(code, date, control_pct, ambiguous_pct, file)
-      .render_quality_table(issues, "No participants with low control score!")
+      .render_quality_table(quality_low_control_issues(), "No participants with low control score!")
     })
 
     output$quality_high_ambiguous <- DT::renderDT({
-      req(rv$aat_data)
-      threshold <- input$threshold_ambiguous
-      if (is.null(threshold)) threshold <- 5
-      issues <- rv$aat_data %>%
-        dplyr::filter(!is.na(n_ambivalent) & n_ambivalent > threshold) %>%
-        dplyr::select(code, date, n_ambivalent, n_evaluable, n_total, file)
-      .render_quality_table(issues, "No participants with high ambiguous responses!")
+      .render_quality_table(quality_high_ambivalent_issues(), "No participants with high ambivalent responses!")
     })
 
     output$quality_high_dontknow <- DT::renderDT({
-      req(rv$aat_data)
-      issues <- rv$aat_data %>%
-        dplyr::filter(!is.na(n_dont_know) & n_dont_know > 3) %>%
-        dplyr::select(code, date, n_dont_know, n_evaluable, n_total, file)
-      .render_quality_table(issues, "No participants with high 'don't know' responses!")
+      .render_quality_table(quality_high_dontknow_issues(), "No participants with high 'don't know' responses!")
     })
 
     output$quality_missing_date <- DT::renderDT({
-      req(rv$aat_data)
-      issues <- rv$aat_data %>%
-        dplyr::filter(is.na(date) | date == "" | date == "NA") %>%
-        dplyr::select(code, date, ambiguous_pct, control_pct, file)
-      .render_quality_table(issues, "No participants with missing date!")
+      .render_quality_table(quality_missing_date_issues(), "No participants with missing date!")
     })
 
     output$quality_missing_code <- DT::renderDT({
-      req(rv$aat_data)
-      issues <- rv$aat_data %>%
-        dplyr::filter(is.na(code) | code == "" | code == "NA") %>%
-        dplyr::select(code, date, ambiguous_pct, control_pct, file)
-      .render_quality_table(issues, "No participants with missing code!")
+      .render_quality_table(quality_missing_code_issues(), "No participants with missing code!")
     })
 
     # Download CSV
