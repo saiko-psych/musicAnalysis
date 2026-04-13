@@ -215,7 +215,7 @@ mod_aat_ui <- function(id) {
         h5("Quality Control Thresholds"),
         fluidRow(
           column(
-            width = 6,
+            width = 4,
             numericInput(
               ns("threshold_control"),
               "Low Control Score Threshold (%):",
@@ -227,7 +227,7 @@ mod_aat_ui <- function(id) {
             tags$small(class = "text-muted", "Participants with control_pct below this value will be flagged")
           ),
           column(
-            width = 6,
+            width = 4,
             numericInput(
               ns("threshold_ambiguous"),
               "High Ambivalent Count Threshold:",
@@ -237,6 +237,18 @@ mod_aat_ui <- function(id) {
               step = 1
             ),
             tags$small(class = "text-muted", "Participants with n_ambivalent above this value will be flagged")
+          ),
+          column(
+            width = 4,
+            numericInput(
+              ns("threshold_dontknow"),
+              "High Don't Know Count Threshold:",
+              value = 3,
+              min = 0,
+              max = 50,
+              step = 1
+            ),
+            tags$small(class = "text-muted", "Participants with n_dont_know above this value will be flagged")
           )
         )
       )
@@ -343,7 +355,7 @@ mod_aat_ui <- function(id) {
             tabPanel(
               "High Don't Know",
               br(),
-              p("Participants with > 3 'don't know' responses"),
+              htmlOutput(ns("quality_high_dontknow_text")),
               DT::DTOutput(ns("quality_high_dontknow"))
             ),
             tabPanel(
@@ -700,8 +712,9 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
       mean_ambiguous <- round(mean(data$ambiguous_pct, na.rm = TRUE), 1)
       mean_control <- round(mean(data$control_pct, na.rm = TRUE), 1)
       thresh_ambivalent <- input$threshold_ambiguous
+      thresh_dontknow <- input$threshold_dontknow
       n_with_quality_issues <- sum(
-        data$n_ambivalent > thresh_ambivalent | data$n_dont_know > 3, na.rm = TRUE
+        data$n_ambivalent > thresh_ambivalent | data$n_dont_know > thresh_dontknow, na.rm = TRUE
       )
 
       HTML(paste0(
@@ -710,7 +723,7 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
         "<p><strong>Mean Ambiguous %:</strong> ", mean_ambiguous, "%</p>",
         "<p><strong>Mean Control %:</strong> ", mean_control, "%</p>",
         "<p><strong>Participants with Quality Issues:</strong> ", n_with_quality_issues,
-        " (>", thresh_ambivalent, " ambivalent or >3 don't know)</p>",
+        " (>", thresh_ambivalent, " ambivalent or >", thresh_dontknow, " don't know)</p>",
         "</div>"
       ))
     })
@@ -721,11 +734,10 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
 
       data_display <- rv$aat_data_edited
 
-      # Apply quality filter if enabled (uses configurable threshold)
+      # Apply quality filter if enabled (uses configurable thresholds)
       if (isTRUE(input$show_quality_only)) {
-        thresh <- input$threshold_ambiguous
         data_display <- data_display %>%
-          dplyr::filter(n_ambivalent > thresh | n_dont_know > 3)
+          dplyr::filter(n_ambivalent > input$threshold_ambiguous | n_dont_know > input$threshold_dontknow)
       }
 
       # Get rows to display from input
@@ -813,7 +825,7 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
     quality_high_dontknow_issues <- reactive({
       req(rv$aat_data)
       rv$aat_data %>%
-        dplyr::filter(!is.na(n_dont_know) & n_dont_know > 3) %>%
+        dplyr::filter(!is.na(n_dont_know) & n_dont_know > input$threshold_dontknow) %>%
         dplyr::select(code, date, n_dont_know, n_evaluable, n_total, file)
     })
 
@@ -838,6 +850,10 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
 
     output$quality_high_ambiguous_text <- renderUI({
       p(paste0("Participants with > ", input$threshold_ambiguous, " ambivalent responses (n_ambivalent)"))
+    })
+
+    output$quality_high_dontknow_text <- renderUI({
+      p(paste0("Participants with > ", input$threshold_dontknow, " don't know responses (n_dont_know)"))
     })
 
     # Quality table outputs

@@ -63,7 +63,7 @@ mod_home_ui <- function(id) {
               tags$strong("Build Date: "),
               tags$span(
                 style = "color: #8B7355; font-family: monospace; font-weight: bold;",
-                "2026-04-13"
+                "2026-04-13"  # v0.0.0.9074
               )
             )
           )
@@ -73,28 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9073 (2026-04-13)"),
+        h4("What's New in v0.0.0.9074 (2026-04-13)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("ADDED: "),
-            "Plot grouping by custom variable in Musical Experience module"
+            "KLAWA visualizations - boxplots, histograms, and violin plots for performance metrics with grouping"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Variable labels (attr) for all time-derived variables (IMP, totals, starting ages, counts)"
+            "SPSS (.sav) and Stata (.dta) export in Musical Experience - preserves variable labels"
+          ),
+          tags$li(
+            tags$strong("ADDED: "),
+            "Configurable Don't-Know threshold in AAT quality controls (was hardcoded >3)"
           ),
           tags$li(
             tags$strong("IMPROVED: "),
-            "Wide output columns now logically sorted: per-category blocks, totals, counts, IMP, names"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "Consistent H2 heading hierarchy across all modules"
-          ),
-          tags$li(
-            tags$strong("FIXED: "),
-            "AAT summary stats now use configurable thresholds instead of hardcoded values"
+            "Plot grouping, variable labels, column sorting, heading hierarchy (from v0.0.0.9073)"
           )
         )
       ),

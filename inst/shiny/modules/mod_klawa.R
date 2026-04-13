@@ -246,6 +246,57 @@ mod_klawa_ui <- function(id) {
 
     br(), br(),
 
+    # Visualization section (only visible after scan)
+    conditionalPanel(
+      condition = sprintf("output['%s'] !== null", ns("tbl")),
+      wellPanel(
+        style = "background-color: #f5f5f5;",
+        h4("6. Visualize Results"),
+        fluidRow(
+          column(
+            width = 4,
+            selectInput(
+              ns("plot_metric"),
+              "Metric to plot:",
+              choices = c(
+                "Volume Difference" = "volume_difference",
+                "Pitch" = "pitch",
+                "Onset Difference" = "onset_difference",
+                "Pitch Duration Difference" = "pitch_duration_difference"
+              ),
+              selected = "volume_difference"
+            )
+          ),
+          column(
+            width = 4,
+            selectInput(
+              ns("plot_type_klawa"),
+              "Plot type:",
+              choices = c("Boxplot" = "boxplot", "Histogram" = "histogram", "Violin" = "violin"),
+              selected = "boxplot"
+            )
+          ),
+          column(
+            width = 4,
+            selectInput(
+              ns("plot_group_by"),
+              "Group by:",
+              choices = c(
+                "None" = "none",
+                "Group" = "group",
+                "Measurement" = "measurement",
+                "PC" = "pc"
+              ),
+              selected = "group"
+            )
+          )
+        ),
+        plotly::plotlyOutput(ns("klawa_plot"), height = "500px")
+      )
+    ),
+
+    br(), br(),
+
     # Auto-generated quality analysis (detailed tables only)
     uiOutput(ns("auto_reports_ui")),
 
@@ -689,6 +740,81 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
 
       # Store edited data
       edited_data(current_data)
+    })
+
+    # --- KLAWA Visualization ---------------------------------------------------
+    output$klawa_plot <- plotly::renderPlotly({
+      req(klawa_rv())
+      data <- if (!is.null(edited_data())) edited_data() else klawa_rv()
+
+      metric <- input$plot_metric
+      plot_type <- input$plot_type_klawa
+      group_by <- input$plot_group_by
+
+      req(metric %in% names(data))
+
+      # Remove NA values for the selected metric
+      plot_data <- data[!is.na(data[[metric]]), ]
+      if (nrow(plot_data) == 0) return(plotly::plotly_empty())
+
+      metric_labels <- c(
+        volume_difference = "Volume Difference",
+        pitch = "Pitch",
+        onset_difference = "Onset Difference",
+        pitch_duration_difference = "Pitch Duration Difference"
+      )
+      y_label <- metric_labels[[metric]]
+
+      if (plot_type == "histogram") {
+        if (group_by != "none" && group_by %in% names(plot_data)) {
+          p <- plotly::plot_ly(plot_data, x = stats::as.formula(paste0("~", metric)),
+                               color = stats::as.formula(paste0("~", group_by)),
+                               type = "histogram", alpha = 0.7) %>%
+            plotly::layout(barmode = "overlay",
+                           xaxis = list(title = y_label),
+                           yaxis = list(title = "Count"))
+        } else {
+          p <- plotly::plot_ly(plot_data, x = stats::as.formula(paste0("~", metric)),
+                               type = "histogram") %>%
+            plotly::layout(xaxis = list(title = y_label),
+                           yaxis = list(title = "Count"))
+        }
+      } else {
+        # Boxplot or Violin
+        if (group_by != "none" && group_by %in% names(plot_data)) {
+          p <- plotly::plot_ly(plot_data,
+                               x = stats::as.formula(paste0("~", group_by)),
+                               y = stats::as.formula(paste0("~", metric)),
+                               color = stats::as.formula(paste0("~", group_by)),
+                               type = "box") %>%
+            plotly::layout(xaxis = list(title = group_by),
+                           yaxis = list(title = y_label),
+                           showlegend = FALSE)
+          if (plot_type == "violin") {
+            p <- plotly::plot_ly(plot_data,
+                                 x = stats::as.formula(paste0("~", group_by)),
+                                 y = stats::as.formula(paste0("~", metric)),
+                                 color = stats::as.formula(paste0("~", group_by)),
+                                 type = "violin",
+                                 box = list(visible = TRUE),
+                                 meanline = list(visible = TRUE)) %>%
+              plotly::layout(xaxis = list(title = group_by),
+                             yaxis = list(title = y_label),
+                             showlegend = FALSE)
+          }
+        } else {
+          p <- plotly::plot_ly(plot_data,
+                               y = stats::as.formula(paste0("~", metric)),
+                               type = if (plot_type == "violin") "violin" else "box",
+                               name = y_label) %>%
+            plotly::layout(yaxis = list(title = y_label))
+        }
+      }
+
+      p %>% plotly::layout(
+        title = paste(y_label, if (group_by != "none") paste("by", group_by) else ""),
+        hovermode = "closest"
+      )
     })
 
     output$dl_csv <- downloadHandler(

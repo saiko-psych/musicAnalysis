@@ -17,7 +17,7 @@ This file provides essential guidance to Claude Code when working with this repo
 3. **AAT CSV** - Auditory Ambiguity Test (ambiguous % and control % metrics)
 4. **PPPT CSV** - Pitch Perception Proficiency Test (PPP indices across 6 UCF frequency bands)
 
-**Current Version**: 0.0.0.9073 (2026-04-13)
+**Current Version**: 0.0.0.9074 (2026-04-13)
 
 ## Git Workflow
 
@@ -103,11 +103,14 @@ git push origin master
 12. ✅ AAT dynamic quality thresholds
 13. ✅ shinytest2 regression test for AAT module
 
+### Completed (v0.0.0.9074)
+14. ✅ KLAWA visualizations (boxplots, histograms, violin plots with grouping)
+15. ✅ Export with labels (SPSS .sav and Stata .dta via haven)
+16. ✅ Don't-Know threshold configurable in AAT
+
 ### Next Steps
-1. ⬜ KLAWA visualizations (boxplots/histograms for performance metrics)
-2. ⬜ Musical Experience profile Shiny integration
-3. ⬜ Export with labels (SPSS/Stata format to preserve attr labels)
-4. ⬜ Don't-Know threshold configurable in AAT (currently hardcoded >3)
+1. ⬜ Musical Experience profile Shiny integration
+2. ⬜ Bracket cleaning in profile output (musical_experience_profile)
 
 ## Code Style
 

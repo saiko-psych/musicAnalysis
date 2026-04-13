@@ -1,6 +1,6 @@
 Package: musicAnalysis
 Title: MusicPsychology Analysis in R (for University of Graz)
-Version: 0.0.0.9073
+Version: 0.0.0.9074
 Authors@R: 
     person("David", "Matischek", , "david.matischek@uni-graz.at", role = c("aut", "cre"))
 Description: Should be usefull for our Analysis in Musicpsychology at the KF-Graz (only for our Team).
@@ -26,4 +26,6 @@ Imports:
     shinyFiles,
     plotly
 Suggests:
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    shinytest2,
+    haven

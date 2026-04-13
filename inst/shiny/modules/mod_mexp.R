@@ -313,9 +313,19 @@ mod_mexp_ui <- function(id) {
       )
     ),
     br(),
-    downloadButton(ns("dl_wide"), "Download WIDE CSV"),
-    downloadButton(ns("dl_long"), "Download LONG CSV"),
-    downloadButton(ns("dl_flags"), "Download FLAGS CSV")
+    fluidRow(
+      column(width = 6,
+        h5("CSV Export"),
+        downloadButton(ns("dl_wide"), "Download WIDE CSV", icon = icon("download")),
+        downloadButton(ns("dl_long"), "Download LONG CSV", icon = icon("download")),
+        downloadButton(ns("dl_flags"), "Download FLAGS CSV", icon = icon("download"))
+      ),
+      column(width = 6,
+        h5("SPSS/Stata Export (preserves variable labels)"),
+        downloadButton(ns("dl_wide_sav"), "Download WIDE .sav (SPSS)", icon = icon("download")),
+        downloadButton(ns("dl_wide_dta"), "Download WIDE .dta (Stata)", icon = icon("download"))
+      )
+    )
   )
 }
 
@@ -887,6 +897,40 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     output$dl_history <- downloadHandler(
       filename = function() paste0("practice_history_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
       content = function(file) { req(history_rv()); readr::write_csv(history_rv(), file) }
+    )
+
+    # SPSS/Stata exports (preserve attr labels)
+    output$dl_wide_sav <- downloadHandler(
+      filename = function() paste0("musical_experience_wide_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".sav"),
+      content = function(file) {
+        req(res_rv())
+        wide <- res_rv()$wide
+        # Convert attr("label") to haven labelled format
+        for (col in names(wide)) {
+          lbl <- attr(wide[[col]], "label")
+          if (!is.null(lbl)) {
+            attr(wide[[col]], "label") <- lbl
+          }
+        }
+        haven::write_sav(wide, file)
+      }
+    )
+
+    output$dl_wide_dta <- downloadHandler(
+      filename = function() paste0("musical_experience_wide_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".dta"),
+      content = function(file) {
+        req(res_rv())
+        wide <- res_rv()$wide
+        # Stata requires valid variable names (no spaces, max 32 chars)
+        names(wide) <- make.names(substr(names(wide), 1, 32), unique = TRUE)
+        for (col in names(wide)) {
+          lbl <- attr(wide[[col]], "label")
+          if (!is.null(lbl)) {
+            attr(wide[[col]], "label") <- lbl
+          }
+        }
+        haven::write_dta(wide, file)
+      }
     )
   })
 }

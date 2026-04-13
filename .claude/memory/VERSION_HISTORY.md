@@ -3,7 +3,13 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9073 (2026-04-13)
+## Current Version: v0.0.0.9074 (2026-04-13)
+
+### v0.0.0.9074 (2026-04-13)
+- **ADDED: KLAWA visualizations** - boxplots, histograms, violin plots for performance metrics (volume_difference, pitch, onset_difference, pitch_duration_difference) with grouping by group/measurement/PC
+- **ADDED: SPSS/Stata export** - Musical Experience module now exports .sav (SPSS) and .dta (Stata) preserving attr variable labels
+- **ADDED: Don't-Know threshold** - AAT quality controls now have configurable Don't-Know threshold (was hardcoded >3)
+- **ADDED: haven to Suggests** - Required for SPSS/Stata export
 
 ### v0.0.0.9073 (2026-04-13)
 - **ADDED: Plot grouping by custom variable** - Musical Experience "By grouping variable" facet now fully implemented
