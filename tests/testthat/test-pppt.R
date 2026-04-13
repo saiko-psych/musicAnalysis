@@ -68,9 +68,9 @@ test_that("pppt_analyze_structure returns correct counts", {
   result <- pppt_analyze_structure(test_dir)
 
   expect_type(result, "list")
-  expect_true("n_rsl_files" %in% names(result))
-  expect_true("n_itl_files" %in% names(result))
-  expect_gte(result$n_rsl_files, 1)
+  expect_true("n_pppt_rsl" %in% names(result))
+  expect_true("n_pppt_itl" %in% names(result))
+  expect_gte(result$n_pppt_rsl, 1)
 })
 
 test_that("pppt_parse_one handles CODE_CONFLICT correctly", {

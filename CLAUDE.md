@@ -92,12 +92,22 @@ git push origin master
 3. ✅ Show R Code buttons implemented
 4. ✅ UI polish complete (brown theme, transparent ASCII art)
 
-### Next Steps (see .claude/memory/PRIORITIES.md)
-1. ⬜ KLAWA flexible folder structure
-2. ⬜ Musical Experience variable organization
-3. ⬜ Variable name cleaning (remove brackets)
-4. ⬜ Variable labels implementation
-5. ⬜ Plot grouping by variables
+### Completed (v0.0.0.9073)
+5. ✅ KLAWA flexible folder structure (auto-detect + custom settings)
+6. ✅ Musical Experience variable organization (logical column ordering)
+7. ✅ Variable name cleaning (brackets removed from survey passthrough columns)
+8. ✅ Variable labels (attr labels for all time-derived variables)
+9. ✅ Plot grouping by variables (Musical Experience group faceting)
+10. ✅ Consistent H2 heading hierarchy across all modules
+11. ✅ AAT terminology fix (ambiguous vs ambivalent)
+12. ✅ AAT dynamic quality thresholds
+13. ✅ shinytest2 regression test for AAT module
+
+### Next Steps
+1. ⬜ KLAWA visualizations (boxplots/histograms for performance metrics)
+2. ⬜ Musical Experience profile Shiny integration
+3. ⬜ Export with labels (SPSS/Stata format to preserve attr labels)
+4. ⬜ Don't-Know threshold configurable in AAT (currently hardcoded >3)
 
 ## Code Style
 
@@ -112,7 +122,7 @@ git push origin master
 ## Testing
 
 ```r
-# Run all tests (139 tests: 60 KLAWA, 31 AAT, 20 merge, 28 utils)
+# Run all tests (189 tests)
 devtools::test()
 
 # Quick visual test
