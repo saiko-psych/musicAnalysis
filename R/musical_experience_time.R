@@ -716,15 +716,17 @@ compute_practice_history <- function(
                             paste0("Total yearly practice hours: ", cat_display))
     wide_data <- .set_label(wide_data, paste0(cat, "_min_starting_age"),
                             paste0("Earliest starting age across all ", tolower(cat_display)))
-    wide_data <- .set_label(wide_data, paste0("number_of_", cat, "s"),
-                            paste0("Number of different ", tolower(cat_display), " experiences"))
     wide_data <- .set_label(wide_data, paste0("IMP_", cat),
                             paste0("Index of Musical Practice: ", cat_display))
   }
 
-  # Fix: number_of_singing has no 's' suffix
+  # Count variables use inconsistent naming — label each explicitly
+  wide_data <- .set_label(wide_data, "number_of_instruments",
+                          "Number of different instrument experiences")
   wide_data <- .set_label(wide_data, "number_of_singing",
                           "Number of different singing experiences")
+  wide_data <- .set_label(wide_data, "number_of_othermusic",
+                          "Number of different other music experiences")
 
   # Global aggregates
   wide_data <- .set_label(wide_data, "total_musical_experience",
@@ -762,11 +764,18 @@ compute_practice_history <- function(
   ordered <- c(ordered, sort(grep("^singingtype\\d+$", all_cols, value = TRUE)))
   ordered <- c(ordered, sort(grep("^whichothermusic\\d+$", all_cols, value = TRUE)))
 
-  # Any remaining columns not yet ordered
+  # Any remaining columns not yet ordered (raw survey passthrough)
   remaining <- setdiff(all_cols, ordered)
   ordered <- c(ordered, remaining)
 
   wide_data <- wide_data[, ordered, drop = FALSE]
+
+  # Clean bracket notation from passthrough survey column names
+  # e.g., "firstyears[1]" → "firstyears_1", "music2[other]" → "music2_other"
+  clean_names <- names(wide_data)
+  clean_names <- gsub("\\[", "_", clean_names)
+  clean_names <- gsub("\\]", "", clean_names)
+  names(wide_data) <- clean_names
 
   wide_data
 }
