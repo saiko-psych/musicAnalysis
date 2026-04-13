@@ -489,7 +489,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
       )
     })
 
-    # Group variable selector
+    # Group variable selector (must not suspend when hidden by conditionalPanel)
     output$group_var_ui <- renderUI({
       req(res_rv())
       wide_data <- res_rv()$wide
@@ -504,6 +504,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
         selected = NULL
       )
     })
+    outputOptions(output, "group_var_ui", suspendWhenHidden = FALSE)
 
     # Reactive value to store current plot and code
     current_plot_rv <- reactiveVal(NULL)
