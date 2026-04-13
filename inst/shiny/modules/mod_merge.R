@@ -3,7 +3,7 @@
 mod_merge_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
-    h3("Merge datasets by `code`"),
+    h2("Merge datasets by `code`"),
     p("Provide two CSV files with a `code` column. Left dataset (X) will be the anchor."),
     fluidRow(
       column(6, fileInput(ns("x_csv"), "Left dataset (X)", accept = ".csv")),

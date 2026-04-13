@@ -699,7 +699,10 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
       n_participants <- nrow(data)
       mean_ambiguous <- round(mean(data$ambiguous_pct, na.rm = TRUE), 1)
       mean_control <- round(mean(data$control_pct, na.rm = TRUE), 1)
-      n_with_quality_issues <- sum(data$n_ambivalent > 5 | data$n_dont_know > 3, na.rm = TRUE)
+      thresh_ambivalent <- input$threshold_ambiguous
+      n_with_quality_issues <- sum(
+        data$n_ambivalent > thresh_ambivalent | data$n_dont_know > 3, na.rm = TRUE
+      )
 
       HTML(paste0(
         "<div style='background-color: #e3f2fd; padding: 15px; border-radius: 5px;'>",
@@ -707,7 +710,7 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
         "<p><strong>Mean Ambiguous %:</strong> ", mean_ambiguous, "%</p>",
         "<p><strong>Mean Control %:</strong> ", mean_control, "%</p>",
         "<p><strong>Participants with Quality Issues:</strong> ", n_with_quality_issues,
-        " (>5 ambivalent or >3 don't know)</p>",
+        " (>", thresh_ambivalent, " ambivalent or >3 don't know)</p>",
         "</div>"
       ))
     })
@@ -718,10 +721,11 @@ write.csv(aat_data, "aat_results.csv", row.names = FALSE)', escaped_path)
 
       data_display <- rv$aat_data_edited
 
-      # Apply quality filter if enabled
+      # Apply quality filter if enabled (uses configurable threshold)
       if (isTRUE(input$show_quality_only)) {
+        thresh <- input$threshold_ambiguous
         data_display <- data_display %>%
-          dplyr::filter(n_ambivalent > 5 | n_dont_know > 3)
+          dplyr::filter(n_ambivalent > thresh | n_dont_know > 3)
       }
 
       # Get rows to display from input

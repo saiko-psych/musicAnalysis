@@ -6,7 +6,7 @@ An R package for automated data extraction and preparation from music psychology
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.4.0-blue.svg)](https://www.r-project.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.0.0.9072-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
+[![Version](https://img.shields.io/badge/version-0.0.0.9073-green.svg)](https://github.com/saiko-psych/musicAnalysis/releases)
 
 ---
 
@@ -92,7 +92,7 @@ devtools::install_github("saiko-psych/musicAnalysis")
 ```r
 # Download the latest release tarball
 # Then install locally:
-install.packages("path/to/musicAnalysis_0.0.0.9072.tar.gz",
+install.packages("path/to/musicAnalysis_0.0.0.9073.tar.gz",
                  repos = NULL, type = "source")
 ```
 
@@ -659,5 +659,5 @@ For questions, issues, or feature requests:
 ---
 
 **Last Updated**: 2026-04-13
-**Version**: 0.0.0.9072
+**Version**: 0.0.0.9073
 **Status**: Active Development 🚧

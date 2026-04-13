@@ -3,7 +3,14 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9072 (2026-04-13)
+## Current Version: v0.0.0.9073 (2026-04-13)
+
+### v0.0.0.9073 (2026-04-13)
+- **ADDED: Plot grouping by custom variable** - Musical Experience "By grouping variable" facet now fully implemented
+- **ADDED: Variable labels** - `attr(col, "label")` for all time-derived variables (IMP, totals, starting ages, counts)
+- **IMPROVED: Wide output column ordering** - logically sorted: code → per-category → totals → counts → IMP → names
+- **FIXED: Heading hierarchy** - all module titles now use H2 consistently (Musical Experience, Merge were H3)
+- **FIXED: AAT dynamic thresholds** - summary stats and quality filter now use configurable threshold inputs
 
 ### v0.0.0.9072 (2026-04-13)
 - **REFACTOR: Quality tables use shared reactives** - deduplicated filtering logic across quality report tabs

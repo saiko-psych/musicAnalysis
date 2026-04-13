@@ -73,24 +73,28 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9072 (2026-04-13)"),
+        h4("What's New in v0.0.0.9073 (2026-04-13)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
-            tags$strong("FIXED: "),
-            "AAT terminology corrected - 'ambivalent' now used consistently for response type (code=2) across all UI labels"
-          ),
-          tags$li(
-            tags$strong("REFACTORED: "),
-            "Quality report tables use shared reactive expressions for cleaner, more efficient code"
+            tags$strong("ADDED: "),
+            "Plot grouping by custom variable in Musical Experience module"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Automated shinytest2 regression test for AAT module"
+            "Variable labels (attr) for all time-derived variables (IMP, totals, starting ages, counts)"
           ),
           tags$li(
-            tags$strong("CLEANUP: "),
-            "Heading hierarchy, spacing, and dead code removal across AAT module"
+            tags$strong("IMPROVED: "),
+            "Wide output columns now logically sorted: per-category blocks, totals, counts, IMP, names"
+          ),
+          tags$li(
+            tags$strong("FIXED: "),
+            "Consistent H2 heading hierarchy across all modules"
+          ),
+          tags$li(
+            tags$strong("FIXED: "),
+            "AAT summary stats now use configurable thresholds instead of hardcoded values"
           )
         )
       ),

@@ -17,7 +17,7 @@ This file provides essential guidance to Claude Code when working with this repo
 3. **AAT CSV** - Auditory Ambiguity Test (ambiguous % and control % metrics)
 4. **PPPT CSV** - Pitch Perception Proficiency Test (PPP indices across 6 UCF frequency bands)
 
-**Current Version**: 0.0.0.9072 (2026-04-13)
+**Current Version**: 0.0.0.9073 (2026-04-13)
 
 ## Git Workflow
 

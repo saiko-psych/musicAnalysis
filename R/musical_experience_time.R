@@ -688,6 +688,86 @@ compute_practice_history <- function(
     }
   }
 
+  # Add descriptive labels to time-derived variables
+  .set_label <- function(data, col, label) {
+    if (col %in% names(data)) attr(data[[col]], "label") <- label
+    data
+  }
+
+  for (cat in c("instrument", "singing", "othermusic")) {
+    cat_display <- .get_category_display_name(cat)
+
+    # Per-item yearly hours: instrument1, instrument2, ...
+    item_cols <- grep(paste0("^", cat, "\\d+$"), names(wide_data), value = TRUE)
+    for (col in item_cols) {
+      id <- sub(cat, "", col)
+      wide_data <- .set_label(wide_data, col, paste0(cat_display, " ", id, ": Yearly practice hours"))
+    }
+
+    # Per-item starting ages: instrument_starting_age1, ...
+    sa_cols <- grep(paste0("^", cat, "_starting_age\\d+$"), names(wide_data), value = TRUE)
+    for (col in sa_cols) {
+      id <- sub(paste0(cat, "_starting_age"), "", col)
+      wide_data <- .set_label(wide_data, col, paste0(cat_display, " ", id, ": Starting age (years)"))
+    }
+
+    # Category totals and aggregates
+    wide_data <- .set_label(wide_data, paste0(cat, "_total"),
+                            paste0("Total yearly practice hours: ", cat_display))
+    wide_data <- .set_label(wide_data, paste0(cat, "_min_starting_age"),
+                            paste0("Earliest starting age across all ", tolower(cat_display)))
+    wide_data <- .set_label(wide_data, paste0("number_of_", cat, "s"),
+                            paste0("Number of different ", tolower(cat_display), " experiences"))
+    wide_data <- .set_label(wide_data, paste0("IMP_", cat),
+                            paste0("Index of Musical Practice: ", cat_display))
+  }
+
+  # Fix: number_of_singing has no 's' suffix
+  wide_data <- .set_label(wide_data, "number_of_singing",
+                          "Number of different singing experiences")
+
+  # Global aggregates
+  wide_data <- .set_label(wide_data, "total_musical_experience",
+                          "Grand total yearly practice hours (all categories)")
+  wide_data <- .set_label(wide_data, "nodme",
+                          "Number of Different Musical Experiences (total count)")
+  wide_data <- .set_label(wide_data, "IMP_total",
+                          "Index of Musical Practice: Total (all categories)")
+
+  # Reorder columns logically: code → per-category blocks → totals → counts → IMP → which-names → rest
+  all_cols <- names(wide_data)
+  ordered <- "code"
+
+  for (cat in c("instrument", "singing", "othermusic")) {
+    # Yearly hours: instrument1, instrument2, ...
+    ordered <- c(ordered, sort(grep(paste0("^", cat, "\\d+$"), all_cols, value = TRUE)))
+    # Starting ages: instrument_starting_age1, ...
+    ordered <- c(ordered, sort(grep(paste0("^", cat, "_starting_age\\d+$"), all_cols, value = TRUE)))
+    # Category total
+    ordered <- c(ordered, intersect(paste0(cat, "_total"), all_cols))
+    # Min starting age
+    ordered <- c(ordered, intersect(paste0(cat, "_min_starting_age"), all_cols))
+  }
+
+  # Grand total
+  ordered <- c(ordered, intersect("total_musical_experience", all_cols))
+  # Counts
+  ordered <- c(ordered, intersect(c("number_of_instruments", "number_of_singing",
+                                     "number_of_othermusic", "nodme"), all_cols))
+  # IMP
+  ordered <- c(ordered, intersect(c("IMP_instrument", "IMP_singing",
+                                     "IMP_othermusic", "IMP_total"), all_cols))
+  # Which-names (free text)
+  ordered <- c(ordered, sort(grep("^whichinstrument\\d+$", all_cols, value = TRUE)))
+  ordered <- c(ordered, sort(grep("^singingtype\\d+$", all_cols, value = TRUE)))
+  ordered <- c(ordered, sort(grep("^whichothermusic\\d+$", all_cols, value = TRUE)))
+
+  # Any remaining columns not yet ordered
+  remaining <- setdiff(all_cols, ordered)
+  ordered <- c(ordered, remaining)
+
+  wide_data <- wide_data[, ordered, drop = FALSE]
+
   wide_data
 }
 

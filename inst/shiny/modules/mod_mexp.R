@@ -3,7 +3,7 @@
 mod_mexp_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
-    h3("Musical Experience (LimeSurvey CSV)"),
+    h2("Musical Experience (LimeSurvey CSV)"),
 
     # Explanation panel
     wellPanel(
@@ -557,11 +557,13 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
       }
 
       facet_by_val <- input$facet_by
-      # Handle group faceting
+      group_var_name <- NULL
       if (facet_by_val == "group") {
-        # Need to implement group faceting in plot function
-        # For now, treat as "none" and show warning
-        showNotification("Group variable faceting not yet fully implemented - using single plot", type = "warning")
+        group_var_name <- input$group_var
+        if (is.null(group_var_name) || !group_var_name %in% names(wide_data)) {
+          showNotification("Please select a valid grouping variable", type = "warning")
+          return(NULL)
+        }
         facet_by_val <- "none"
       }
 
@@ -617,22 +619,66 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
       }
 
       # Generate plot (might be single plot or list of plots)
-      result <- tryCatch({
+      .make_plot <- function(ld, wd) {
         musicAnalysis::plot_practice_curves(
-          long_data = long_data,
-          wide_data = wide_data,  # CRITICAL: Pass wide_data for instrument name display in legends
+          long_data = ld,
+          wide_data = wd,
           plot_type = plot_type_ui,
           categories = categories,
           category_ids = category_ids,
           n_participants = n_participants,
           subset_by = input$participant_selection,
-          smooth = FALSE,  # removed smooth option
+          smooth = FALSE,
           facet_by = facet_by_val,
           category_sum_combined = category_sum_combined,
-          color_by = if (is.null(line_color_val)) input$color_by else "code",  # color_by ignored if line_color set
+          color_by = if (is.null(line_color_val)) input$color_by else "code",
           line_color = line_color_val,
           show_legend = input$show_legend
         )
+      }
+
+      result <- tryCatch({
+        if (!is.null(group_var_name)) {
+          # Group faceting: split data by chosen variable, create separate plots
+          group_vals <- wide_data[[group_var_name]]
+          group_lookup <- dplyr::tibble(code = wide_data$code, .group_val = group_vals)
+          long_grouped <- dplyr::left_join(long_data, group_lookup, by = "code")
+          unique_groups <- sort(unique(stats::na.omit(long_grouped$.group_val)))
+
+          if (length(unique_groups) == 0) {
+            showNotification("Grouping variable has no valid values", type = "warning")
+            .make_plot(long_data, wide_data)
+          } else if (length(unique_groups) > 20) {
+            showNotification(paste0("Too many groups (", length(unique_groups), "). Max 20. Showing ungrouped."), type = "warning")
+            .make_plot(long_data, wide_data)
+          } else {
+            plot_list <- lapply(unique_groups, function(gval) {
+              codes_in_group <- group_lookup$code[group_lookup$.group_val == gval]
+              ld_sub <- long_data %>% dplyr::filter(.data$code %in% codes_in_group)
+              wd_sub <- wide_data %>% dplyr::filter(.data$code %in% codes_in_group)
+              if (nrow(ld_sub) == 0) return(NULL)
+              p <- .make_plot(ld_sub, wd_sub)
+              if (inherits(p, "plotly")) {
+                p <- p %>% plotly::layout(title = paste0(group_var_name, ": ", gval))
+              }
+              p
+            })
+            plot_list <- Filter(Negate(is.null), plot_list)
+            if (length(plot_list) == 1) {
+              plot_list[[1]]
+            } else {
+              attr(plot_list, "facet_info") <- list(
+                type = "group",
+                n_plots = length(plot_list),
+                group_var = group_var_name,
+                group_values = unique_groups
+              )
+              plot_list
+            }
+          }
+        } else {
+          .make_plot(long_data, wide_data)
+        }
       }, error = function(e) {
         showNotification(paste("Error creating plot:", e$message), type = "error")
         NULL
