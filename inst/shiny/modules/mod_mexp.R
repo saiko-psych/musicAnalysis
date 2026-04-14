@@ -114,6 +114,27 @@ mod_mexp_ui <- function(id) {
         DTOutput(ns("flags_tbl"))
       ),
       tabPanel(
+        "Profile",
+        br(),
+        fluidRow(
+          column(
+            width = 6,
+            p("Musical background profile: demographics, preferences, inner hearing, rankings")
+          ),
+          column(
+            width = 6,
+            selectInput(
+              ns("rows_to_display_profile"),
+              "Rows to display:",
+              choices = c("10" = 10, "25" = 25, "50" = 50, "100" = 100, "All" = -1),
+              selected = 25,
+              width = "150px"
+            )
+          )
+        ),
+        DTOutput(ns("profile_tbl"))
+      ),
+      tabPanel(
         "Practice Growth Curves",
         fluidRow(
           column(
@@ -314,16 +335,25 @@ mod_mexp_ui <- function(id) {
     ),
     br(),
     fluidRow(
-      column(width = 6,
+      column(width = 4,
         h5("CSV Export"),
         downloadButton(ns("dl_wide"), "Download WIDE CSV", icon = icon("download")),
         downloadButton(ns("dl_long"), "Download LONG CSV", icon = icon("download")),
-        downloadButton(ns("dl_flags"), "Download FLAGS CSV", icon = icon("download"))
+        downloadButton(ns("dl_flags"), "Download FLAGS CSV", icon = icon("download")),
+        downloadButton(ns("dl_profile"), "Download PROFILE CSV", icon = icon("download"))
       ),
-      column(width = 6,
-        h5("SPSS/Stata Export (preserves variable labels)"),
+      column(width = 4,
+        h5("SPSS/Stata Export (preserves labels)"),
         downloadButton(ns("dl_wide_sav"), "Download WIDE .sav (SPSS)", icon = icon("download")),
-        downloadButton(ns("dl_wide_dta"), "Download WIDE .dta (Stata)", icon = icon("download"))
+        downloadButton(ns("dl_wide_dta"), "Download WIDE .dta (Stata)", icon = icon("download")),
+        downloadButton(ns("dl_profile_sav"), "Download PROFILE .sav (SPSS)", icon = icon("download"))
+      ),
+      column(width = 4,
+        h5("Info"),
+        p(tags$small(class = "text-muted",
+          "WIDE = Time + Profile merged. PROFILE = profile-only variables. ",
+          "SPSS/Stata formats preserve variable labels."
+        ))
       )
     )
   )
@@ -340,9 +370,10 @@ mod_mexp_server <- function(id) {
       withProgress(message = "Parsing CSV...", value = 0, {
         incProgress(0.1)
         out <- try({
-          musicAnalysis::musical_experience_time(
+          musicAnalysis::musical_experience(
             file = input$csv$datapath,
-            check_instruments = isTRUE(input$instrument_checks)
+            time_args = list(check_instruments = isTRUE(input$instrument_checks)),
+            verbose = TRUE
           )
         }, silent = TRUE)
 
@@ -464,7 +495,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     # Dynamically update category IDs based on parsed data (simplified - no instrument names)
     observe({
       req(res_rv())
-      long_data <- res_rv()$long
+      long_data <- res_rv()$sections$time$long
 
       if (nrow(long_data) == 0) return(NULL)
 
@@ -523,7 +554,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     # Practice growth curves
     observeEvent(input$update_graph, {
       req(res_rv())
-      long_data <- res_rv()$long
+      long_data <- res_rv()$sections$time$long
       wide_data <- res_rv()$wide
 
       if (nrow(long_data) == 0) {
@@ -803,7 +834,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     # Practice history computation
     observeEvent(input$compute_history, {
       req(res_rv())
-      long_data <- res_rv()$long
+      long_data <- res_rv()$sections$time$long
 
       if (nrow(long_data) == 0) {
         showNotification("No data available", type = "warning")
@@ -870,7 +901,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
       rows_display <- as.integer(input$rows_to_display_long)
       if (is.na(rows_display)) rows_display <- 25  # default
 
-      DT::datatable(res_rv()$long, options = list(scrollX = TRUE, pageLength = rows_display), filter = "top")
+      DT::datatable(res_rv()$sections$time$long, options = list(scrollX = TRUE, pageLength = rows_display), filter = "top")
     })
     output$flags_tbl <- DT::renderDT({
       req(res_rv())
@@ -881,6 +912,22 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
 
       DT::datatable(res_rv()$flags, options = list(scrollX = TRUE, pageLength = rows_display), filter = "top")
     })
+    output$profile_tbl <- DT::renderDT({
+      req(res_rv())
+      req(res_rv()$sections$profile)
+
+      rows_display <- as.integer(input$rows_to_display_profile)
+      if (is.na(rows_display)) rows_display <- 25
+
+      DT::datatable(res_rv()$sections$profile,
+                    options = list(scrollX = TRUE, pageLength = rows_display),
+                    filter = "top")
+    })
+
+    # DT outputs in hidden tabs need suspendWhenHidden = FALSE to render on tab switch
+    outputOptions(output, "long_tbl", suspendWhenHidden = FALSE)
+    outputOptions(output, "flags_tbl", suspendWhenHidden = FALSE)
+    outputOptions(output, "profile_tbl", suspendWhenHidden = FALSE)
 
     output$dl_wide  <- downloadHandler(
       filename = function() paste0("musical_experience_wide_",  format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
@@ -888,11 +935,15 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     )
     output$dl_long  <- downloadHandler(
       filename = function() paste0("musical_experience_long_",  format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
-      content = function(file) { req(res_rv()); readr::write_csv(res_rv()$long,  file) }
+      content = function(file) { req(res_rv()); readr::write_csv(res_rv()$sections$time$long,  file) }
     )
     output$dl_flags <- downloadHandler(
       filename = function() paste0("musical_experience_flags_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
       content = function(file) { req(res_rv()); readr::write_csv(res_rv()$flags, file) }
+    )
+    output$dl_profile <- downloadHandler(
+      filename = function() paste0("musical_experience_profile_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
+      content = function(file) { req(res_rv()); readr::write_csv(res_rv()$sections$profile, file) }
     )
     output$dl_history <- downloadHandler(
       filename = function() paste0("practice_history_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
@@ -930,6 +981,14 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
           }
         }
         haven::write_dta(wide, file)
+      }
+    )
+
+    output$dl_profile_sav <- downloadHandler(
+      filename = function() paste0("musical_experience_profile_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".sav"),
+      content = function(file) {
+        req(res_rv())
+        haven::write_sav(res_rv()$sections$profile, file)
       }
     )
   })

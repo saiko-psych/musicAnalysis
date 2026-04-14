@@ -3,7 +3,16 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9074 (2026-04-13)
+## Current Version: v0.0.0.9075 (2026-04-14)
+
+### v0.0.0.9075 (2026-04-14)
+- **FEAT: Musical Experience Profile Shiny integration** - Profile data now fully available in the app
+- **CHANGED: Parse uses musical_experience()** instead of musical_experience_time() — merges time + profile data
+- **ADDED: Profile tab** - new tab showing 79 profile variables (demographics, preferences, rankings)
+- **ADDED: Profile downloads** - CSV and SPSS (.sav) export for profile data
+- **ADDED: Profile variables as plot grouping options** - e.g., group practice curves by music_status or handedness
+- **FIXED: DT tables in hidden tabs** - added suspendWhenHidden=FALSE for Long, Flags, Profile tabs
+- **NOTE: Bracket cleaning in profile output not needed** - musical_experience_profile() already returns clean snake_case
 
 ### v0.0.0.9074 (2026-04-13)
 - **ADDED: KLAWA visualizations** - boxplots, histograms, violin plots for performance metrics (volume_difference, pitch, onset_difference, pitch_duration_difference) with grouping by group/measurement/PC

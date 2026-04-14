@@ -63,7 +63,7 @@ mod_home_ui <- function(id) {
               tags$strong("Build Date: "),
               tags$span(
                 style = "color: #8B7355; font-family: monospace; font-weight: bold;",
-                "2026-04-13"  # v0.0.0.9074
+                "2026-04-14"  # v0.0.0.9075
               )
             )
           )
@@ -73,24 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9074 (2026-04-13)"),
+        h4("What's New in v0.0.0.9075 (2026-04-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("ADDED: "),
-            "KLAWA visualizations - boxplots, histograms, and violin plots for performance metrics with grouping"
+            "Musical Experience Profile fully integrated - new Profile tab with demographics, preferences, and rankings"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "SPSS (.sav) and Stata (.dta) export in Musical Experience - preserves variable labels"
+            "Profile variables available as plot grouping options (e.g., group practice curves by music_status)"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Configurable Don't-Know threshold in AAT quality controls (was hardcoded >3)"
+            "Profile CSV and SPSS export buttons"
           ),
           tags$li(
-            tags$strong("IMPROVED: "),
-            "Plot grouping, variable labels, column sorting, heading hierarchy (from v0.0.0.9073)"
+            tags$strong("FIXED: "),
+            "Long, Flags, and Profile tabs now render correctly on first visit"
           )
         )
       ),
