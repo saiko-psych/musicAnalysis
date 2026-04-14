@@ -57,10 +57,26 @@ git push origin master
    - Add new version entry
    - Document all significant changes
 
+4b. **Update CLAUDE.md**:
+    - Update "Current Version" field
+
 5. **Build Package**:
    ```r
    devtools::build()
    ```
+
+## Environment
+
+- **R executable**: `"C:/Program Files/R/R-4.4.1/bin/Rscript.exe"` (not in PATH)
+- **Shiny app starten**: `nohup Rscript tests/manual/test_start_app.R > /tmp/shiny_app.log 2>&1 &` (Port 7654)
+- **WICHTIG**: `devtools::install('.', quick=TRUE)` VOR Shiny-Tests — `app.R` nutzt `system.file()` (installiertes Paket)
+- **Playwright**: Kann nur Dateien innerhalb des Projektordners hochladen — Testdaten aus `tests/testdata_*` verwenden
+
+## Shiny Gotchas
+
+- **`renderUI`/`renderDT` in conditionalPanel oder hidden Tabs**: IMMER `outputOptions(output, "id", suspendWhenHidden = FALSE)` setzen, sonst bleibt Output leer
+- **AAT Terminologie**: "ambiguous" = Item-Typ (Stimulus), "ambivalent" = Antwort-Typ (code=2) — NICHT verwechseln
+- **Musical Experience**: `musical_experience()` (nicht `_time()`) liefert merged Time+Profile; Shiny nutzt `$wide`, `$sections$time$long`, `$sections$profile`, `$flags`
 
 ## Core Architecture
 
@@ -92,27 +108,9 @@ git push origin master
 3. ✅ Show R Code buttons implemented
 4. ✅ UI polish complete (brown theme, transparent ASCII art)
 
-### Completed (v0.0.0.9073)
-5. ✅ KLAWA flexible folder structure (auto-detect + custom settings)
-6. ✅ Musical Experience variable organization (logical column ordering)
-7. ✅ Variable name cleaning (brackets removed from survey passthrough columns)
-8. ✅ Variable labels (attr labels for all time-derived variables)
-9. ✅ Plot grouping by variables (Musical Experience group faceting)
-10. ✅ Consistent H2 heading hierarchy across all modules
-11. ✅ AAT terminology fix (ambiguous vs ambivalent)
-12. ✅ AAT dynamic quality thresholds
-13. ✅ shinytest2 regression test for AAT module
-
-### Completed (v0.0.0.9074)
-14. ✅ KLAWA visualizations (boxplots, histograms, violin plots with grouping)
-15. ✅ Export with labels (SPSS .sav and Stata .dta via haven)
-16. ✅ Don't-Know threshold configurable in AAT
-
-### Completed (v0.0.0.9075)
-17. ✅ Musical Experience profile Shiny integration (Profile tab, merged wide, profile grouping in plots)
-
-### Next Steps
-1. ⬜ (No major open items — see VERSION_HISTORY.md for details)
+### Status
+All planned features through v0.0.0.9075 are complete.
+See `.claude/memory/VERSION_HISTORY.md` for detailed history.
 
 ## Code Style
 

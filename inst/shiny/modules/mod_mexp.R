@@ -398,7 +398,7 @@ library(musicAnalysis)
 
 # Parse Musical Experience CSV
 # Replace "path/to/your/file.csv" with your actual file path
-mexp_data <- musical_experience_time(
+mexp_data <- musical_experience(
   file = "path/to/your/file.csv",
   check_instruments = TRUE  # Set to FALSE to disable instrument validation
 )
@@ -409,7 +409,7 @@ wide_data <- mexp_data$wide
 View(wide_data)
 
 # - Long format (one row per instrument/activity)
-long_data <- mexp_data$long
+long_data <- mexp_data$sections$time$long
 View(long_data)
 
 # - Flags (problematic entries for review)
@@ -465,7 +465,7 @@ library(musicAnalysis)
 
 # Parse Musical Experience CSV
 # Replace "path/to/your/file.csv" with your actual file path
-mexp_data <- musical_experience_time(
+mexp_data <- musical_experience(
   file = "path/to/your/file.csv",
   check_instruments = TRUE  # Set to FALSE to disable instrument validation
 )
@@ -476,7 +476,7 @@ wide_data <- mexp_data$wide
 View(wide_data)
 
 # - Long format (one row per instrument/activity)
-long_data <- mexp_data$long
+long_data <- mexp_data$sections$time$long
 View(long_data)
 
 # - Flags (problematic entries for review)
@@ -615,7 +615,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
         "library(musicAnalysis)",
         "",
         "# Assuming you have parsed your data:",
-        "# res <- musical_experience_time('your_file.csv')",
+        "# res <- musical_experience('your_file.csv')",
         "# long_data <- res$long",
         "",
         "# Generate plot",
@@ -950,36 +950,29 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
       content = function(file) { req(history_rv()); readr::write_csv(history_rv(), file) }
     )
 
-    # SPSS/Stata exports (preserve attr labels)
+    # SPSS/Stata exports (haven reads attr("label") natively)
+    .require_haven <- function() {
+      if (!requireNamespace("haven", quietly = TRUE)) {
+        showNotification("Install the 'haven' package for SPSS/Stata export: install.packages('haven')", type = "error")
+        return(FALSE)
+      }
+      TRUE
+    }
+
     output$dl_wide_sav <- downloadHandler(
       filename = function() paste0("musical_experience_wide_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".sav"),
       content = function(file) {
-        req(res_rv())
-        wide <- res_rv()$wide
-        # Convert attr("label") to haven labelled format
-        for (col in names(wide)) {
-          lbl <- attr(wide[[col]], "label")
-          if (!is.null(lbl)) {
-            attr(wide[[col]], "label") <- lbl
-          }
-        }
-        haven::write_sav(wide, file)
+        req(res_rv(), .require_haven())
+        haven::write_sav(res_rv()$wide, file)
       }
     )
 
     output$dl_wide_dta <- downloadHandler(
       filename = function() paste0("musical_experience_wide_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".dta"),
       content = function(file) {
-        req(res_rv())
+        req(res_rv(), .require_haven())
         wide <- res_rv()$wide
-        # Stata requires valid variable names (no spaces, max 32 chars)
         names(wide) <- make.names(substr(names(wide), 1, 32), unique = TRUE)
-        for (col in names(wide)) {
-          lbl <- attr(wide[[col]], "label")
-          if (!is.null(lbl)) {
-            attr(wide[[col]], "label") <- lbl
-          }
-        }
         haven::write_dta(wide, file)
       }
     )
@@ -987,7 +980,7 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     output$dl_profile_sav <- downloadHandler(
       filename = function() paste0("musical_experience_profile_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".sav"),
       content = function(file) {
-        req(res_rv())
+        req(res_rv(), .require_haven())
         haven::write_sav(res_rv()$sections$profile, file)
       }
     )

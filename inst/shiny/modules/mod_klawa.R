@@ -782,26 +782,22 @@ write.csv(klawa_data, "klawa_results.csv", row.names = FALSE)', escaped_path)
       } else {
         # Boxplot or Violin
         if (group_by != "none" && group_by %in% names(plot_data)) {
-          p <- plotly::plot_ly(plot_data,
-                               x = stats::as.formula(paste0("~", group_by)),
-                               y = stats::as.formula(paste0("~", metric)),
-                               color = stats::as.formula(paste0("~", group_by)),
-                               type = "box") %>%
+          chart_type <- if (plot_type == "violin") "violin" else "box"
+          extra_args <- if (plot_type == "violin") {
+            list(box = list(visible = TRUE), meanline = list(visible = TRUE))
+          } else {
+            list()
+          }
+          p <- do.call(plotly::plot_ly, c(list(
+            data = plot_data,
+            x = stats::as.formula(paste0("~", group_by)),
+            y = stats::as.formula(paste0("~", metric)),
+            color = stats::as.formula(paste0("~", group_by)),
+            type = chart_type
+          ), extra_args)) %>%
             plotly::layout(xaxis = list(title = group_by),
                            yaxis = list(title = y_label),
                            showlegend = FALSE)
-          if (plot_type == "violin") {
-            p <- plotly::plot_ly(plot_data,
-                                 x = stats::as.formula(paste0("~", group_by)),
-                                 y = stats::as.formula(paste0("~", metric)),
-                                 color = stats::as.formula(paste0("~", group_by)),
-                                 type = "violin",
-                                 box = list(visible = TRUE),
-                                 meanline = list(visible = TRUE)) %>%
-              plotly::layout(xaxis = list(title = group_by),
-                             yaxis = list(title = y_label),
-                             showlegend = FALSE)
-          }
         } else {
           p <- plotly::plot_ly(plot_data,
                                y = stats::as.formula(paste0("~", metric)),
