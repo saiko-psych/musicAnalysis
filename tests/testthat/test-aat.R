@@ -102,9 +102,9 @@ test_that(".itl file parsing extracts quality metrics", {
   expect_equal(result$n_evaluable, 5)    # Five codes "0" or "1"
   expect_equal(result$file_type, "itl")
 
-  # With corrected formula: F0 codes are 1 AND 2
-  # Rows 2,3,5,6 have codes 1 or 2 = 4 F0 responses out of 7 total = 57.1%
-  expect_equal(result$ambiguous_pct, 57.1)
+  # Corrected formula: only evaluable items (code 0+1) count, F0 = code 1 only
+  # Evaluable items: rows 1(0),2(1),3(1),4(0),5(1) = 5 items, 3 F0 = 60%
+  expect_equal(result$ambiguous_pct, 60)
   # Control_pct is NA because test data lacks required columns for tone-pair aggregation
   # (Reference F0, F0 Difference, Phase)
   expect_true(is.na(result$control_pct))

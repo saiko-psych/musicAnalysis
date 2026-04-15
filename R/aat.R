@@ -267,9 +267,16 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # - Ambiguous items: Nmin has DIFFERENT harmonic numbers (e.g., "5 2", "7 3", "9 4")
 
     nmin_col <- data[["Nmin [-]"]]
-    n_items <- data[["# Items"]]
-    n_f0 <- data[["# F0"]]
-    
+    n_items_raw <- as.numeric(data[["# Items"]])
+    n_f0 <- as.numeric(data[["# F0"]])
+    n_ambi <- if ("# Ambi." %in% names(data)) as.numeric(data[["# Ambi."]]) else rep(0, nrow(data))
+    n_skipped <- if ("# Skipped" %in% names(data)) as.numeric(data[["# Skipped"]]) else rep(0, nrow(data))
+
+    # Evaluable items = total items minus ambivalent and skipped
+    # This matches the AAT software's calculation (verified against matched pairs)
+    n_evaluable_items <- n_items_raw - n_ambi - n_skipped
+    n_evaluable_items[n_evaluable_items < 0] <- 0
+
     # Split Nmin into two parts and check if they're the same
     nmin_parts <- stringr::str_split(nmin_col, "\\s+")
     is_control <- purrr::map_lgl(nmin_parts, ~.x[1] == .x[2])
@@ -277,17 +284,17 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # Ambiguous: Nmin parts are DIFFERENT
     ambig_idx <- which(!is_control)
     if (length(ambig_idx) > 0) {
-      ambig_total_items <- sum(n_items[ambig_idx], na.rm = TRUE)
+      ambig_eval_items <- sum(n_evaluable_items[ambig_idx], na.rm = TRUE)
       ambig_f0_responses <- sum(n_f0[ambig_idx], na.rm = TRUE)
 
-      if (ambig_total_items > 0) {
-        ambiguous_pct <- round((ambig_f0_responses / ambig_total_items) * 100, 1)
+      if (ambig_eval_items > 0) {
+        ambiguous_pct <- round((ambig_f0_responses / ambig_eval_items) * 100, 2)
       }
 
-      # Calculate tone pairs and avg items per pair
-      a_tone_pairs <- length(ambig_idx)
+      # Tone pairs with at least 1 evaluable item
+      a_tone_pairs <- sum(n_evaluable_items[ambig_idx] > 0, na.rm = TRUE)
       a_avg_items_per_pair <- if (a_tone_pairs > 0) {
-        round(ambig_total_items / a_tone_pairs, 1)
+        round(ambig_eval_items / a_tone_pairs, 2)
       } else {
         NA_real_
       }
@@ -296,17 +303,16 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # Control: Nmin parts are SAME
     control_idx <- which(is_control)
     if (length(control_idx) > 0) {
-      control_total_items <- sum(n_items[control_idx], na.rm = TRUE)
+      control_eval_items <- sum(n_evaluable_items[control_idx], na.rm = TRUE)
       control_f0_responses <- sum(n_f0[control_idx], na.rm = TRUE)
 
-      if (control_total_items > 0) {
-        control_pct <- round((control_f0_responses / control_total_items) * 100, 1)
+      if (control_eval_items > 0) {
+        control_pct <- round((control_f0_responses / control_eval_items) * 100, 2)
       }
 
-      # Calculate tone pairs and avg items per pair
-      c_tone_pairs <- length(control_idx)
+      c_tone_pairs <- sum(n_evaluable_items[control_idx] > 0, na.rm = TRUE)
       c_avg_items_per_pair <- if (c_tone_pairs > 0) {
-        round(control_total_items / c_tone_pairs, 1)
+        round(control_eval_items / c_tone_pairs, 2)
       } else {
         NA_real_
       }
@@ -404,12 +410,18 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # Create unique tone pair identifiers (must include ALL defining columns!)
     pair_keys <- c("Reference F0 [Hz]", "F0 Difference [%]", "Nmin [-]", "Phase [Cos;Alt;Rnd]", "Type")
 
-    # CRITICAL FIX: F0 codes are 1 AND 2 (not just 1!)
-    # This matches the AAT manual and makes Control scores work correctly
-    data$is_f0 <- (classifications %in% c(1, 2))
+    # Only EVALUABLE items count: Pitch Classification in c(0, 1)
+    # Code 2 (ambivalent) and -1 (don't know) are excluded from both numerator AND denominator
+    # F0 response = code 1 only (NOT code 2)
+    # This matches the AAT software's calculation exactly (verified against 15 matched pairs)
+    data$is_evaluable <- (classifications %in% c(0, 1))
+    data$is_f0 <- (classifications == 1)
 
-    # Aggregate by tone pair
-    pairs <- data %>%
+    # Filter to evaluable items only before aggregation
+    eval_data <- data[data$is_evaluable, ]
+
+    # Aggregate by tone pair (only evaluable items)
+    pairs <- eval_data %>%
       dplyr::group_by(
         dplyr::across(dplyr::all_of(pair_keys))
       ) %>%
@@ -425,7 +437,7 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
       dplyr::summarise(
         n_tone_pairs = dplyr::n(),
         avg_items_per_pair = mean(n_items, na.rm = TRUE),
-        # FORMULA: AAT Score = 100 * sum(# F0) / sum(# Items)
+        # FORMULA: AAT Score = 100 * sum(# F0) / sum(# evaluable Items)
         aat_score = 100 * sum(n_f0, na.rm = TRUE) / sum(n_items, na.rm = TRUE),
         .groups = "drop"
       )
@@ -433,7 +445,7 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # Extract results for Ambiguous
     ambig_row <- type_summary[type_summary$Type == "Ambiguous", ]
     if (nrow(ambig_row) > 0) {
-      ambiguous_pct <- round(ambig_row$aat_score, 1)
+      ambiguous_pct <- round(ambig_row$aat_score, 2)
       a_tone_pairs <- as.integer(ambig_row$n_tone_pairs)
       a_avg_items_per_pair <- round(ambig_row$avg_items_per_pair, 2)
     }
@@ -441,16 +453,16 @@ aat_parse_one <- function(file_path, rel_path, code_pattern, date_format, ambigu
     # Extract results for Control
     control_row <- type_summary[type_summary$Type == "Control", ]
     if (nrow(control_row) > 0) {
-      control_pct <- round(control_row$aat_score, 1)
+      control_pct <- round(control_row$aat_score, 2)
       c_tone_pairs <- as.integer(control_row$n_tone_pairs)
       c_avg_items_per_pair <- round(control_row$avg_items_per_pair, 2)
     }
 
   } else {
     # Fallback: if required columns don't exist, calculate overall percentage
-    if (n_total > 0) {
-      n_f0_total <- sum(classifications %in% c(1, 2), na.rm = TRUE)
-      overall_f0_pct <- round((n_f0_total / n_total) * 100, 1)
+    if (n_evaluable > 0) {
+      n_f0_total <- sum(classifications == 1, na.rm = TRUE)
+      overall_f0_pct <- round((n_f0_total / n_evaluable) * 100, 2)
       ambiguous_pct <- overall_f0_pct
     }
   }
