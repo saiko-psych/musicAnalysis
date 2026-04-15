@@ -73,24 +73,24 @@ mod_home_ui <- function(id) {
       # What's New Section
       wellPanel(
         style = "background-color: #e8f5e9; border-left: 4px solid #4caf50; margin-bottom: 30px;",
-        h4("What's New in v0.0.0.9075 (2026-04-14)"),
+        h4("What's New in v0.0.0.9076 (2026-04-14)"),
         tags$ul(
           style = "line-height: 1.8;",
           tags$li(
             tags$strong("ADDED: "),
-            "Musical Experience Profile fully integrated - new Profile tab with demographics, preferences, and rankings"
+            "Descriptive Statistics tab - Mean, SD, Median, Min, Max, N with optional grouping by profile variables"
           ),
           tags$li(
             tags$strong("ADDED: "),
-            "Profile variables available as plot grouping options (e.g., group practice curves by music_status)"
+            "Musical Experience Profile tab with demographics, preferences, rankings (v0.0.0.9075)"
           ),
           tags$li(
-            tags$strong("ADDED: "),
-            "Profile CSV and SPSS export buttons"
+            tags$strong("IMPROVED: "),
+            "Context-aware Top/Bottom N participant ranking (uses current plot type and categories)"
           ),
           tags$li(
             tags$strong("FIXED: "),
-            "Long, Flags, and Profile tabs now render correctly on first visit"
+            "8 GitHub Issues closed (#1-5, #6, #8, #11)"
           )
         )
       ),

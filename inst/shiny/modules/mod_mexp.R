@@ -135,6 +135,53 @@ mod_mexp_ui <- function(id) {
         DTOutput(ns("profile_tbl"))
       ),
       tabPanel(
+        "Descriptive Statistics",
+        br(),
+        fluidRow(
+          column(
+            width = 4,
+            selectInput(
+              ns("desc_group_var"),
+              "Stratify by (optional):",
+              choices = c("None" = "none"),
+              selected = "none"
+            )
+          ),
+          column(
+            width = 4,
+            checkboxGroupInput(
+              ns("desc_variables"),
+              "Variables to summarize:",
+              choices = c(
+                "Instrument Total" = "instrument_total",
+                "Singing Total" = "singing_total",
+                "Other Music Total" = "othermusic_total",
+                "Total Musical Experience" = "total_musical_experience",
+                "IMP Instrument" = "IMP_instrument",
+                "IMP Singing" = "IMP_singing",
+                "IMP Other Music" = "IMP_othermusic",
+                "IMP Total" = "IMP_total",
+                "Nr. of Instruments" = "number_of_instruments",
+                "Nr. of Singing" = "number_of_singing",
+                "Nr. of Other Music" = "number_of_othermusic",
+                "NODME" = "nodme"
+              ),
+              selected = c("instrument_total", "singing_total", "othermusic_total",
+                           "total_musical_experience", "IMP_total", "nodme")
+            )
+          ),
+          column(
+            width = 4,
+            p(tags$strong("Summary Statistics"), br(),
+              "Mean, SD, Median, Min, Max, N for selected variables.",
+              br(), "Optionally stratified by a grouping variable."),
+            br(),
+            downloadButton(ns("dl_desc_stats"), "Download Statistics CSV", icon = icon("download"))
+          )
+        ),
+        DTOutput(ns("desc_stats_tbl"))
+      ),
+      tabPanel(
         "Practice Growth Curves",
         fluidRow(
           column(
@@ -206,6 +253,10 @@ mod_mexp_ui <- function(id) {
               conditionalPanel(
                 condition = "input.participant_selection != 'all'",
                 ns = ns,
+                tags$small(class = "text-muted",
+                  "Ranking is context-aware: uses only the currently selected plot type and categories"
+                ),
+                br(),
                 numericInput(
                   ns("n_participants"),
                   "Number of participants:",
@@ -928,6 +979,88 @@ write.csv(flags_data, "musical_experience_flags.csv", row.names = FALSE)'
     outputOptions(output, "long_tbl", suspendWhenHidden = FALSE)
     outputOptions(output, "flags_tbl", suspendWhenHidden = FALSE)
     outputOptions(output, "profile_tbl", suspendWhenHidden = FALSE)
+
+    # --- Descriptive Statistics (Issue #6) ---
+    # Update grouping variable choices when data is loaded
+    observeEvent(res_rv(), {
+      req(res_rv())
+      wide <- res_rv()$wide
+      # Offer meaningful grouping variables (curated list + label columns)
+      group_choices <- c("None" = "none")
+      # Priority: count variables and key profile variables
+      priority_vars <- c("number_of_instruments", "number_of_singing", "number_of_othermusic", "nodme",
+                          "music_status_label", "handedness_label", "vocal_range_label",
+                          "absolute_hearing_label", "vocal_knowledge_label",
+                          "practice_motivation_early_label", "main_instrument")
+      for (col in priority_vars) {
+        if (col %in% names(wide)) {
+          n_unique <- length(unique(stats::na.omit(wide[[col]])))
+          if (n_unique >= 2 && n_unique <= 20) {
+            group_choices <- c(group_choices, setNames(col, col))
+          }
+        }
+      }
+      updateSelectInput(session, "desc_group_var", choices = group_choices, selected = "none")
+    })
+
+    desc_stats_data <- reactive({
+      req(res_rv())
+      wide <- res_rv()$wide
+      vars <- input$desc_variables
+      req(length(vars) > 0)
+
+      # Filter to variables that exist in the data
+      vars <- intersect(vars, names(wide))
+      if (length(vars) == 0) return(NULL)
+
+      group_var <- input$desc_group_var
+
+      .summarise_vars <- function(df, label = "All") {
+        stats_list <- lapply(vars, function(v) {
+          x <- df[[v]]
+          x <- x[!is.na(x)]
+          tibble::tibble(
+            Variable = v,
+            N = length(x),
+            Mean = if (length(x) > 0) round(mean(x), 2) else NA_real_,
+            SD = if (length(x) > 1) round(sd(x), 2) else NA_real_,
+            Median = if (length(x) > 0) round(median(x), 2) else NA_real_,
+            Min = if (length(x) > 0) round(min(x), 2) else NA_real_,
+            Max = if (length(x) > 0) round(max(x), 2) else NA_real_
+          )
+        })
+        result <- dplyr::bind_rows(stats_list)
+        if (label != "All") result$Group <- label
+        result
+      }
+
+      if (group_var == "none" || !group_var %in% names(wide)) {
+        .summarise_vars(wide)
+      } else {
+        groups <- sort(unique(stats::na.omit(wide[[group_var]])))
+        results <- lapply(groups, function(g) {
+          sub_df <- wide[wide[[group_var]] == g & !is.na(wide[[group_var]]), ]
+          .summarise_vars(sub_df, label = as.character(g))
+        })
+        result <- dplyr::bind_rows(results)
+        # Move Group column to front
+        result <- result[, c("Group", setdiff(names(result), "Group")), drop = FALSE]
+        result
+      }
+    })
+
+    output$desc_stats_tbl <- DT::renderDT({
+      req(desc_stats_data())
+      DT::datatable(desc_stats_data(),
+                    options = list(scrollX = TRUE, pageLength = 25, dom = "t"),
+                    rownames = FALSE)
+    })
+    outputOptions(output, "desc_stats_tbl", suspendWhenHidden = FALSE)
+
+    output$dl_desc_stats <- downloadHandler(
+      filename = function() paste0("descriptive_statistics_", format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),
+      content = function(file) { req(desc_stats_data()); readr::write_csv(desc_stats_data(), file) }
+    )
 
     output$dl_wide  <- downloadHandler(
       filename = function() paste0("musical_experience_wide_",  format(Sys.time(), "%Y%m%d-%H%M%S"), ".csv"),

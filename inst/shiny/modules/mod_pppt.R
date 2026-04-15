@@ -446,7 +446,7 @@ mod_pppt_server <- function(id) {
       req(rv$root_path)
 
       tryCatch({
-        rv$structure_info <- pppt_analyze_structure(rv$root_path)
+        rv$structure_info <- musicAnalysis::pppt_analyze_structure(rv$root_path)
       }, error = function(e) {
         showNotification(
           paste("Error analyzing folder:", e$message),
@@ -507,7 +507,7 @@ mod_pppt_server <- function(id) {
         }
 
         # Perform scan
-        result <- pppt_scan(
+        result <- musicAnalysis::pppt_scan(
           root = rv$root_path,
           code_pattern = input$code_pattern,
           date_format = input$date_format,

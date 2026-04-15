@@ -447,7 +447,7 @@ mod_aat_server <- function(id) {
 
       withProgress(message = "Analyzing folder structure...", value = 0.5, {
         tryCatch({
-          rv$structure_info <- aat_analyze_structure(rv$root_path)
+          rv$structure_info <- musicAnalysis::aat_analyze_structure(rv$root_path)
         }, error = function(e) {
           showNotification(
             paste("Error analyzing structure:", e$message),
@@ -527,7 +527,7 @@ mod_aat_server <- function(id) {
           }
 
           # Scan files
-          rv$aat_data <- aat_scan(
+          rv$aat_data <- musicAnalysis::aat_scan(
             root = rv$root_path,
             code_pattern = code_pattern,
             date_format = date_format,

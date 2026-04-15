@@ -3,7 +3,12 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9075 (2026-04-14)
+## Current Version: v0.0.0.9076 (2026-04-14)
+
+### v0.0.0.9076 (2026-04-14)
+- **ADDED: Descriptive Statistics tab** in Musical Experience — Mean, SD, Median, Min, Max, N for key practice variables with optional grouping by profile variables
+- **VERIFIED: Context-aware Top/Bottom N selection** — ranking already uses filtered data matching current plot type and categories (added UI hint)
+- **CLOSED: GitHub Issues #1, #2, #3, #4, #5, #6, #8, #11** — all previously implemented features now tracked
 
 ### v0.0.0.9075 (2026-04-14)
 - **FEAT: Musical Experience Profile Shiny integration** - Profile data now fully available in the app
