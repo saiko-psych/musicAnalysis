@@ -24,7 +24,7 @@
 #' are flagged as unrealistic.
 #'
 #' @param file Path to the LimeSurvey CSV export file.
-#' @param min_lastpage Keep rows where `lastpage == min_lastpage` (default: 4).
+#' @param min_lastpage Keep rows where `lastpage >= min_lastpage` (default: 4).
 #' @param id_col Optional name of the column that should be used as `code`.
 #'   If `NULL` and a `code` column exists, it is used as-is; otherwise a synthetic
 #'   `code` is created.
@@ -85,7 +85,7 @@ musical_experience_time <- function(
 
   # 2) filter lastpage
   filtered_data <- if ("lastpage" %in% names(raw_data)) {
-    out <- dplyr::filter(raw_data, suppressWarnings(as.numeric(.data$lastpage)) == min_lastpage)
+    out <- dplyr::filter(raw_data, suppressWarnings(as.numeric(.data$lastpage)) >= min_lastpage)
     if (verbose) cat("After lastpage filter:", nrow(out), "rows remaining\n")
     out
   } else {
@@ -180,14 +180,16 @@ musical_experience_time <- function(
     if (length(played_cols)) {
       played_df <- dplyr::select(clean_data, .data$code, dplyr::all_of(played_cols))
 
-      # Normalize Y/N to 1/2 before joining (handles both old and new survey formats)
+      # Normalize played values to 1 (yes) / 2 (no)
+      # Handles: Y/N, Ja/Nein, 1/2, N/A, Yes/No
       played_df <- dplyr::mutate(
         played_df,
         dplyr::across(
           dplyr::all_of(played_cols),
           ~ dplyr::case_when(
-            toupper(trimws(as.character(.x))) == "Y" ~ "1",
-            toupper(trimws(as.character(.x))) == "N" ~ "2",
+            toupper(trimws(as.character(.x))) %in% c("Y", "JA", "YES", "1") ~ "1",
+            toupper(trimws(as.character(.x))) %in% c("N", "NEIN", "NO", "2") ~ "2",
+            toupper(trimws(as.character(.x))) %in% c("N/A", "NA", "") ~ NA_character_,
             TRUE ~ as.character(.x)
           )
         )

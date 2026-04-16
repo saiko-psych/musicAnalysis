@@ -37,7 +37,7 @@
 #'   - `worst_music1..3` + `worst_music_concat` (keeps input order)
 #'
 #' @param file Path to the LimeSurvey CSV export.
-#' @param min_lastpage Keep rows where `lastpage == min_lastpage` when column exists (default: 4).
+#' @param min_lastpage Keep rows where `lastpage >= min_lastpage` when column exists (default: 4).
 #' @param id_col Optional column name to be used as `code`. If `NULL`, uses existing `code`,
 #'   otherwise creates a synthetic code.
 #' @param anchor_regex Only used to warn if the expected block (e.g. `firstyears[1]`) is missing.
@@ -158,7 +158,7 @@ musical_experience_profile <- function(
     col_types = readr::cols(.default = readr::col_character())
   )
   if ("lastpage" %in% names(raw)) {
-    raw <- dplyr::filter(raw, .data$lastpage == as.character(min_lastpage))
+    raw <- dplyr::filter(raw, suppressWarnings(as.numeric(.data$lastpage)) >= min_lastpage)
   }
   if (!is.null(id_col) && id_col %in% names(raw)) {
     raw <- dplyr::rename(raw, code = dplyr::all_of(id_col))
