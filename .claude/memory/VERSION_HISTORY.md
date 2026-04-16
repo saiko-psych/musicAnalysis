@@ -3,7 +3,14 @@
 This file contains the complete version history for the musicAnalysis package.
 Main development documentation is in CLAUDE.md.
 
-## Current Version: v0.0.0.9076 (2026-04-14)
+## Current Version: v0.0.0.9077 (2026-04-16)
+
+### v0.0.0.9077 (2026-04-16)
+- **FIX: AAT calculation matches software exactly** — evaluable items only (code 0+1) as denominator, code 1 as F0; verified against 25 matched raw/results pairs with 0 mismatches
+- **FIX: Support modified LimeSurvey surveys** — lastpage filter uses >= instead of ==; played columns accept Ja/Nein/N/A in addition to Y/N
+- **DOCS: Rewritten README** — concise, badges, no emojis; added GitHub issue templates (bug, feature, data format)
+- **ADDED: Descriptive Statistics tab** in Musical Experience (v0.0.0.9076)
+- **FIXED: AAT/PPPT namespace** — added musicAnalysis:: prefix to scan/analyze calls in Shiny modules
 
 ### v0.0.0.9076 (2026-04-14)
 - **ADDED: Descriptive Statistics tab** in Musical Experience — Mean, SD, Median, Min, Max, N for key practice variables with optional grouping by profile variables

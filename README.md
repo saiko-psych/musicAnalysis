@@ -4,7 +4,7 @@
 
 [![R >= 4.4.0](https://img.shields.io/badge/R-%3E%3D4.4.0-blue.svg)](https://www.r-project.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.0.0.9076-green.svg)](https://github.com/saiko-psych/musicAnalysis)
+[![Version](https://img.shields.io/badge/version-0.0.0.9077-green.svg)](https://github.com/saiko-psych/musicAnalysis)
 [![Tests](https://img.shields.io/badge/tests-189%20passing-brightgreen.svg)]()
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
 
@@ -28,7 +28,7 @@ An R package for extracting and preparing music psychology research data. Includ
 devtools::install_github("saiko-psych/musicAnalysis")
 
 # From local tarball
-install.packages("musicAnalysis_0.0.0.9076.tar.gz", repos = NULL, type = "source")
+install.packages("musicAnalysis_0.0.0.9077.tar.gz", repos = NULL, type = "source")
 ```
 
 ## Quick Start
@@ -83,4 +83,4 @@ University of Graz, Music Psychology Research
 
 ---
 
-Version 0.0.0.9076 | Last updated 2026-04-14
+Version 0.0.0.9077 | Last updated 2026-04-16
